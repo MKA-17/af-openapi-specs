@@ -1,5 +1,5 @@
 {
-  "name": "af-openapi-specs",
+  "name": "@apifreaks/openapi-specs",
   "version": "0.1.0",
   "description": "Public OpenAPI 3.1 specifications for all APIFreaks API products.",
   "type": "module",
