@@ -1,7 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, basename, relative } from 'node:path';
+import { load } from 'js-yaml';
 import {
   SPEC_SLUGS,
   SPECS,
@@ -30,7 +31,6 @@ const allSpecFiles = findAllSpecs(specsDir);
 
 describe('OpenAPI spec validation', () => {
   for (const relPath of allSpecFiles) {
-    const slug = basename(relPath, '.json');
     const filePath = join(specsDir, relPath);
 
     it(`${relPath} is valid and well-formed`, () => {
@@ -101,4 +101,19 @@ describe('Category structure', () => {
   it('getSpecsByCategory returns empty array for unknown category', () => {
     assert.deepEqual(getSpecsByCategory('nonexistent'), []);
   });
+});
+
+const distSpecsDir = join(import.meta.dirname, '..', 'dist', 'specs');
+
+describe('YAML spec generation', { skip: !existsSync(distSpecsDir) }, () => {
+  for (const relPath of allSpecFiles) {
+    const slug = basename(relPath, '.json');
+
+    it(`${slug} YAML matches its JSON source`, () => {
+      const jsonSpec = JSON.parse(readFileSync(join(specsDir, relPath), 'utf-8'));
+      const yamlPath = join(distSpecsDir, relPath.replace(/\.json$/, '.yaml'));
+      const yamlSpec = load(readFileSync(yamlPath, 'utf-8'));
+      assert.deepEqual(yamlSpec, jsonSpec, `${relPath} YAML must match its JSON source`);
+    });
+  }
 });

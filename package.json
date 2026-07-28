@@ -13,6 +13,7 @@
       "require": "./dist/index.cjs"
     },
     "./specs/*.json": "./specs/*.json",
+    "./specs/*.yaml": "./dist/specs/*.yaml",
     "./package.json": "./package.json"
   },
   "files": [
@@ -21,7 +22,8 @@
   ],
   "scripts": {
     "generate": "tsx scripts/generate-manifest.ts",
-    "build": "npm run generate && tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json",
+    "generate:yaml": "tsx scripts/generate-yaml.ts",
+    "build": "npm run generate && tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json && npm run generate:yaml",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/validate.test.ts",
     "bump:patch": "npm test && npm version patch --git-tag-version && git push --follow-tags",
@@ -73,7 +75,9 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^26.1.1",
+    "js-yaml": "^5.2.2",
     "tsup": "^8.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
