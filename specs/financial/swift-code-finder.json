@@ -1,0 +1,192 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "SWIFT/BIC Code Finder API Reference",
+    "version": "1.0.0",
+    "description": "Progressively drill down from all supported countries to a specific bank's SWIFT/BIC codes. With no parameters, returns the list of all supported countries. Adding country returns the list of bank names in that country. Adding bank returns the list of cities that bank operates in. Adding city as well returns the matching SWIFT/BIC codes. Parameters must be supplied in order (country, then bank, then city) — supplying bank without country, for example, returns a 400. An unmatched country/bank/city combination returns a 200 with an empty array, not an error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "SWIFT/BIC Code Finder API Server"
+    }
+  ],
+  "paths": {
+    "/swift-code/finder": {
+      "get": {
+        "tags": ["Financial APIs"],
+        "summary": "Find SWIFT codes",
+        "description": "Drills down from countries to banks to cities to SWIFT/BIC codes, one parameter level at a time.",
+        "operationId": "findSwiftCode",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specify the desired response format. Options: 'json' (default) or 'xml'."
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Country name (accepts full name, e.g., Pakistan, United States). If supplied alone, returns the list of bank names in that country. If omitted entirely, returns the list of all supported countries."
+          },
+          {
+            "name": "bank",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Bank name (upper case) to drill into. Requires country to also be set. If supplied without city, returns the list of cities that bank operates in."
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "City (upper case) to narrow results to. Requires country and bank to also be set. Returns the matching SWIFT/BIC codes for that bank in that city."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response. The array's contents depend on which parameters were supplied — see the examples for each drill-down level.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwiftCodeFinderResponse"
+                },
+                "examples": {
+                  "allCountries": {
+                    "summary": "No parameters — all supported countries",
+                    "value": ["Albania", "Algeria", "Andorra", "Germany", "United States"]
+                  },
+                  "banksInCountry": {
+                    "summary": "country only — bank names in that country",
+                    "value": ["1NCE GMBH", "AAREAL BANK AG", "DEUTSCHE BANK AG"]
+                  },
+                  "citiesForBank": {
+                    "summary": "country + bank — cities that bank operates in",
+                    "value": ["AACHEN", "BERLIN", "FRANKFURT AM MAIN", "MUENCHEN"]
+                  },
+                  "swiftCodes": {
+                    "summary": "country + bank + city — matching SWIFT/BIC codes",
+                    "value": [
+                      "DEUTDEBB101",
+                      "DEUTDEBB162",
+                      "DEUTDEBB165",
+                      "DEUTDEBBXXX",
+                      "DEUTDEDB101"
+                    ]
+                  },
+                  "noMatch": {
+                    "summary": "Unmatched country/bank/city — empty array, not an error",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Parameters supplied out of order",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "OutOfOrder": {
+                    "summary": "bank supplied without country",
+                    "value": {
+                      "message": "Invalid query parameters. Provide parameters in sequence: country → bank → city"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SwiftCodeFinderResponse": {
+        "type": "array",
+        "description": "Array of strings whose meaning depends on the supplied parameters: country names, bank names, city names, or SWIFT/BIC codes.",
+        "items": {
+          "$ref": "#/components/schemas/SwiftCodeString"
+        }
+      },
+      "SwiftCodeString": {
+        "type": "string",
+        "description": "A single result value — a country name, bank name, city name, or SWIFT/BIC code depending on the drill-down level."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "SWIFT/BIC Code API - Look Up Bank Details or Find Codes by Country, Bank & City",
+    "version": "1.0.0",
+    "description": "Look up a SWIFT/BIC code to retrieve bank details. Returns the bank name, address, city, country, country code, and bank code for any valid 8 or 11 character SWIFT/BIC code. Supports both headquarters and branch-level SWIFT codes.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "SWIFT/BIC Code Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/swift-code/lookup": {
+      "get": {
+        "tags": ["Financial APIs"],
+        "summary": "Lookup SWIFT code details",
+        "description": "Fetches detailed information about a SWIFT code.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specify the desired response format. Options: 'json' (default) or 'xml'."
+          },
+          {
+            "name": "swiftCode",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "SWIFT/BIC code to lookup (must be 8 or 11 characters)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwiftCodeLookup"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response — normalized to 11-character form",
+                    "value": {
+                      "swiftCode": "NWBKGB2LXXX",
+                      "countryCode": "GB",
+                      "bankAddress": "250 BISHOPSGATE",
+                      "bankCode": "NWBK",
+                      "bankName": "NATIONAL WESTMINSTER BANK PLC",
+                      "city": "LONDON",
+                      "country": "United Kingdom"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingSwiftCode": {
+                    "summary": "Missing required swiftCode parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/swift-code/lookup",
+                      "status": 400,
+                      "timestamp": "2026-07-27T11:50:49.650Z"
+                    }
+                  },
+                  "BadLength": {
+                    "summary": "swiftCode is not 8 or 11 characters",
+                    "value": {
+                      "message": "Bad request: SWIFT code input must be either 8 characters or 11 characters"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NotFound": {
+                    "summary": "SWIFT code not found",
+                    "value": {
+                      "message": "No bank found with the provided SWIFT code"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "lookupSwiftCode"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SwiftCodeLookup": {
+        "type": "object",
+        "properties": {
+          "swiftCode": {
+            "type": "string",
+            "description": "SWIFT/BIC code, normalized to its 11-character form (an 8-character input is returned padded with XXX)."
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code where the bank is registered."
+          },
+          "bankAddress": {
+            "type": "string",
+            "description": "Physical address of the bank branch."
+          },
+          "bankCode": {
+            "type": "string",
+            "description": "Bank code portion of the SWIFT code (first 4 characters)."
+          },
+          "bankName": {
+            "type": "string",
+            "description": "Full name of the bank or financial institution."
+          },
+          "city": {
+            "type": "string",
+            "description": "City where the bank branch is located."
+          },
+          "country": {
+            "type": "string",
+            "description": "Full country name where the bank is registered."
+          }
+        },
+        "required": [
+          "swiftCode",
+          "countryCode",
+          "bankAddress",
+          "bankCode",
+          "bankName",
+          "city",
+          "country"
+        ],
+        "description": "Bank details returned for a SWIFT/BIC code lookup."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        },
+        "description": "Standard error envelope returned by the API on failed requests."
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

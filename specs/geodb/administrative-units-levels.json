@@ -1,0 +1,198 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Admin Levels API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the administrative level hierarchy for any country using ISO 3166-1 alpha-2 country codes. Returns the distinct administrative level types defined for that country (e.g., state, district, province, outlying area) as a flat array of strings. Use the returned level names with the Administrative Units endpoint to filter results by one or more specific levels. A valid two-letter country code is required; invalid codes return a 400 error and countries without published admin levels return a 404.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Admin Levels API Server"
+    }
+  ],
+  "paths": {
+    "/geo/admin-levels": {
+      "get": {
+        "tags": ["GeoDB APIs"],
+        "summary": "Retrieve administrative level types for a country",
+        "description": "Returns the distinct administrative level types (e.g., province, district, state) defined for a given country using ISO 3166-1 alpha-2 country code.",
+        "operationId": "getAdminLevels",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "description": "Country code in ISO 3166-1 alpha-2 format (e.g., US, PK).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of administrative levels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminLevelsResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "admin_levels": [
+                        "outlying area",
+                        "district",
+                        "state",
+                        "military postal region"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing country parameter, or country is not a valid/known ISO 3166-1 alpha-2 code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingCountry": {
+                    "summary": "Missing required country parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/geo/admin-levels",
+                      "status": 400,
+                      "timestamp": "2026-07-24T10:42:02.477Z"
+                    }
+                  },
+                  "InvalidCountryCode": {
+                    "summary": "Malformed or unrecognized country code (also returned for well-formed but non-existent codes)",
+                    "value": {
+                      "timestamp": "2026-07-24T10:42:02.997Z",
+                      "path": "/v1/admin-levels",
+                      "status": 400,
+                      "error": "Invalid Country Code provided",
+                      "message": "Only ISO 3166-1 alpha-2 codes country codes are supported."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Country is a recognized ISO 3166-1 alpha-2 code but has no published admin levels (e.g. Vatican City)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NoAdminUnits": {
+                    "summary": "No admin units for this country",
+                    "value": {
+                      "timestamp": "2026-07-24T10:42:15.470Z",
+                      "path": "/v1/admin-levels",
+                      "status": 404,
+                      "error": "No Admin Unit present in country",
+                      "message": "This Country does not have any admin units associated with it."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "AdminLevelsResponse": {
+        "type": "object",
+        "description": "Response containing the distinct administrative level types defined for the requested country.",
+        "required": ["admin_levels"],
+        "properties": {
+          "admin_levels": {
+            "type": "array",
+            "description": "An array of unique administrative level types defined for the specified country. Each value represents a category of administrative division, such as state, district, or outlying area.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

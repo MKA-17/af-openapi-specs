@@ -1,0 +1,1056 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Time Series Weather API Reference",
+    "version": "1.0.0",
+    "description": "Pull historical weather data across a date range for a single location. Requires startDate and endDate with a range up to 90 days for daily precision or 7 days for hourly precision. Accepts location by city name, GPS coordinates, or IP address. Returns daily or hourly data keyed by date in an object, with each date containing temperature max/min/mean, precipitation, wind speed and gusts, cloud cover, relative humidity, pressure, dew point, shortwave radiation, and evapotranspiration data plus astronomy information (sunrise/sunset, moon phase). All dates must be in the past (1940 onwards).",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0/weather",
+      "description": "Time Series Weather API Server"
+    }
+  ],
+  "paths": {
+    "/time-series": {
+      "get": {
+        "tags": ["Weather APIs"],
+        "summary": "Get historical weather data across a date range",
+        "description": "Pull historical weather information for date ranges up to 90 days (daily data) or 7 days (hourly data). Get consistent formatting across your specified date range with reliable historical weather patterns.",
+        "operationId": "getTimeSeriesData",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json.",
+            "schema": {
+              "type": "string",
+              "enum": ["json"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Starting date for the data in YYYY-MM-DD format. Historical dates must be past dates only. Current or future dates are not allowed for historical data. Data available from 1940 onwards. For precision=daily, the difference between endDate and startDate must not exceed 90 days. For precision=hourly, the difference must not exceed 7 days."
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date for the data in YYYY-MM-DD format. Historical dates must be past dates only. Current or future dates are not allowed for historical data. Data available from 1940 onwards. For precision=daily, the difference between endDate and startDate must not exceed 90 days. For precision=hourly, the difference must not exceed 7 days."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "City name, place name, or full address.",
+            "required": false
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Latitude of the location, used together with long. A value of exactly 0 is treated as missing by the live API and returns a 400, so use a small non-zero value (e.g. 0.0001) for equator queries.",
+            "required": false
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Longitude of the location, used together with lat. A value of exactly 0 is treated as missing by the live API and returns a 400, so use a small non-zero value (e.g. 0.0001) for prime-meridian queries.",
+            "required": false
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IP(v4 or v6) address for location inference.",
+            "required": false
+          },
+          {
+            "name": "precision",
+            "in": "query",
+            "schema": {
+              "enum": ["daily", "hourly"],
+              "type": "string",
+              "default": "daily"
+            },
+            "description": "Precision of the data. daily returns a daily aggregate per date; hourly returns 24 hourly readings per date instead and requires the date range to be 7 days or less.",
+            "required": false
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Timezone for the results.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeSeriesResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response (daily precision, address lookup)",
+                    "value": {
+                      "location": {
+                        "location_string": "Lahore",
+                        "country_name": "Pakistan",
+                        "state_prov": "Punjab",
+                        "city": "Lahore",
+                        "locality": "",
+                        "latitude": "31.56568",
+                        "longitude": "74.31418",
+                        "elevation": "",
+                        "timezone": "Asia/Karachi",
+                        "timezone_abbreviation": "GMT+5"
+                      },
+                      "historical": {
+                        "2025-08-01": {
+                          "daily": {
+                            "timestamp": "2025-08-01",
+                            "weather_code": 63,
+                            "temperature_2m_mean": 27.7,
+                            "temperature_2m_max": 30.3,
+                            "temperature_2m_min": 26,
+                            "apparent_temperature_mean": 34,
+                            "apparent_temperature_max": 36.8,
+                            "apparent_temperature_min": 31.8,
+                            "precipitation_sum": 11.9,
+                            "rain_sum": 11.9,
+                            "snowfall_sum": 0,
+                            "wind_speed_10m_max": 10.9,
+                            "wind_gusts_10m_max": 27.7,
+                            "wind_speed_10m_mean": 7.4,
+                            "wind_speed_10m_min": 3.1,
+                            "wind_gusts_10m_min": 6.8,
+                            "wind_gusts_10m_mean": 17.8,
+                            "wind_direction_10m_dominant": 82,
+                            "shortwave_radiation_sum": 8.98,
+                            "et0_fao_evapotranspiration_sum": 2.01,
+                            "cloud_cover_mean": 99,
+                            "dew_point_2m_mean": 25.9,
+                            "dew_point_2m_max": 26.5,
+                            "dew_point_2m_min": 24.9,
+                            "relative_humidity_2m_mean": 90,
+                            "relative_humidity_2m_max": 97,
+                            "relative_humidity_2m_min": 79,
+                            "pressure_msl_mean": 999.2,
+                            "surface_pressure_mean": 975.3
+                          },
+                          "astronomy": {
+                            "date": "2025-08-01",
+                            "mid_night": "00:09",
+                            "night_end": "03:47",
+                            "sunrise": "05:17",
+                            "sunset": "19:00",
+                            "night_begin": "20:30",
+                            "sun_status": "-",
+                            "solar_noon": "12:09",
+                            "day_length": "13:43",
+                            "moon_phase": "FIRST_QUARTER",
+                            "moonrise": "12:18",
+                            "moonset": "23:04",
+                            "moon_status": "-"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "hourlyPrecision": {
+                    "summary": "Hourly precision response (no daily key)",
+                    "value": {
+                      "location": {
+                        "location_string": "Lahore",
+                        "country_name": "Pakistan",
+                        "state_prov": "Punjab",
+                        "city": "Lahore",
+                        "locality": "",
+                        "latitude": "31.56568",
+                        "longitude": "74.31418",
+                        "elevation": "",
+                        "timezone": "Asia/Karachi",
+                        "timezone_abbreviation": "GMT+5"
+                      },
+                      "historical": {
+                        "2025-08-01": {
+                          "hourly": [
+                            {
+                              "timestamp": "2025-08-01T00:00",
+                              "temperature_2m": 27,
+                              "relative_humidity_2m": 92,
+                              "dew_point_2m": 25.5,
+                              "apparent_temperature": 32.9,
+                              "precipitation": 0,
+                              "rain": 0,
+                              "snowfall": 0,
+                              "weather_code": 3,
+                              "pressure_msl": 999.5,
+                              "surface_pressure": 975.5,
+                              "cloud_cover": 100,
+                              "et0_fao_evapotranspiration": 0,
+                              "wind_speed_10m": 8.2,
+                              "wind_direction_10m": 100,
+                              "wind_gusts_10m": 16.2,
+                              "albedo": null,
+                              "shortwave_radiation": 0,
+                              "direct_radiation": 0,
+                              "diffuse_radiation": 0,
+                              "direct_normal_irradiance": 0,
+                              "global_tilted_irradiance": 0
+                            }
+                          ],
+                          "astronomy": {
+                            "date": "2025-08-01",
+                            "mid_night": "00:09",
+                            "night_end": "03:47",
+                            "sunrise": "05:17",
+                            "sunset": "19:00",
+                            "night_begin": "20:30",
+                            "sun_status": "-",
+                            "solar_noon": "12:09",
+                            "day_length": "13:43",
+                            "moon_phase": "FIRST_QUARTER",
+                            "moonrise": "12:18",
+                            "moonset": "23:04",
+                            "moon_status": "-"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing/invalid parameters, invalid date range, or location could not be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingParams": {
+                    "summary": "Missing startDate/endDate",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:05.667Z",
+                      "status": 400,
+                      "message": "please pass correct parameters",
+                      "error": "Invalid Param Exception",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "InvalidDateFormat": {
+                    "summary": "startDate/endDate not in YYYY-MM-DD format",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:26.589Z",
+                      "status": 400,
+                      "message": "startDate must be in yyyy-mm-dd format",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "DateRangeTooWideDaily": {
+                    "summary": "Range over 90 days at daily precision",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:06.179Z",
+                      "status": 400,
+                      "message": "Date range cannot exceed 90 days.",
+                      "error": "error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "DateRangeTooWideHourly": {
+                    "summary": "Range over 7 days at hourly precision",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:06.654Z",
+                      "status": 400,
+                      "message": "Time-series hourly date range must not exceed 7 days",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "EndDateBeforeStartDate": {
+                    "summary": "endDate earlier than startDate",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:14.787Z",
+                      "status": 400,
+                      "message": "startDate must be before or equal to endDate",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "FutureDate": {
+                    "summary": "endDate is today or in the future",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:14.329Z",
+                      "status": 400,
+                      "message": "endDate cannot be current or future date",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "DateOutOfRange": {
+                    "summary": "startDate earlier than 1940-01-01",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:26.108Z",
+                      "status": 400,
+                      "message": "Parameter 'startDate' is out of allowed range from 1940-01-01 to 2026-07-24",
+                      "error": "error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "InvalidCoordinates": {
+                    "summary": "Latitude or longitude out of range (e.g. lat=999)",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:15.849Z",
+                      "status": 400,
+                      "message": "Invalid latitude or longitude values. Latitude must be between -90 and 90, and longitude must be between -180 and 180",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "InvalidIPAddress": {
+                    "summary": "Invalid IP address",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:16.321Z",
+                      "status": 400,
+                      "message": "Invalid IP address",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "LocationNotFound": {
+                    "summary": "Location string could not be geocoded (returns 400, not 404, on this endpoint)",
+                    "value": {
+                      "timestamp": "2026-07-24T11:36:14.115Z",
+                      "status": 400,
+                      "message": "We couldn't find the location (xyzxyzxyz123nonexistent). Try a city or state level location address only.",
+                      "error": "error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "InvalidPrecision": {
+                    "summary": "precision value outside daily/hourly",
+                    "value": {
+                      "timestamp": "2026-07-24T11:36:04.187Z",
+                      "status": 400,
+                      "message": "Invalid precision",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  },
+                  "InvalidTimezone": {
+                    "summary": "Unrecognized timezone value",
+                    "value": {
+                      "timestamp": "2026-07-24T11:36:04.753Z",
+                      "status": 400,
+                      "message": "Check whether your input value is correct; timezone = NotATimezone",
+                      "error": "error",
+                      "path": "/v1.0/weather/time-series"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "TimeSeriesResponse": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/WeatherLocation"
+          },
+          "historical": {
+            "$ref": "#/components/schemas/TimeSeriesData"
+          }
+        },
+        "required": ["location", "historical"],
+        "description": "Time-series weather response containing location data and date-keyed time-series data."
+      },
+      "LocationByCoordinates": {
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "country_name",
+          "state_prov",
+          "city",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude coordinate in decimal degrees, ranging from -90 (South Pole) to +90 (North Pole). Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude coordinate in decimal degrees, ranging from -180 (West) to +180 (East). Returned as a string, not a number."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full name of the country corresponding to the provided coordinates. Empty string when the coordinates could not be reverse-geocoded (e.g. open ocean)."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division name for the location. Empty string when the coordinates could not be reverse-geocoded."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name associated with the coordinate location. Empty string when the coordinates could not be reverse-geocoded."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, district, or village name within the broader area."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Height above mean sea level in meters for the specified coordinates. Returned as a string, not a number; can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the location (e.g., America/New_York, Europe/London)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Abbreviated timezone representation based on current offset (e.g., EST, GMT, PST)."
+          }
+        },
+        "description": "Location data when the target is specified by GPS coordinates (lat/long)."
+      },
+      "LocationByIP": {
+        "type": "object",
+        "required": [
+          "continent_code",
+          "continent_name",
+          "country_code2",
+          "country_code3",
+          "country_name",
+          "country_name_official",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "continent_code": {
+            "type": "string",
+            "description": "Two-letter continent code (e.g., NA for North America, EU for Europe, AS for Asia)."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Full name of the continent where the IP address is registered."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 two-letter country code (e.g., US, GB, FR)."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 three-letter country code (e.g., USA, GBR, FRA)."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Common name of the country associated with the IP address."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official long-form country name as recognized internationally (e.g., United States of America)."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Boolean flag indicating whether the country is a member state of the European Union."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division associated with the IP location."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "ISO 3166-2 subdivision code for the state or province (e.g., CA for California)."
+          },
+          "district": {
+            "type": "string",
+            "description": "District, county, or secondary administrative division within the region."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or urban area name where the IP address is geographically registered."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "Postal code or ZIP code for the approximate location of the IP address."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees for the IP geolocation, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees for the IP geolocation, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, or small area designation within the city."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters for the IP geolocation. Returned as a string, not a number; can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the IP location (e.g., America/Chicago, Asia/Tokyo)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation based on local offset (e.g., CST, JST, UTC)."
+          }
+        },
+        "description": "Location data when the target is inferred from an IP address."
+      },
+      "LocationByAddress": {
+        "type": "object",
+        "required": [
+          "location_string",
+          "country_name",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "Original location query string as submitted, including full address or place name."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Resolved country name derived from the geocoded location query."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division identified from the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name extracted from the geocoded location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, suburb, or village within the geocoded area."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geocoded latitude coordinate in decimal degrees, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geocoded longitude coordinate in decimal degrees, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters at the geocoded coordinates. Returned as a string, not a number; can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the geocoded location (e.g., America/Los_Angeles)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation for the location based on local offset (e.g., PDT, CET)."
+          }
+        },
+        "description": "Location data when the target is specified by a city name or address string."
+      },
+      "HistoricalDaily": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp"
+          },
+          "weather_code": {
+            "type": "integer",
+            "description": "Weather condition code"
+          },
+          "temperature_2m_mean": {
+            "type": "number",
+            "description": "Daily mean air temperature at 2 meters (°C)"
+          },
+          "temperature_2m_max": {
+            "type": "number",
+            "description": "Daily maximum air temperature at 2 meters (°C)"
+          },
+          "temperature_2m_min": {
+            "type": "number",
+            "description": "Daily minimum air temperature at 2 meters (°C)"
+          },
+          "apparent_temperature_mean": {
+            "type": "number",
+            "description": "Daily mean perceived temperature (°C)"
+          },
+          "apparent_temperature_max": {
+            "type": "number",
+            "description": "Daily maximum perceived temperature (°C)"
+          },
+          "apparent_temperature_min": {
+            "type": "number",
+            "description": "Daily minimum perceived temperature (°C)"
+          },
+          "precipitation_sum": {
+            "type": "number",
+            "description": "Total precipitation (mm)"
+          },
+          "rain_sum": {
+            "type": "number",
+            "description": "Total rainfall (mm)"
+          },
+          "snowfall_sum": {
+            "type": "number",
+            "description": "Total snowfall (cm)"
+          },
+          "wind_speed_10m_max": {
+            "type": "number",
+            "description": "Maximum wind speed at 10 meters (km/h)"
+          },
+          "wind_gusts_10m_max": {
+            "type": "number",
+            "description": "Maximum wind gusts at 10 meters (km/h)"
+          },
+          "wind_speed_10m_mean": {
+            "type": "number",
+            "description": "Daily mean wind speed at 10 meters (km/h)"
+          },
+          "wind_speed_10m_min": {
+            "type": "number",
+            "description": "Minimum wind speed at 10 meters (km/h)"
+          },
+          "wind_gusts_10m_min": {
+            "type": "number",
+            "description": "Minimum wind gusts at 10 meters (km/h)"
+          },
+          "wind_gusts_10m_mean": {
+            "type": "number",
+            "description": "Daily mean wind gusts at 10 meters (km/h)"
+          },
+          "wind_direction_10m_dominant": {
+            "type": "integer",
+            "description": "Dominant wind direction at 10 meters (°)"
+          },
+          "shortwave_radiation_sum": {
+            "type": "number",
+            "description": "Daily sum of shortwave solar radiation (MJ/m²)"
+          },
+          "et0_fao_evapotranspiration_sum": {
+            "type": "number",
+            "description": "Daily sum of reference evapotranspiration (mm)"
+          },
+          "cloud_cover_mean": {
+            "type": "number",
+            "description": "Daily mean cloud cover percentage (%)"
+          },
+          "dew_point_2m_mean": {
+            "type": "number",
+            "description": "Daily mean dew point temperature at 2 meters (°C)"
+          },
+          "dew_point_2m_max": {
+            "type": "number",
+            "description": "Daily maximum dew point temperature at 2 meters (°C)"
+          },
+          "dew_point_2m_min": {
+            "type": "number",
+            "description": "Daily minimum dew point temperature at 2 meters (°C)"
+          },
+          "relative_humidity_2m_mean": {
+            "type": "number",
+            "description": "Daily mean relative humidity at 2 meters (%)"
+          },
+          "relative_humidity_2m_max": {
+            "type": "integer",
+            "description": "Daily maximum relative humidity at 2 meters (%)"
+          },
+          "relative_humidity_2m_min": {
+            "type": "integer",
+            "description": "Daily minimum relative humidity at 2 meters (%)"
+          },
+          "pressure_msl_mean": {
+            "type": "number",
+            "description": "Daily mean atmospheric pressure at mean sea level (hPa)"
+          },
+          "surface_pressure_mean": {
+            "type": "number",
+            "description": "Daily mean surface pressure at ground level (hPa)"
+          }
+        },
+        "required": [
+          "timestamp",
+          "weather_code",
+          "temperature_2m_mean",
+          "temperature_2m_max",
+          "temperature_2m_min",
+          "apparent_temperature_mean",
+          "apparent_temperature_max",
+          "apparent_temperature_min",
+          "precipitation_sum",
+          "rain_sum",
+          "snowfall_sum",
+          "wind_speed_10m_max",
+          "wind_gusts_10m_max",
+          "wind_speed_10m_mean",
+          "wind_speed_10m_min",
+          "wind_gusts_10m_min",
+          "wind_gusts_10m_mean",
+          "wind_direction_10m_dominant",
+          "shortwave_radiation_sum",
+          "et0_fao_evapotranspiration_sum",
+          "cloud_cover_mean",
+          "dew_point_2m_mean",
+          "dew_point_2m_max",
+          "dew_point_2m_min",
+          "relative_humidity_2m_mean",
+          "relative_humidity_2m_max",
+          "relative_humidity_2m_min",
+          "pressure_msl_mean",
+          "surface_pressure_mean"
+        ],
+        "description": "Daily historical weather summary with temperature, precipitation, wind, and radiation statistics."
+      },
+      "HistoricalHourly": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp"
+          },
+          "temperature_2m": {
+            "type": "number",
+            "description": "Air temperature at 2 meters (°C)"
+          },
+          "relative_humidity_2m": {
+            "type": "number",
+            "description": "Relative humidity at 2 meters (%)"
+          },
+          "dew_point_2m": {
+            "type": "number",
+            "description": "Dew point temperature at 2 meters (°C)"
+          },
+          "apparent_temperature": {
+            "type": "number",
+            "description": "Perceived temperature (°C)"
+          },
+          "precipitation": {
+            "type": "number",
+            "description": "Total precipitation in this hour (mm)"
+          },
+          "rain": {
+            "type": "number",
+            "description": "Rainfall in this hour (mm)"
+          },
+          "snowfall": {
+            "type": "number",
+            "description": "Snowfall in this hour (cm)"
+          },
+          "weather_code": {
+            "type": "integer",
+            "description": "Weather condition code"
+          },
+          "pressure_msl": {
+            "type": "number",
+            "description": "Atmospheric pressure at mean sea level (hPa)"
+          },
+          "surface_pressure": {
+            "type": "number",
+            "description": "Atmospheric pressure at ground level (hPa)"
+          },
+          "cloud_cover": {
+            "type": "number",
+            "description": "Cloud cover percentage (%)"
+          },
+          "et0_fao_evapotranspiration": {
+            "type": "number",
+            "description": "Hourly reference evapotranspiration (mm)"
+          },
+          "wind_speed_10m": {
+            "type": "number",
+            "description": "Wind speed at 10 meters (km/h)"
+          },
+          "wind_direction_10m": {
+            "type": "integer",
+            "description": "Wind direction at 10 meters (°)"
+          },
+          "wind_gusts_10m": {
+            "type": "number",
+            "description": "Wind gusts at 10 meters (km/h)"
+          },
+          "albedo": {
+            "type": ["number", "null"],
+            "description": "Reflectivity of the Earth's surface. Observed as null in every sampled response; this field is not currently populated by the upstream data source."
+          },
+          "shortwave_radiation": {
+            "type": "number",
+            "description": "Incoming shortwave solar radiation (W/m²)"
+          },
+          "direct_radiation": {
+            "type": "number",
+            "description": "Direct solar radiation (W/m²)"
+          },
+          "diffuse_radiation": {
+            "type": "number",
+            "description": "Diffuse solar radiation (W/m²)"
+          },
+          "direct_normal_irradiance": {
+            "type": "number",
+            "description": "Direct solar irradiance (W/m²)"
+          },
+          "global_tilted_irradiance": {
+            "type": "number",
+            "description": "Total solar irradiance on a tilted surface (W/m²)"
+          }
+        },
+        "required": [
+          "timestamp",
+          "temperature_2m",
+          "relative_humidity_2m",
+          "dew_point_2m",
+          "apparent_temperature",
+          "precipitation",
+          "rain",
+          "snowfall",
+          "weather_code",
+          "pressure_msl",
+          "surface_pressure",
+          "cloud_cover",
+          "et0_fao_evapotranspiration",
+          "wind_speed_10m",
+          "wind_direction_10m",
+          "wind_gusts_10m",
+          "albedo",
+          "shortwave_radiation",
+          "direct_radiation",
+          "diffuse_radiation",
+          "direct_normal_irradiance",
+          "global_tilted_irradiance"
+        ],
+        "description": "Hourly historical weather reading with temperature, precipitation, and wind data."
+      },
+      "Astronomy": {
+        "type": "object",
+        "required": [
+          "date",
+          "mid_night",
+          "night_end",
+          "sunrise",
+          "solar_noon",
+          "sunset",
+          "night_begin",
+          "day_length",
+          "sun_status",
+          "moon_phase",
+          "moonrise",
+          "moonset",
+          "moon_status"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Calendar date in YYYY-MM-DD format for the astronomical data."
+          },
+          "mid_night": {
+            "type": "string",
+            "description": "Time of true solar midnight in HH:MM format."
+          },
+          "night_end": {
+            "type": "string",
+            "description": "Time when astronomical twilight ends and dawn begins in HH:MM format."
+          },
+          "sunrise": {
+            "type": "string",
+            "description": "Time when the Sun becomes visible above the horizon in HH:MM format."
+          },
+          "solar_noon": {
+            "type": "string",
+            "description": "Time when the Sun reaches its highest point in the sky in HH:MM format."
+          },
+          "sunset": {
+            "type": "string",
+            "description": "Time when the Sun disappears below the horizon in HH:MM format."
+          },
+          "night_begin": {
+            "type": "string",
+            "description": "Time when astronomical twilight begins and night starts in HH:MM format."
+          },
+          "day_length": {
+            "type": "string",
+            "description": "Total duration of daylight in HH:MM format."
+          },
+          "sun_status": {
+            "type": "string",
+            "description": "Current position of the Sun relative to the horizon (above_horizon, below_horizon, or -)."
+          },
+          "moon_phase": {
+            "type": "string",
+            "description": "Current lunar phase (NEW_MOON, WAXING_CRESCENT, FULL_MOON, WANING_GIBBOUS, etc.)."
+          },
+          "moonrise": {
+            "type": "string",
+            "description": "Time when the Moon becomes visible above the horizon in HH:MM format."
+          },
+          "moonset": {
+            "type": "string",
+            "description": "Time when the Moon disappears below the horizon in HH:MM format."
+          },
+          "moon_status": {
+            "type": "string",
+            "description": "Current visibility status of the Moon (visible, not_visible, or -)."
+          }
+        },
+        "description": "Astronomical data including sunrise, sunset, solar noon, day length, moon phase, and moon times."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "WeatherLocation": {
+        "type": "object",
+        "description": "Location information",
+        "oneOf": [
+          {
+            "description": "Location data when the target is specified by GPS coordinates (lat/long).",
+            "$ref": "#/components/schemas/LocationByCoordinates"
+          },
+          {
+            "description": "Location data when the target is inferred from an IP address.",
+            "$ref": "#/components/schemas/LocationByIP"
+          },
+          {
+            "description": "Location data when the target is specified by a city name or address string.",
+            "$ref": "#/components/schemas/LocationByAddress"
+          }
+        ]
+      },
+      "TimeSeriesDay": {
+        "type": "object",
+        "description": "Time-series weather data for a single day. Contains astronomy data plus exactly one of daily or hourly, depending on the request's precision parameter — the other key is absent, not empty, in the actual response.",
+        "required": ["astronomy"],
+        "properties": {
+          "daily": {
+            "$ref": "#/components/schemas/HistoricalDaily",
+            "description": "Daily aggregate weather data for the specified day. Present only when precision=daily (the default); absent entirely when precision=hourly."
+          },
+          "hourly": {
+            "type": "array",
+            "description": "Array of hourly weather readings for this day. Present only when precision=hourly; absent entirely when precision=daily.",
+            "items": {
+              "$ref": "#/components/schemas/HistoricalHourly"
+            }
+          },
+          "astronomy": {
+            "$ref": "#/components/schemas/Astronomy",
+            "description": "Astronomical data including sunrise, sunset, and moon phases. Present regardless of precision."
+          }
+        }
+      },
+      "TimeSeriesData": {
+        "type": "object",
+        "description": "Time-series data object keyed by date (YYYY-MM-DD). Each key is a date and the value is a TimeSeriesDay containing daily aggregates, hourly readings, and astronomy data.",
+        "properties": {
+          "date": {
+            "$ref": "#/components/schemas/TimeSeriesDay"
+          }
+        },
+        "required": ["date"]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

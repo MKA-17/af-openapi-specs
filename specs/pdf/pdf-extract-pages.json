@@ -1,0 +1,295 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Extract Pages API Reference",
+    "version": "1.0.0",
+    "description": "Extract specific pages from a PDF file. Specify page ranges or individual page numbers. Returns a task ID for tracking the extraction progress.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Extract Pages API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/extract-pages": {
+      "post": {
+        "tags": [
+          "PDF Operations APIs"
+        ],
+        "summary": "Extract pages from a PDF",
+        "description": "This API extracts specific pages or page ranges from a PDF file and returns them as a new PDF.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output PDF file after pages have been extracted. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies which pages to extract from the PDF. You can provide individual page numbers (e.g., '2') and/or page ranges in any order, including descending (e.g., '9-5', '16-last'). Use commas to separate entries and hyphens for ranges. You may alternatively pass only one of the special keywords: 'even' (extracts all even-numbered pages), 'odd' (extracts all odd-numbered pages), 'last' (extracts only the last page), or 'all' (extracts all pages into individual files). Examples: '2,6-3', 'even', 'all'. Mixing special keywords with specific pages/ranges is not allowed. Malformed values or page numbers exceeding the document's page count are not rejected on this call \u2014 the resulting task fails asynchronously (check task status)."
+          },
+          {
+            "name": "separated",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, each of the specified pages will be extracted and returned as a separate PDF file."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to extract pages from. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Extract task created successfully. Malformed or out-of-range page specifications are not rejected synchronously \u2014 the task is created, then fails asynchronously; poll the task status endpoint and check for status \"failed\" with an error/message pair.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "dabcbcf5-d4ba-4143-bc34-3a8db6c8476e",
+                      "inputIds": [
+                        "01a77122-c457-475d-a6f2-f88cd4ad8924"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingPages": {
+                    "summary": "Missing required pages parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/extract-pages",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:53:18.573Z"
+                    }
+                  },
+                  "InvalidID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/v1.0/pdf/extract-pages",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:53:19.182Z"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 File type not supported",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "UnsupportedFileType": {
+                    "summary": "Uploaded file is not a supported type",
+                    "value": {
+                      "timestamp": "2026-07-27T10:53:19.733Z",
+                      "path": "/v1.0/pdf/extract-pages",
+                      "status": 415,
+                      "error": "Unsupported File Type",
+                      "message": "The provided file type is not supported. Refer to the documentation for valid file types."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "extractPdfPages"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "PDFResponse": {
+        "type": "object",
+        "description": "Response containing the task ID and input file IDs for a PDF processing task.",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "Task ID of the requested task, used to check the task status."
+          },
+          "inputIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "File IDs for the input files provided for the task. Not returned when destroy parameter is true."
+          }
+        }
+      },
+      "PdfFileUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the PDF file to process.",
+        "required": [],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Raw PDF file bytes sent as a multipart/form-data field named 'file'. Omit this field entirely and pass file_id in the query string instead to use an already-uploaded file."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

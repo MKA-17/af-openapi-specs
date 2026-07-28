@@ -1,0 +1,328 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "IBAN Validation API - Validate Format, Check SEPA & Return Bank Details",
+    "version": "1.0.0",
+    "description": "Validate an IBAN number against country-specific format, length, and checksum rules. Supports IBANs from all SEPA and IBAN-compliant countries. Returns detailed validation results for each check — alphanumeric, supported country, length, structure, and check digit. Includes bank data such as BIC/SWIFT code, bank name, branch details, and SEPA eligibility when available.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "IBAN Validation API Server"
+    }
+  ],
+  "paths": {
+    "/iban/validation": {
+      "get": {
+        "tags": ["Financial APIs"],
+        "summary": "Validate IBAN",
+        "description": "Checks an IBAN for structural validity, checksum accuracy, and bank metadata.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specify the desired response format. Options: 'json' (default) or 'xml'."
+          },
+          {
+            "name": "iban",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IBAN to validate."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IbanValidationResponse"
+                },
+                "examples": {
+                  "validIban": {
+                    "summary": "Valid IBAN with full bank data",
+                    "value": {
+                      "valid": true,
+                      "iban": "GB29NWBK60161331926819",
+                      "validation": {
+                        "is_alpha_numeric": true,
+                        "is_iban_supported_country": true,
+                        "is_valid_length": true,
+                        "is_valid_structure": true,
+                        "is_iban_check_digit_valid": true,
+                        "bban": "valid"
+                      },
+                      "bank_data": {
+                        "bic": "NWBKGB2LBHM",
+                        "bank": "NATIONAL WESTMINSTER BANK PLC",
+                        "bank_code": "NWBK",
+                        "branch_code": "601613",
+                        "country": "United Kingdom",
+                        "country_iso2": "GB",
+                        "city": "BIRMINGHAM",
+                        "address": "6 BRINDLEY PLACE - BIRMINGHAM, B1",
+                        "account": "31926819",
+                        "sepa": true
+                      }
+                    }
+                  },
+                  "invalidIban": {
+                    "summary": "Structurally invalid IBAN — still a 200, not an error, with the failing checks flagged",
+                    "value": {
+                      "valid": false,
+                      "iban": "NOTANIBAN123",
+                      "validation": {
+                        "is_alpha_numeric": true,
+                        "is_iban_supported_country": true,
+                        "is_valid_length": false,
+                        "is_valid_structure": false,
+                        "is_iban_check_digit_valid": false,
+                        "bban": "unknown"
+                      },
+                      "bank_data": {
+                        "bic": null,
+                        "bank": null,
+                        "bank_code": null,
+                        "branch_code": "",
+                        "country": "Norway",
+                        "country_iso2": "NO",
+                        "city": null,
+                        "address": null,
+                        "account": "N123",
+                        "sepa": true
+                      }
+                    }
+                  },
+                  "unsupportedCountry": {
+                    "summary": "Country prefix not covered by IBAN — bank_data fields are null",
+                    "value": {
+                      "valid": false,
+                      "iban": "US29NWBK60161331926819",
+                      "validation": {
+                        "is_alpha_numeric": true,
+                        "is_iban_supported_country": false,
+                        "is_valid_length": false,
+                        "is_valid_structure": false,
+                        "is_iban_check_digit_valid": false,
+                        "bban": "unknown"
+                      },
+                      "bank_data": {
+                        "bic": null,
+                        "bank": null,
+                        "bank_code": null,
+                        "branch_code": "",
+                        "country": null,
+                        "country_iso2": "US",
+                        "city": null,
+                        "address": null,
+                        "account": null,
+                        "sepa": null
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingIban": {
+                    "summary": "Missing required iban parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/iban/validation",
+                      "status": 400,
+                      "timestamp": "2026-07-27T11:49:29.286Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "validateIban"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "IbanValidationResponse": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "description": "True if the IBAN passes all validation checks."
+          },
+          "iban": {
+            "type": "string",
+            "description": "The IBAN number provided in the request."
+          },
+          "validation": {
+            "$ref": "#/components/schemas/IbanValidationResult"
+          },
+          "bank_data": {
+            "$ref": "#/components/schemas/IbanBankData"
+          }
+        },
+        "required": ["valid", "iban", "validation", "bank_data"],
+        "description": "IBAN validation response containing validation results and bank data."
+      },
+      "IbanValidationResult": {
+        "type": "object",
+        "description": "Object contains IBAN validation details.",
+        "required": [
+          "is_alpha_numeric",
+          "is_iban_supported_country",
+          "is_valid_length",
+          "is_valid_structure",
+          "is_iban_check_digit_valid"
+        ],
+        "properties": {
+          "is_alpha_numeric": {
+            "type": "boolean",
+            "description": "Whether the IBAN contains only alphanumeric characters."
+          },
+          "is_iban_supported_country": {
+            "type": "boolean",
+            "description": "Whether the country extracted from the IBAN supports IBAN standards."
+          },
+          "is_valid_length": {
+            "type": "boolean",
+            "description": "Whether the IBAN length matches the expected length for its country."
+          },
+          "is_valid_structure": {
+            "type": "boolean",
+            "description": "Whether the IBAN structure matches the pattern for its country."
+          },
+          "is_iban_check_digit_valid": {
+            "type": "boolean",
+            "description": "Whether the IBAN check digit is valid."
+          },
+          "bban": {
+            "type": "string",
+            "enum": ["valid", "invalid", "unknown"],
+            "description": "BBAN checksum status. \"unknown\" means BBAN checksum validation isn't supported for this country."
+          }
+        }
+      },
+      "IbanBankData": {
+        "type": "object",
+        "description": "Object contains Bank and BIC details. Most fields are null when the IBAN is structurally invalid or the country's bank data isn't resolvable.",
+        "required": ["country_iso2"],
+        "properties": {
+          "bic": {
+            "type": ["string", "null"],
+            "description": "SWIFT/BIC code extracted from the IBAN. Null when not available for this country or IBAN."
+          },
+          "bank": {
+            "type": ["string", "null"],
+            "description": "Bank name extracted from the IBAN. Null when not resolvable."
+          },
+          "bank_code": {
+            "type": ["string", "null"],
+            "description": "Bank code extracted from the IBAN. Null when not resolvable."
+          },
+          "branch_code": {
+            "type": "string",
+            "description": "Branch code extracted from the IBAN. Can be an empty string when not available."
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Country name extracted from the IBAN. Null when the country prefix isn't a supported IBAN country."
+          },
+          "country_iso2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code extracted from the IBAN's prefix."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "City or branch name for the bank. Null when not resolvable."
+          },
+          "address": {
+            "type": ["string", "null"],
+            "description": "Bank branch address. Null when not resolvable."
+          },
+          "account": {
+            "type": ["string", "null"],
+            "description": "Account number extracted from the IBAN. Null when the country prefix isn't a supported IBAN country."
+          },
+          "sepa": {
+            "type": ["boolean", "null"],
+            "description": "Whether the country supports Single Euro Payments Area (SEPA). Null when the country prefix isn't a supported IBAN country."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        },
+        "description": "Standard error envelope returned by the API on failed requests."
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,346 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "User Agent Parser - Parse User Agent into Readable Format",
+    "version": "1.0.0",
+    "description": "Parse any User-Agent string to obtain detailed browser, device, operating system, and rendering engine information. Returns the browser or application name and version, device hardware details (name, type, brand, CPU), layout engine data, and operating system metadata by default. Supports desktop, mobile, tablet, eReader, game console, and crawler detection across all major platforms. Pass the User-Agent string via the `User-Agent` request header to get a structured JSON response with individual fields for each component. A malformed or unparsable User-Agent string still returns a `200` response with every classification field set to `Hacker` rather than failing the request; a missing or empty `User-Agent` header returns a `400` error instead. Unresolvable version-like fields (`version`, `version_major`, `build`) are returned as the literal string `??` rather than being omitted.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "User Agent Parser API Server"
+    }
+  ],
+  "paths": {
+    "/user-agent/lookup": {
+      "get": {
+        "tags": ["User Agent APIs"],
+        "summary": "Parse a User-Agent string to obtain browser, device, and operating system details",
+        "description": "Parse any User-Agent string to obtain detailed information about the browser, device, layout engine, and operating system. Supports desktop, mobile, tablet, and crawler detection.",
+        "operationId": "parseUserAgent",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "User-Agent",
+            "in": "header",
+            "required": true,
+            "description": "The User-Agent string to parse for browser, device, and operating system details.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with parsed user agent data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAgentParserResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Desktop browser User-Agent",
+                    "value": {
+                      "user_agent_string": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0",
+                      "name": "Firefox",
+                      "type": "Browser",
+                      "version": "142.0",
+                      "version_major": "142",
+                      "device": {
+                        "name": "Linux Desktop",
+                        "type": "Desktop",
+                        "brand": "Unknown",
+                        "cpu": "Intel x86_64"
+                      },
+                      "engine": {
+                        "name": "Gecko",
+                        "type": "Browser",
+                        "version": "142.0",
+                        "version_major": "142"
+                      },
+                      "operating_system": {
+                        "name": "Ubuntu",
+                        "type": "Desktop",
+                        "version": "??",
+                        "version_major": "??",
+                        "build": "??"
+                      }
+                    }
+                  },
+                  "crawlerUserAgent": {
+                    "summary": "Search engine crawler User-Agent — Robot/Cloud classification",
+                    "value": {
+                      "user_agent_string": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+                      "name": "Googlebot",
+                      "type": "Robot",
+                      "version": "2.1",
+                      "version_major": "2",
+                      "device": {
+                        "name": "Google",
+                        "type": "Robot",
+                        "brand": "Google",
+                        "cpu": "Unknown"
+                      },
+                      "engine": {
+                        "name": "Googlebot",
+                        "type": "Robot",
+                        "version": "??",
+                        "version_major": "??"
+                      },
+                      "operating_system": {
+                        "name": "Google Cloud",
+                        "type": "Cloud",
+                        "version": "??",
+                        "version_major": "??",
+                        "build": "??"
+                      }
+                    }
+                  },
+                  "unparsableUserAgent": {
+                    "summary": "Malformed/unparsable User-Agent — still 200, every field set to Hacker",
+                    "value": {
+                      "user_agent_string": "asdkjaslkdjaslkdj12312",
+                      "name": "Hacker",
+                      "type": "Hacker",
+                      "version": "Hacker",
+                      "version_major": "Hacker",
+                      "device": {
+                        "name": "Hacker",
+                        "type": "Hacker",
+                        "brand": "Hacker",
+                        "cpu": "Unknown"
+                      },
+                      "engine": {
+                        "name": "Hacker",
+                        "type": "Hacker",
+                        "version": "Hacker",
+                        "version_major": "Hacker"
+                      },
+                      "operating_system": {
+                        "name": "Hacker",
+                        "type": "Hacker",
+                        "version": "Hacker",
+                        "version_major": "Hacker",
+                        "build": "??"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or empty User-Agent header",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingHeader": {
+                    "summary": "User-Agent header missing or empty",
+                    "value": {
+                      "error": "Invalid Header Exception",
+                      "message": "Please provide correct headers",
+                      "path": "/v1.0/user-agent/lookup",
+                      "status": 400,
+                      "timestamp": "2026-07-24T10:12:15.828Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "UserAgentParserResponse": {
+        "type": "object",
+        "description": "Parsed User-Agent result containing browser, device, engine, and operating system information. When the User-Agent string is malformed or cannot be parsed, every field across this object and its nested device/engine/operating_system objects is set to the literal string \"Hacker\" instead of the request failing.",
+        "required": [
+          "user_agent_string",
+          "name",
+          "type",
+          "version",
+          "version_major",
+          "device",
+          "engine",
+          "operating_system"
+        ],
+        "properties": {
+          "user_agent_string": {
+            "type": "string",
+            "description": "The raw User-Agent string that was parsed for browser, device, and operating system details."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the browser, crawler, or application identified from the User-Agent string."
+          },
+          "type": {
+            "type": "string",
+            "description": "Category of the agent. Possible values: Browser, Browser Webview, Mobile App, Robot Mobile, Cloud Application, Email Client, Voice, Special, Testclient, Hacker, Unknown."
+          },
+          "version": {
+            "type": "string",
+            "description": "Full version string of the browser or application. \"??\" when the version could not be determined; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major version number extracted from the version string. \"??\" when the version could not be determined; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/Engine"
+          },
+          "operating_system": {
+            "$ref": "#/components/schemas/OperatingSystem"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "description": "Hardware device information extracted from the User-Agent string.",
+        "required": ["name", "type", "brand", "cpu"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Device name or model identifier of the hardware used."
+          },
+          "type": {
+            "type": "string",
+            "description": "Device category. Possible values: Desktop, Mobile, Tablet, Phone, Watch, Virtual Reality, eReader, Set-top box, TV, Game Console, Handheld Game Console, Voice, Robot, Robot Mobile, Robot Imitator, Hacker, Anonymized, Unknown."
+          },
+          "brand": {
+            "type": "string",
+            "description": "Device manufacturer or brand name."
+          },
+          "cpu": {
+            "type": "string",
+            "description": "CPU architecture or model identifier of the device."
+          }
+        }
+      },
+      "Engine": {
+        "type": "object",
+        "description": "Layout or rendering engine information extracted from the User-Agent string.",
+        "required": ["name", "type", "version", "version_major"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the layout or rendering engine (e.g., Blink, Gecko, WebKit)."
+          },
+          "type": {
+            "type": "string",
+            "description": "Engine category. Possible values: Browser, Mobile App, Hacker, Robot, Unknown."
+          },
+          "version": {
+            "type": "string",
+            "description": "Full version string of the layout engine. \"??\" when unknown; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major version number of the layout engine. \"??\" when unknown; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          }
+        }
+      },
+      "OperatingSystem": {
+        "type": "object",
+        "description": "Operating system information extracted from the User-Agent string.",
+        "required": ["name", "type", "version", "version_major", "build"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the operating system (e.g., Windows, Android, Ubuntu)."
+          },
+          "type": {
+            "type": "string",
+            "description": "Operating system category. Possible values: Desktop, Mobile, Game Console, Embedded, Cloud, Hacker, Anonymized, Unknown."
+          },
+          "version": {
+            "type": "string",
+            "description": "Full version string of the operating system. \"??\" when unknown; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major version number of the operating system. \"??\" when unknown; \"Hacker\" when the User-Agent string itself is malformed/unparsable."
+          },
+          "build": {
+            "type": "string",
+            "description": "Build number or identifier of the operating system. \"??\" when unknown."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,634 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "SSL Lookup API - Check and Monitor SSL Certificate Chains",
+    "version": "1.0.0",
+    "description": "Retrieve comprehensive SSL certificate information for any domain including expiry dates, issuer details, signature algorithms, public key data, and certificate extensions. Supports extended key usages, CRL distribution points, authority info access, subject alternative names, and certificate policies.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "SSL Certificate Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/domain/ssl/live": {
+      "get": {
+        "tags": ["SSL APIs"],
+        "summary": "Retrieve the SSL certificate and any hidden information embedded within it for a domain.",
+        "description": "Retrieve comprehensive SSL certificate information without the certificate chain.\nThis endpoint provides detailed information about the SSL certificate including expiry dates, issuer details, and encryption methods.\n",
+        "operationId": "sslCertificateLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "domainName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Domain name or URL whose SSL certificate lookup is required"
+          },
+          {
+            "name": "sslRaw",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Set to true to get the raw openSSL response of the domain"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful SSL certificate lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SSLLookupResponse"
+                },
+                "examples": {
+                  "Single SSL Certificate": {
+                    "value": {
+                      "domainName": "google.com",
+                      "queryTime": "2026-06-06 14:58:44",
+                      "sslCertificates": [
+                        {
+                          "chainOrder": "end-user",
+                          "authenticationType": "domain",
+                          "validityStartDate": "2026-05-18 18:35:21 UTC",
+                          "validityEndDate": "2026-08-10 18:35:20 UTC",
+                          "serialNumber": "d5:2a:59:68:49:a3:ce:9b:10:64:16:9b:c7:eb:df:4b",
+                          "signatureAlgorithm": "SHA256-RSA",
+                          "subject": {
+                            "commonName": "*.google.com"
+                          },
+                          "issuer": {
+                            "commonName": "WR2",
+                            "organization": "Google Trust Services",
+                            "country": "US"
+                          },
+                          "publicKey": {
+                            "keySize": "256 bit",
+                            "keyAlgorithm": "ECDSA",
+                            "pemRaw": "-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErGwQHDlGZHg4bCpvaBQKF07hm4v6puRsRi7O6JQH78GTcBkGAHRZSLqvlH8K+wDBOiTKlDh3sWlmEJDUJDdoKA==\n-----END PUBLIC KEY-----\n"
+                          },
+                          "extensions": {
+                            "authorityKeyIdentifier": "DE:1B:1E:ED:79:15:D4:3E:37:24:C3:21:BB:EC:34:39:6D:42:B2:30",
+                            "subjectKeyIdentifier": "2E:EC:34:B9:3E:97:83:C3:7E:E5:D0:F4:AB:56:D4:25:99:67:7D:6B",
+                            "keyUsages": ["Digital Signature"],
+                            "extendedKeyUsages": [
+                              "TLS Web Server Authentication"
+                            ],
+                            "crlDistributionPoints": [
+                              "http://c.pki.goog/wr2/GSyT1N4PBrg.crl"
+                            ],
+                            "authorityInfoAccess": {
+                              "issuers": ["http://i.pki.goog/wr2.crt"],
+                              "ocsp": ["http://o.pki.goog/wr2"]
+                            },
+                            "subjectAlternativeNames": {
+                              "dnsNames": [
+                                "*.google.com",
+                                "google.com",
+                                "youtube.com",
+                                "*.youtube.com",
+                                "*.ytimg.com"
+                              ]
+                            },
+                            "certificatePolicies": [
+                              {
+                                "policyId": "2.23.140.1.2.1"
+                              }
+                            ]
+                          },
+                          "pemRaw": "-----BEGIN CERTIFICATE-----\nMIIIdTCCB12gAwIBAgIRANUqWWhJo86bEGQWm8fr30swDQYJKoZIhvcNAQELBQAwOzELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFUdvb2dsZSBUcnVzdCBTZXJ2aWNlczEMMAoGA1UEAxMDV1IyMB4XDTI2MDUxODE4MzUyMVoXDTI2MDgxMDE4MzUyMFowFzEVMBMGA1UEAwwMKi5nb29nbGUuY29tMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAErGwQHDlGZHg4bCpvaBQKF07hm4v6puRsRi7O6JQH78GTcBkGAHRZSLqvlH8K+wDBOiTKlDh3sWlmEJDUJDdoKKOCBmEwggZdMA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDATAMBgNVHRMBAf8EAjAAMB0GA1UdDgQWBBQu7DS5PpeDw37l0PSrVtQlmWd9azAfBgNVHSMEGDAWgBTeGx7teRXUPjckwyG77DQ5bUKyMDBYBggrBgEFBQcBAQRMMEowIQYIKwYBBQUHMAGGFWh0dHA6Ly9vLnBraS5nb29nL3dyMjAlBggrBgEFBQcwAoYZaHR0cDovL2kucGtpLmdvb2cvd3IyLmNydDCCBDgGA1UdEQSCBC8wggQrggwqLmdvb2dsZS5jb22CFiouYXBwZW5naW5lLmdvb2dsZS5jb22CCSouYmRuLmRldoIVKi5vcmlnaW4tdGVzdC5iZG4uZGV2ghIqLmNsb3VkLmdvb2dsZS5jb22CGCouY3Jvd2Rzb3VyY2UuZ29vZ2xlLmNvbYIYKi5kYXRhY29tcHV0ZS5nb29nbGUuY29tggsqLmdvb2dsZS5jYYILKi5nb29nbGUuY2yCDiouZ29vZ2xlLmNvLmlugg4qLmdvb2dsZS5jby5qcIIOKi5nb29nbGUuY28udWuCDyouZ29vZ2xlLmNvbS5hcoIPKi5nb29nbGUuY29tLmF1gg8qLmdvb2dsZS5jb20uYnKCDyouZ29vZ2xlLmNvbS5jb4IPKi5nb29nbGUuY29tLm14gg8qLmdvb2dsZS5jb20udHKCDyouZ29vZ2xlLmNvbS52boILKi5nb29nbGUuZGWCCyouZ29vZ2xlLmVzggsqLmdvb2dsZS5mcoILKi5nb29nbGUuaHWCCyouZ29vZ2xlLml0ggsqLmdvb2dsZS5ubIILKi5nb29nbGUucGyCCyouZ29vZ2xlLnB0ghkqLmdlbWluaS5jbG91ZC5nb29nbGUuY29tgg0qLmdzdGF0aWMuY29tghQqLm1ldHJpYy5nc3RhdGljLmNvbYIKKi5ndnQxLmNvbYIRKi5nY3BjZG4uZ3Z0MS5jb22CCiouZ3Z0Mi5jb22CDiouZ2NwLmd2dDIuY29tghAqLnVybC5nb29nbGUuY29tghYqLnlvdXR1YmUtbm9jb29raWUuY29tggsqLnl0aW1nLmNvbYIKYWkuYW5kcm9pZIILYW5kcm9pZC5jb22CDSouYW5kcm9pZC5jb22CEyouZmxhc2guYW5kcm9pZC5jb22CBGcuY28CBDEwLmdvb2dsZS5jb22CEiouZ29vZ2xlLWNhcnRzLmNvbYIKZ29vZ2xlLmNvbYISZ29vZ2xlY29tbWVyY2UuY29tghQqLmdvb2dsZWNvbW1lcmNlLmNvbYIKdXJjaGluLmNvbYIMKi51cmNoaW4uY29tggh5b3V0dS5iZYILeW91dHViZS5jb22CDSoueW91dHViZS5jb22CEW11c2ljLnlvdXR1YmUuY29tghMqLm11c2ljLnlvdXR1YmUuY29tghR5b3V0dWJlZWR1Y2F0aW9uLmNvbYIWKi55b3V0dWJlZWR1Y2F0aW9uLmNvbYIPeW91dHViZWtpZHMuY29tghEqLnlvdXR1YmVraWRzLmNvbYIFeXQuYmWCByoueXQuYmWCGmFuZHJvaWQuY2xpZW50cy5nb29nbGUuY29tghUqLmFpc3R1ZGlvLmdvb2dsZS5jb20wEwYDVR0gBAwwCjAIBgZngQwBAgEwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2MucGtpLmdvb2cvd3IyL0dTeVQxTjRQQnJnLmNybDCCAQMGCisGAQQB1nkCBAIEgfQEgfEA7wB2AMs49xWJfIShRF9bwd37yW7ymlnNRwppBYWwyxTDFFjnAAABnjyV+/0AAAQDAEcwRQIgCgvqLruYdmtREQIJopZQVZEAux/EdciE9ThPK5WLOIwCIQDJjNYSb4sTv+LnXVHnirnD6kTT5FY8gLI6mKR0WI/m1AB1ANgJVTuUT3r/yBYZb5RPhauw+Pxeh1UmDxXRLnK7RUsUAAABnjyV+8EAAAQDAEYwRAIgQvDSSJRos+D8Lk6bpjH2ZlYxD/N6Gv2TqkFZhUlFKeQCIBq55PPw4e5N89gLgzFC2kp1X+YvFsURPsLrz1LqOAymMA0GCSqGSIb3DQEBCwUAA4IBAQBtZusj1ojCxhZxk5KpZ92eZuTkDVJgJGtDq8gPRehf50mZiu2gDK1JgXIzKRey3tHmgNrCmTon5QJAL9yDyrOGs2GoQsfMkenH0+/hTsLB+n03ni9+9jghfPvE9CZbFimniiqGznhnW5mNOZGy2AnXz79ZfHr4J8AuPh4HVvPc6q/2coyl7Vlxp2XDo6j1eoZARVSske22WvE34U4Yunq+SE0E0a8aKTV7Q7YHeu8/NAsFmG7V6QSSqAyFyxqeEzuz8ylBPxS/cejBk+29tGlfqqrR1JEKdcFLF7EuRyvRWAuQMQBHRA9boa3/lz1f+jEkkUbfqEMrDAnxLthdKKJk\n-----END CERTIFICATE-----\n"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Invalid domain parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Invalid Domain Param": {
+                    "value": {
+                      "timestamp": "2025-08-14T10:21:23.349Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value[For Technical Support: support@apifreaks.com]",
+                      "path": "/v1.0/ssl/live"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden – Domain extension unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Unavailable Domain Extension": {
+                    "value": {
+                      "timestamp": "2025-08-14T10:18:47.504Z",
+                      "status": 403,
+                      "error": "Forbidden",
+                      "message": "Unavailable domain extension.",
+                      "path": "/v1.0/ssl/live"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found – No SSL certificate exists for entered domain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "No SSL Certificate": {
+                    "value": {
+                      "timestamp": "2025-08-14T10:18:28.465Z",
+                      "status": 404,
+                      "error": "SSL Data Not Found",
+                      "message": "No Ssl Certificate exists for entered Domain",
+                      "path": "/v1.0/ssl/live"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SSLLookupResponse": {
+        "type": "object",
+        "required": ["domainName", "queryTime", "sslCertificates"],
+        "properties": {
+          "domainName": {
+            "type": "string",
+            "description": "Domain name or URL that was queried."
+          },
+          "queryTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the query was executed."
+          },
+          "sslCertificates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SSLCertificateItem"
+            },
+            "description": "Array of SSL certificate objects in the chain."
+          },
+          "sslRaw": {
+            "type": "string",
+            "description": "Raw OpenSSL response text if sslRaw was set to true."
+          }
+        },
+        "description": "SSL certificate lookup response containing certificate details and extensions."
+      },
+      "SSLCertificateItem": {
+        "type": "object",
+        "description": "A single SSL certificate in the certificate chain.",
+        "required": [
+          "chainOrder",
+          "authenticationType",
+          "validityStartDate",
+          "validityEndDate",
+          "serialNumber",
+          "signatureAlgorithm",
+          "pemRaw",
+          "subject",
+          "issuer",
+          "publicKey",
+          "extensions"
+        ],
+        "properties": {
+          "chainOrder": {
+            "type": "string",
+            "description": "Position in the certificate chain (end-user, intermediate, root)."
+          },
+          "authenticationType": {
+            "type": "string",
+            "description": "Authentication type (domain, organization, extended)."
+          },
+          "validityStartDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Certificate validity start date."
+          },
+          "validityEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Certificate validity end date."
+          },
+          "serialNumber": {
+            "type": "string",
+            "description": "Certificate serial number."
+          },
+          "signatureAlgorithm": {
+            "type": "string",
+            "description": "Signature algorithm used (e.g., SHA256-RSA)."
+          },
+          "subject": {
+            "$ref": "#/components/schemas/SSLSubject"
+          },
+          "issuer": {
+            "$ref": "#/components/schemas/SSLIssuer"
+          },
+          "publicKey": {
+            "$ref": "#/components/schemas/SSLPublicKey"
+          },
+          "extensions": {
+            "$ref": "#/components/schemas/SSLExtensions"
+          },
+          "pemRaw": {
+            "type": "string",
+            "description": "Raw PEM-encoded certificate."
+          }
+        }
+      },
+      "SSLSubject": {
+        "type": "object",
+        "description": "Subject information of the SSL certificate.",
+        "required": ["commonName"],
+        "properties": {
+          "commonName": {
+            "type": "string",
+            "description": "Common name of the subject."
+          },
+          "organization": {
+            "type": "string",
+            "description": "Organization of the subject."
+          },
+          "organizationalUnit": {
+            "type": "string",
+            "description": "Organizational unit of the subject."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Locality of the subject."
+          },
+          "state": {
+            "type": "string",
+            "description": "State of the subject."
+          },
+          "country": {
+            "type": "string",
+            "description": "Country of the subject."
+          },
+          "incCountry": {
+            "type": "string",
+            "description": "Incorporation country of the subject."
+          },
+          "incState": {
+            "type": "string",
+            "description": "Incorporation state of the subject."
+          },
+          "businessCategory": {
+            "type": "string",
+            "description": "Business category of the subject."
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address of the subject."
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code of the subject."
+          },
+          "serialNumber": {
+            "type": "string",
+            "description": "Serial number of the subject."
+          }
+        }
+      },
+      "SSLIssuer": {
+        "type": "object",
+        "description": "Issuer information of the SSL certificate.",
+        "required": ["commonName", "organization", "country"],
+        "properties": {
+          "commonName": {
+            "type": "string",
+            "description": "Common name of the issuer."
+          },
+          "organization": {
+            "type": "string",
+            "description": "Organization of the issuer."
+          },
+          "organizationalUnit": {
+            "type": "string",
+            "description": "Organizational unit of the issuer."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Locality of the issuer."
+          },
+          "state": {
+            "type": "string",
+            "description": "State of the issuer."
+          },
+          "country": {
+            "type": "string",
+            "description": "Country of the issuer."
+          },
+          "incCountry": {
+            "type": "string",
+            "description": "Incorporation country of the issuer."
+          },
+          "incState": {
+            "type": "string",
+            "description": "Incorporation state of the issuer."
+          },
+          "businessCategory": {
+            "type": "string",
+            "description": "Business category of the issuer."
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address of the issuer."
+          },
+          "postalCode": {
+            "type": "string",
+            "description": "Postal code of the issuer."
+          },
+          "serialNumber": {
+            "type": "string",
+            "description": "Serial number of the issuer."
+          }
+        }
+      },
+      "SSLPublicKey": {
+        "type": "object",
+        "description": "Public key details of the SSL certificate.",
+        "required": ["keySize", "keyAlgorithm", "pemRaw"],
+        "properties": {
+          "keySize": {
+            "type": "string",
+            "description": "Public key size (e.g., 256 bit)."
+          },
+          "keyAlgorithm": {
+            "type": "string",
+            "description": "Public key algorithm (e.g., ECDSA, RSA)."
+          },
+          "pemRaw": {
+            "type": "string",
+            "description": "Raw PEM-encoded public key."
+          }
+        }
+      },
+      "SSLExtensions": {
+        "type": "object",
+        "description": "X.509 certificate extensions.",
+        "required": ["keyUsages"],
+        "properties": {
+          "authorityKeyIdentifier": {
+            "type": "string",
+            "description": "Authority key identifier."
+          },
+          "subjectKeyIdentifier": {
+            "type": "string",
+            "description": "Subject key identifier."
+          },
+          "keyUsages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Key usage extensions."
+          },
+          "extendedKeyUsages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Extended key usage extensions."
+          },
+          "crlDistributionPoints": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "CRL distribution point URLs."
+          },
+          "authorityInfoAccess": {
+            "$ref": "#/components/schemas/SSLAuthorityInfoAccess"
+          },
+          "subjectAlternativeNames": {
+            "$ref": "#/components/schemas/SSLSubjectAlternativeNames"
+          },
+          "certificatePolicies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SSLCertificatePolicy"
+            },
+            "description": "Certificate policy objects."
+          }
+        }
+      },
+      "SSLAuthorityInfoAccess": {
+        "type": "object",
+        "description": "Authority information access details.",
+        "properties": {
+          "issuers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Issuer certificate URLs."
+          },
+          "ocsp": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "OCSP responder URLs."
+          }
+        },
+        "required": []
+      },
+      "SSLSubjectAlternativeNames": {
+        "type": "object",
+        "description": "Subject alternative names on the certificate.",
+        "properties": {
+          "dnsNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "DNS names on the certificate."
+          },
+          "emailAddresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Email addresses on the certificate."
+          },
+          "ipAddresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IP addresses on the certificate."
+          },
+          "uris": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "URIs on the certificate."
+          }
+        },
+        "required": []
+      },
+      "SSLCertificatePolicy": {
+        "type": "object",
+        "description": "A certificate policy object.",
+        "properties": {
+          "policyId": {
+            "type": "string",
+            "description": "Policy OID identifier."
+          },
+          "policyQualifier": {
+            "$ref": "#/components/schemas/SSLPolicyQualifier"
+          }
+        },
+        "required": []
+      },
+      "SSLPolicyQualifier": {
+        "type": "object",
+        "description": "Policy qualifier for a certificate policy.",
+        "properties": {
+          "oid": {
+            "type": "string",
+            "description": "OID of the policy qualifier."
+          },
+          "cpsUri": {
+            "type": "string",
+            "format": "uri",
+            "description": "CPS URI for the policy qualifier."
+          },
+          "userNotice": {
+            "$ref": "#/components/schemas/SSLUserNotice"
+          }
+        },
+        "required": []
+      },
+      "SSLUserNotice": {
+        "type": "object",
+        "description": "User notice for a policy qualifier.",
+        "properties": {
+          "explicitText": {
+            "type": "string",
+            "description": "Explicit text of the user notice."
+          },
+          "noticeRef": {
+            "$ref": "#/components/schemas/SSLUserNoticeRef"
+          }
+        },
+        "required": []
+      },
+      "SSLUserNoticeRef": {
+        "type": "object",
+        "description": "Notice reference for a user notice.",
+        "properties": {
+          "organization": {
+            "type": "string",
+            "description": "Organization for the notice reference."
+          },
+          "noticeNumbers": {
+            "type": "string",
+            "description": "Notice numbers."
+          }
+        },
+        "required": []
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

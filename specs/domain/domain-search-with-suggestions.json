@@ -1,0 +1,280 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Domain Search with Suggestions API Reference",
+    "version": "1.0.0",
+    "description": "Check domain availability and receive suggestions for related domains across all top-level domains (TLDs). Supports optional suggestion parameters including a boolean flag to enable suggestions and a count parameter to control the number of results. Uses DNS-based or WHOIS-based lookups to determine domain availability for each suggestion.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Domain Search with Suggestions API Server"
+    }
+  ],
+  "paths": {
+    "/domain/availability/suggestions": {
+      "get": {
+        "tags": ["Domain APIs"],
+        "summary": "Check domain availability and receive suggestions for related domains.",
+        "description": "The Domain Search API is designed to simplify the process of finding available domain names across all top-level domains (TLDs) and second-level domains (SLDs).",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Domain name for availability and suggestions."
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["dns", "whois"],
+              "default": "dns"
+            },
+            "description": "Specify the data source for domain availability checks. Use \"dns\" for DNS-based lookups or \"whois\" for WHOIS-based lookups. By default, \"dns\" is used."
+          },
+          {
+            "name": "sug",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "Set to false to get a single availability result for exactly the given domain (same shape as the Domain Availability API), with no suggestions. Omitting this parameter, or setting it to true, returns an array of suggested alternate-TLD domains instead — despite the parameter's name, omitting it does not behave like false."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 5
+            },
+            "description": "Requested number of suggestions. Observed behavior: the API returns at least 5 alternate-TLD suggestions regardless of a lower count value; recognizable/brandable domains can return more than requested, drawn from a larger suggestion pool."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success. Shape depends on sug: false returns a single availability object; omitted or true returns an array of suggestions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "description": "Returned when sug=false — a single availability result for exactly the requested domain.",
+                      "$ref": "#/components/schemas/DomainAvailabilityResponse"
+                    },
+                    {
+                      "description": "Returned when sug is omitted or true — an array of suggested alternate-TLD domains with their availability.",
+                      "$ref": "#/components/schemas/DomainSuggestionResponse"
+                    }
+                  ]
+                },
+                "examples": {
+                  "suggestions": {
+                    "summary": "sug omitted or true — array of suggestions",
+                    "value": {
+                      "domain_available_response": [
+                        {
+                          "domain": "acme.org",
+                          "domainAvailability": false
+                        },
+                        {
+                          "domain": "acme.dev",
+                          "domainAvailability": false
+                        },
+                        {
+                          "domain": "acme.net",
+                          "domainAvailability": false
+                        },
+                        {
+                          "domain": "acme.com",
+                          "domainAvailability": false
+                        },
+                        {
+                          "domain": "acme.info",
+                          "domainAvailability": false
+                        }
+                      ]
+                    }
+                  },
+                  "noSuggestions": {
+                    "summary": "sug=false — single availability object, same shape as the Domain Availability API",
+                    "value": {
+                      "domain": "quixoticbramble77.com",
+                      "domainAvailability": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Invalid domain parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingDomain": {
+                    "summary": "Missing required domain parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/domain/availability/suggestions",
+                      "status": 400,
+                      "timestamp": "2026-07-27T12:19:46.594Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout – Unable to fetch WHOIS data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Error response",
+                    "value": {
+                      "timestamp": "2025-08-14T10:37:21.871Z",
+                      "status": 408,
+                      "error": "Request Timeout",
+                      "message": "Unable to fetch whois data. Please try again. [For Technical Support email at: support@apifreaks.com]",
+                      "path": "/v1.0/domain/availability/suggestions"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "suggestDomainAvailability"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "DomainAvailabilityResponse": {
+        "type": "object",
+        "description": "Domain availability check response containing the domain name and availability status. Returned when sug=false.",
+        "required": ["domain", "domainAvailability"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Name of the queried domain."
+          },
+          "domainAvailability": {
+            "type": "boolean",
+            "description": "True if available, false if not available."
+          }
+        }
+      },
+      "DomainSuggestionResponse": {
+        "type": "object",
+        "required": ["domain_available_response"],
+        "properties": {
+          "domain_available_response": {
+            "type": "array",
+            "description": "List of domain availability objects.",
+            "items": {
+              "$ref": "#/components/schemas/DomainSuggestionItem"
+            }
+          }
+        },
+        "description": "Domain suggestion response containing a list of availability-suggestions."
+      },
+      "DomainSuggestionItem": {
+        "type": "object",
+        "description": "A single domain suggestion with availability status.",
+        "required": ["domain", "domainAvailability"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Name of the suggested domain."
+          },
+          "domainAvailability": {
+            "type": "boolean",
+            "description": "True if available, false if not available."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,456 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Phone Validation API - Carrier Lookup, Line Type Detection & Location Data",
+    "version": "1.0.0",
+    "description": "Validate a single phone number and receive detailed metadata including carrier, line type, geolocation, time zones, and four standardized formats (E.164, International, National, RFC3966). Accepts international format (+ prefix), local format (with region), or IDD format (with dialer_region). Returns possible/valid status, country code, national number, area code length, and NDC length.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Phone Validation API Server"
+    }
+  ],
+  "paths": {
+    "/phone/validation": {
+      "post": {
+        "tags": ["Phone Validation APIs"],
+        "summary": "Validate a single phone number",
+        "description": "Validates a single phone number and returns detailed metadata including carrier, line type, geolocation, time zones, and standardized formats.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object. If not provided, the API defaults to JSON format."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Send a JSON object with `number` as the only required field. Use `region` **or** `dialer_region` when needed — never both at the same time.\n\n- **International format** (`+` prefix): provide `number` only — no region needed.\n- **Local format** (no `+`, e.g. `03301112233`): provide `number` + `region` (ISO 2-letter country code).\n- **IDD format** (exit code, e.g. `00923301112233`): provide `number` + `dialer_region` (country you are dialing from).",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PhoneValidationRequest"
+              },
+              "examples": {
+                "international_format": {
+                  "summary": "International format (+ prefix) — no region needed",
+                  "value": {
+                    "number": "+14155552671"
+                  }
+                },
+                "local_format_with_region": {
+                  "summary": "Local format — use region (not dialer_region)",
+                  "value": {
+                    "number": "03301112233",
+                    "region": "PK"
+                  }
+                },
+                "idd_format_with_dialer_region": {
+                  "summary": "IDD format — use dialer_region (not region)",
+                  "value": {
+                    "number": "0014155552671",
+                    "dialer_region": "AU"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful phone validation response. Note: numbers that are too short or otherwise not a plausible phone number are NOT rejected with a 400 — they return 200 with possible/valid set to false and most other fields absent.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhoneValidationResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Valid, fully-resolved number",
+                    "value": {
+                      "raw_input": {
+                        "number": "+14155552671"
+                      },
+                      "possible": true,
+                      "valid": true,
+                      "country_prefix": 1,
+                      "national_number": 4155552671,
+                      "country_code": "US",
+                      "location": "San Francisco, CA",
+                      "time_zones": ["America/Los_Angeles"],
+                      "line_type": "FIXED_LINE_OR_MOBILE",
+                      "formats": {
+                        "E164": "+14155552671",
+                        "International": "+1 415-555-2671",
+                        "National": "(415) 555-2671",
+                        "RFC3966": "tel:+1-415-555-2671"
+                      },
+                      "area_code_length": 3,
+                      "ndc_length": 3,
+                      "can_be_internationally_dialled": true
+                    }
+                  },
+                  "tooShort": {
+                    "summary": "Too short to be a plausible number — not an error",
+                    "value": {
+                      "raw_input": {
+                        "number": "123",
+                        "region": "US"
+                      },
+                      "possible": false,
+                      "valid": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – e.g. missing required field or both region codes provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missing_number": {
+                    "summary": "Missing number",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:03.470Z",
+                      "status": 400,
+                      "error": "Missing Number",
+                      "message": "The 'number' is required in POST Body and cannot be empty.",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  },
+                  "missing_region_information": {
+                    "summary": "Missing region information",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:03.962Z",
+                      "status": 400,
+                      "error": "Missing Region Information",
+                      "message": "Provide the region explicitly (e.g. 'US') or include a '+' with the country code.",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  },
+                  "multiple_region_codes": {
+                    "summary": "Multiple region codes provided",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:04.456Z",
+                      "status": 400,
+                      "error": "Multiple Region Codes Provided",
+                      "message": "Provide only one region code, either 'region' or 'dialer_region', not both.",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  },
+                  "invalid_region_code": {
+                    "summary": "Invalid region code",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:20.810Z",
+                      "status": 400,
+                      "error": "Invalid Region Code",
+                      "message": "Region code must be a 2-letter ISO country code (e.g., 'US', 'GB').",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  },
+                  "invalid_number_format": {
+                    "summary": "Invalid number format",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:21.336Z",
+                      "status": 400,
+                      "error": "Invalid Number Format",
+                      "message": "The input does not match the expected structure of a phone number.",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  },
+                  "number_too_long": {
+                    "summary": "Number too long",
+                    "value": {
+                      "timestamp": "2026-07-27T12:55:22.391Z",
+                      "status": 400,
+                      "error": "Number Too Long",
+                      "message": "The phone number has more digits than any valid phone number can have.",
+                      "path": "/v1.0/phone-number/info"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found – Wrong HTTP method used on the endpoint (e.g. GET instead of POST)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "wrongMethod": {
+                    "summary": "GET used instead of POST",
+                    "value": {
+                      "error": "Resource Not Found",
+                      "message": "The requested resource could not be found. Please verify the URL and try again.",
+                      "path": "/v1.0/phone/validation",
+                      "status": 404,
+                      "timestamp": "2026-07-27T12:56:14.351Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout – Timed out while connecting to the remote server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Error response",
+                    "value": {
+                      "timestamp": "2026-06-06T14:00:00.000Z",
+                      "path": "/v1.0/phone/validation",
+                      "status": 408,
+                      "error": "Request Timeout",
+                      "message": "Timed out while connecting to the remote URL."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limit Exceeded – API rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Error response",
+                    "value": {
+                      "timestamp": "2026-06-06T14:00:00.000Z",
+                      "path": "/v1.0/phone/validation",
+                      "status": 429,
+                      "error": "Too Many Requests",
+                      "message": "API rate limit exceeded."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "validatePhoneNumber"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "PhoneValidationResponse": {
+        "type": "object",
+        "properties": {
+          "raw_input": {
+            "$ref": "#/components/schemas/PhoneRawInput"
+          },
+          "possible": {
+            "type": "boolean",
+            "description": "Whether the number is possible (length and format checks only). A number can be possible but not valid."
+          },
+          "valid": {
+            "type": "boolean",
+            "description": "Whether the number is valid according to the numbering plan."
+          },
+          "country_prefix": {
+            "type": "integer",
+            "description": "The international dialing prefix for the number's country (e.g., 1 for US/Canada, 44 for United Kingdom)."
+          },
+          "national_number": {
+            "type": "integer",
+            "description": "The national significant number (the phone number without the country code)."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "ISO-2 country code inferred from the number (e.g., US, GB)."
+          },
+          "carrier": {
+            "type": "string",
+            "description": "Carrier name associated with the number (if available). May not reflect ported carriers."
+          },
+          "location": {
+            "type": "string",
+            "description": "Geographic description (city/region) for the number (if applicable)."
+          },
+          "time_zones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Array of possible time zones associated with the number."
+          },
+          "line_type": {
+            "type": "string",
+            "description": "Classification of the phone line (MOBILE, FIXED_LINE, VOIP, etc.).",
+            "enum": [
+              "MOBILE",
+              "FIXED_LINE",
+              "FIXED_LINE_OR_MOBILE",
+              "VOIP",
+              "TOLL_FREE",
+              "PREMIUM_RATE",
+              "SHARED_COST",
+              "PERSONAL_NUMBER",
+              "PAGER",
+              "UAN",
+              "VOICEMAIL",
+              "UNKNOWN"
+            ]
+          },
+          "formats": {
+            "$ref": "#/components/schemas/PhoneFormats"
+          },
+          "area_code_length": {
+            "type": "integer",
+            "description": "Length of the geographic area code. Only applies to geographically-assigned numbers."
+          },
+          "ndc_length": {
+            "type": "integer",
+            "description": "Length of the National Destination Code (NDC), the routing prefix within a country."
+          },
+          "can_be_internationally_dialled": {
+            "type": "boolean",
+            "description": "Whether the number can be dialled internationally. false for short codes, emergency numbers, and domestic-only services."
+          }
+        },
+        "description": "Phone validation response containing validation status and metadata.",
+        "required": ["raw_input", "possible", "valid"]
+      },
+      "PhoneRawInput": {
+        "type": "object",
+        "description": "Original request payload sent by the caller.",
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "The phone number as entered by the user."
+          },
+          "region": {
+            "type": "string",
+            "description": "ISO-2 country code. Present when provided in the request."
+          },
+          "dialer_region": {
+            "type": "string",
+            "description": "ISO-2 country code of the dialing origin. Present when provided in the request."
+          }
+        },
+        "required": ["number"]
+      },
+      "PhoneFormats": {
+        "type": "object",
+        "description": "Four standardized representations of the phone number.",
+        "properties": {
+          "E164": {
+            "type": "string",
+            "description": "Number in E.164 format, the standard machine-readable format."
+          },
+          "International": {
+            "type": "string",
+            "description": "Human-readable international format with country code."
+          },
+          "National": {
+            "type": "string",
+            "description": "Local format as dialed within the country."
+          },
+          "RFC3966": {
+            "type": "string",
+            "description": "URI format following RFC 3966 for tel: links."
+          }
+        },
+        "required": []
+      },
+      "PhoneValidationRequest": {
+        "type": "object",
+        "description": "Request body for phone validation.",
+        "required": ["number"],
+        "properties": {
+          "number": {
+            "type": "string",
+            "description": "Phone number to validate. Accepts international format (+14155552671), local format (4155552671) with region, or IDD format (0014155552671) with dialer_region."
+          },
+          "region": {
+            "type": "string",
+            "description": "Two-letter ISO country code (e.g., US, GB). Required when number is in local format without + prefix. Cannot be used together with dialer_region."
+          },
+          "dialer_region": {
+            "type": "string",
+            "description": "Two-letter ISO country code indicating the country the number is being dialed from. Required when number uses IDD exit code. Cannot be used together with region."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        },
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"]
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

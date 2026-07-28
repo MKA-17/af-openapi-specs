@@ -1,0 +1,208 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF File Status API Reference",
+    "version": "1.0.0",
+    "description": "Check the status of a PDF file using its unique file ID. Returns file metadata including name, type, creation time, and scheduled deletion time. Use this endpoint to verify file availability after upload or before processing.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF File Status API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/file-status": {
+      "get": {
+        "tags": ["Task Status and File Info APIs"],
+        "summary": "Check file status",
+        "description": "This API checks the status of a PDF file using its unique file ID, providing information about its creation and potential deletion time.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The unique ID of the file whose status is requested.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileStatusResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "File found",
+                    "value": {
+                      "fileId": "b7ece7d4-1141-4143-98cb-7b4b818d6d82",
+                      "fileName": "test.pdf",
+                      "fileType": "pdf",
+                      "fileCreationTime": "2026-07-27T10:46:36",
+                      "fileDeletionTime": "2026-08-26"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing required file_id parameter",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingFileId": {
+                    "summary": "Missing file_id parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/file-status",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:46:38.333Z"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File ID Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "File ID not found",
+                    "value": {
+                      "timestamp": "2026-07-27T10:46:37.828Z",
+                      "path": "/v1.0/pdf/file-status",
+                      "status": 404,
+                      "error": "File ID Not Found",
+                      "message": "Please provide a valid file ID."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "getFileStatus"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "FileStatusResponse": {
+        "type": "object",
+        "required": [
+          "fileId",
+          "fileName",
+          "fileType",
+          "fileCreationTime",
+          "fileDeletionTime"
+        ],
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "description": "The unique identifier of the file."
+          },
+          "fileName": {
+            "type": "string",
+            "description": "The name of the file."
+          },
+          "fileType": {
+            "type": "string",
+            "description": "The type of the file (e.g., 'pdf')."
+          },
+          "fileCreationTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The timestamp when the file was created."
+          },
+          "fileDeletionTime": {
+            "type": "string",
+            "format": "date",
+            "description": "Date on which the file is scheduled to be deleted, in UTC."
+          }
+        },
+        "description": "File status response containing metadata about the PDF file."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

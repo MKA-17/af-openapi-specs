@@ -1,0 +1,284 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bulk Domain Checker API - Search Multiple Domains at Once",
+    "version": "1.0.0",
+    "description": "Check the availability of up to 100 domains in a single POST request. Uses DNS-based or WHOIS-based lookups to determine domain availability. Returns an array of results with domain name, availability status, and a per-item processing flag. Domains that fail to resolve are still returned with status false and no domainAvailability field, rather than as a separate error object — such a batch returns 206 Partial Success, and result order is not guaranteed to match the request order.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Bulk Domain Checker API Server"
+    }
+  ],
+  "paths": {
+    "/domain/availability": {
+      "post": {
+        "tags": ["Domain APIs"],
+        "summary": "Check the availability of multiple domains in a single request.",
+        "description": "Perform Bulk Domain Availability checks using a list of domains. Supports upto `100 Domains Per Request`.",
+        "operationId": "checkBulkDomainAvailability",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["dns", "whois"],
+              "default": "dns"
+            },
+            "description": "Specify the data source for domain availability checks. Use \"dns\" for DNS-based lookups or \"whois\" for WHOIS-based lookups. By default, \"dns\" is used."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDomainCheckRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Typical bulk domain check request",
+                  "value": {
+                    "domainNames": [
+                      "google.com",
+                      "example.com",
+                      "techguruss.com"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response — every domain in the batch resolved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkDomainCheckResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "All domains resolved",
+                    "value": {
+                      "bulk_domain_availability_response": [
+                        {
+                          "domain": "google.com",
+                          "domainAvailability": false,
+                          "status": true
+                        },
+                        {
+                          "domain": "thisdomainisdefinitelyavailablexyz123abc.com",
+                          "domainAvailability": true,
+                          "status": true
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial Success — one or more domains in the batch failed to resolve. Failed entries have status false and no domainAvailability field. Even a batch where every domain fails still returns 206, not an error status.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkDomainCheckResponse"
+                },
+                "examples": {
+                  "partialFailure": {
+                    "summary": "Mix of resolved and failed domains",
+                    "value": {
+                      "bulk_domain_availability_response": [
+                        {
+                          "domain": "notadomain",
+                          "status": false
+                        },
+                        {
+                          "domain": "google.com",
+                          "domainAvailability": false,
+                          "status": true
+                        },
+                        {
+                          "domain": "test.an",
+                          "status": false
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidBody": {
+                    "summary": "domainNames field missing or malformed",
+                    "value": {
+                      "error": "Invalid request body Exception",
+                      "message": "Please provide data in required format in request body",
+                      "path": "/v1.0/domain/availability",
+                      "status": 400,
+                      "timestamp": "2026-07-27T12:23:33.394Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large — Request body exceeds the size limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "payloadTooLarge": {
+                    "summary": "Too many domains / body too large",
+                    "value": {
+                      "error": "Payload too large Exception",
+                      "message": "Maximum request body size limit exceeded",
+                      "path": "/v1.0/domain/availability",
+                      "status": 413,
+                      "timestamp": "2026-07-27T12:23:46.923Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "BulkDomainCheckRequest": {
+        "type": "object",
+        "description": "Request body for bulk domain availability check.",
+        "required": ["domainNames"],
+        "properties": {
+          "domainNames": {
+            "type": "array",
+            "description": "List of domain names to check. Maximum 100 domains per request.",
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BulkDomainCheckResponse": {
+        "type": "object",
+        "description": "Wrapper containing the per-domain results array.",
+        "required": ["bulk_domain_availability_response"],
+        "properties": {
+          "bulk_domain_availability_response": {
+            "type": "array",
+            "description": "Array of per-domain results. Order is not guaranteed to match the request order. Domains that fail to resolve appear with status false and no domainAvailability field.",
+            "items": {
+              "$ref": "#/components/schemas/BulkDomainCheckItem"
+            }
+          }
+        }
+      },
+      "BulkDomainCheckItem": {
+        "type": "object",
+        "description": "Result for a single domain in a bulk check. domainAvailability is present only when status is true.",
+        "required": ["domain", "status"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Name of the queried domain."
+          },
+          "domainAvailability": {
+            "type": "boolean",
+            "description": "True if available, false if not available. Absent when this domain failed to resolve (status false)."
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Whether this domain was successfully processed."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Currency Time Series - Historical Currency Exchange Rates for a Time Interval",
+    "version": "1.0.0",
+    "description": "Retrieve day-by-day historical exchange rates for any base currency over a custom date range up to 1 year. Returns an array of daily rate objects, each containing the date and a map of currency codes to exchange rate strings. Accepts optional target symbols and a base currency (defaults to USD). Returns a 400 error for invalid dates or range exceeded, and a 404 error when no data is available.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Currency Time Series API Server"
+    }
+  ],
+  "paths": {
+    "/currency/time-series": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Get time series of exchange rates",
+        "description": "Returns day-by-day historical exchange rates for a custom date range.",
+        "operationId": "getTimeSeries",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in `YYYY-MM-DD` format.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "description": "End date in `YYYY-MM-DD` format. Defaults to yesterday.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "base",
+            "in": "query",
+            "required": false,
+            "description": "Base currency code. Defaults to `USD`.",
+            "schema": {
+              "type": "string",
+              "default": "USD"
+            }
+          },
+          {
+            "name": "symbols",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated currency codes. Omit to get all available rates.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyTimeseriesResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "startDate": "2025-01-01",
+                      "endDate": "2025-01-07",
+                      "base": "USD",
+                      "historicalRatesList": [
+                        {
+                          "date": "2025-01-01",
+                          "rates": {
+                            "EUR": "0.96605",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-02",
+                          "rates": {
+                            "EUR": "0.9739",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-03",
+                          "rates": {
+                            "EUR": "0.97005",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-04",
+                          "rates": {
+                            "EUR": "0.97005",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-05",
+                          "rates": {
+                            "EUR": "0.9704",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-06",
+                          "rates": {
+                            "EUR": "0.96305",
+                            "PKR": "278.4"
+                          }
+                        },
+                        {
+                          "date": "2025-01-07",
+                          "rates": {
+                            "EUR": "0.967",
+                            "PKR": "278.4"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid dates or range exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingStartDate": {
+                    "summary": "Missing required startDate parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/currency/time-series",
+                      "status": 400,
+                      "timestamp": "2026-07-27T12:08:01.002Z"
+                    }
+                  },
+                  "rangeExceeded": {
+                    "summary": "Interval exceeds 1 year",
+                    "value": {
+                      "timestamp": 1785154081486,
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "You can only retrieve time series data for a maximum interval of 1 Year",
+                      "path": "/v2.0/timeseries"
+                    }
+                  },
+                  "startAfterEnd": {
+                    "summary": "startDate is after endDate or the current date (includes any future date)",
+                    "value": {
+                      "timestamp": 1785154082031,
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Starting date cannot be after current date or ending date.",
+                      "path": "/v2.0/timeseries"
+                    }
+                  },
+                  "invalidDateFormat": {
+                    "summary": "startDate/endDate not in YYYY-MM-DD format",
+                    "value": {
+                      "timestamp": 1785154106063,
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Provided Dates are in Invalid Format. Dates must be in a valid format YYYY-MM-DD!",
+                      "path": "/v2.0/timeseries"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - No data for interval",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "noData": {
+                    "summary": "base or symbols not supported for the given interval",
+                    "value": {
+                      "timestamp": 1785154125982,
+                      "status": 404,
+                      "error": "Not Found Exception",
+                      "message": "Rates of provided base and symbols are not found for given intervals.",
+                      "path": "/v2.0/timeseries"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CurrencyTimeseriesResponse": {
+        "type": "object",
+        "required": ["startDate", "endDate", "base", "historicalRatesList"],
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "description": "Start date of the interval (YYYY-MM-DD)."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "End date of the interval (YYYY-MM-DD)."
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency used for all rates in the series."
+          },
+          "historicalRatesList": {
+            "type": "array",
+            "description": "Array of daily rate objects within the specified interval.",
+            "items": {
+              "$ref": "#/components/schemas/CurrencyTimeSeriesItem"
+            }
+          }
+        },
+        "description": "Currency time series response containing daily exchange rate data over a date range."
+      },
+      "CurrencyTimeSeriesItem": {
+        "type": "object",
+        "description": "Daily exchange rate data for a specific date.",
+        "required": ["date", "rates"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date within the interval (YYYY-MM-DD)."
+          },
+          "rates": {
+            "type": "object",
+            "description": "Map of currency codes to exchange rate strings for that date. Each key is a currency code and the value is an exchange rate string.",
+            "additionalProperties": {
+              "title": "ExchangeRateString",
+              "type": "string",
+              "description": "Exchange rate value as a string for this currency code."
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests. Gateway-level validation errors use an ISO 8601 timestamp and the public endpoint path; currency-service errors use a Unix millisecond timestamp and an internal service path instead.",
+        "required": ["message"],
+        "properties": {
+          "timestamp": {
+            "type": ["string", "integer"],
+            "description": "Timestamp when the error occurred — ISO 8601 string for gateway errors, Unix milliseconds integer for currency-service errors."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "error": {
+            "type": "string",
+            "description": "Specific error type (e.g., Invalid Param Exception, Not Found Exception)."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path (gateway errors) or internal service path (currency-service errors) that produced the error."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

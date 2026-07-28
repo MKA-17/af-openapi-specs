@@ -1,0 +1,326 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Reverse Geocoding API - Convert Coordinates to a Street Address",
+    "version": "1.0.0",
+    "description": "Convert a WGS84 latitude/longitude pair into a single human-readable address or place name. Returns the nearest matching location's structured address components (street, city, state, country), a bounding box, and any points of interest, such as a shop or building, at that location. Use the `Accept-Language` header to localize the returned name and address fields to a preferred language, falling back to `en` if the language isn't supported. Both `lat` (-90 to 90) and `lon` (-180 to 180) are required; missing, non-numeric, or out-of-range values return a `400` error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Reverse Geocoding API Server"
+    }
+  ],
+  "paths": {
+    "/geocoder/reverse": {
+      "get": {
+        "tags": ["Geocoder APIs"],
+        "summary": "Convert coordinates into a human-readable address",
+        "description": "Look up the nearest address or place name for a given latitude and longitude pair.",
+        "operationId": "reverseGeocode",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": true,
+            "description": "WGS84 latitude value, ranging from -90 to 90.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": true,
+            "description": "WGS84 longitude value, ranging from -180 to 180.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": false,
+            "description": "Preferred language order for the result name and address, as a comma-separated list of language codes or a single code. Results are returned in the first matched language, falling back to `en` if none match.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful geocoding response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GeocodeResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "lat": 40.7489669,
+                      "lon": -73.985399,
+                      "name": "LensCrafters",
+                      "category": "shop",
+                      "type": "optician",
+                      "poi": [
+                        {
+                          "name": "LensCrafters",
+                          "category": "shop",
+                          "type": "optician"
+                        },
+                        {
+                          "name": "7",
+                          "category": "place",
+                          "type": "house_number"
+                        }
+                      ],
+                      "street": "West 34th Street",
+                      "area": "Manhattan, New York County",
+                      "postcode": "10001",
+                      "city": "New York",
+                      "state_code": "US-NY",
+                      "state": "New York",
+                      "country_code": "US",
+                      "country": "United States",
+                      "full_address": "LensCrafters, 7, West 34th Street, Midtown South, Manhattan Community Board 5, Manhattan, New York County, New York, 10001, United States",
+                      "bounding_box": [
+                        "40.7489169",
+                        "40.7490169",
+                        "-73.9854490",
+                        "-73.9853490"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid or missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingParams": {
+                    "summary": "Missing required `lat` or `lon` parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/geocoder/reverse",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:45.148Z"
+                    }
+                  },
+                  "invalidLatitudeRange": {
+                    "summary": "`lat` outside the -90 to 90 range",
+                    "value": {
+                      "error": "Invalid Latitude Provided",
+                      "message": "Latitude must be between -90 and 90.",
+                      "path": "/v1.0/geocoder/reverse",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:45.727Z"
+                    }
+                  },
+                  "invalidLongitudeRange": {
+                    "summary": "`lon` outside the -180 to 180 range",
+                    "value": {
+                      "error": "Invalid Longitude Provided",
+                      "message": "Longitude must be between -180 and 180.",
+                      "path": "/v1.0/geocoder/reverse",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:46.267Z"
+                    }
+                  },
+                  "nonNumericValue": {
+                    "summary": "`lat` or `lon` is not a valid number",
+                    "value": {
+                      "error": "Invalid Parameters Provided",
+                      "message": "Please provide valid parameters.",
+                      "path": "/v1.0/geocoder/reverse",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:46.809Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "GeocodeResponse": {
+        "type": "object",
+        "description": "The nearest geocoded location to the given coordinates, with structured address components.",
+        "required": [
+          "lat",
+          "lon",
+          "country_code",
+          "country",
+          "full_address",
+          "bounding_box"
+        ],
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "float",
+            "description": "WGS84 latitude value for the location."
+          },
+          "lon": {
+            "type": "number",
+            "format": "float",
+            "description": "WGS84 longitude value for the location."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the primary place searched."
+          },
+          "category": {
+            "type": "string",
+            "description": "High-level category of the place, e.g. amenity, place, natural, building, highway."
+          },
+          "type": {
+            "type": "string",
+            "description": "Specific kind within the category, e.g. fast_food, city, park, residential, house_number."
+          },
+          "poi": {
+            "type": "array",
+            "description": "Points of interest at this location.",
+            "items": {
+              "$ref": "#/components/schemas/PointOfInterest"
+            }
+          },
+          "street": {
+            "type": "string",
+            "description": "Street or road name."
+          },
+          "area": {
+            "type": "string",
+            "description": "Intra-city area below city level, e.g. suburb, borough, quarter, ward, district, sector, zone, tehsil, taluka, neighbourhood."
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Postal code of the area."
+          },
+          "city": {
+            "type": "string",
+            "description": "Settlement label appropriate to the country, e.g. city, town, municipality."
+          },
+          "county": {
+            "type": "string",
+            "description": "Second-tier administrative area, e.g. county, district, shire, prefecture."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Subdivision code when available, typically ISO-3166-2 (e.g. US-TX, PK-PB)."
+          },
+          "state": {
+            "type": "string",
+            "description": "First-tier administrative area; varies by country, e.g. state, region, province, division, autonomous community."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "Two-letter country code in upper case, ISO-3166-1 alpha-2."
+          },
+          "country": {
+            "type": "string",
+            "description": "Country name of the searched place."
+          },
+          "full_address": {
+            "type": "string",
+            "description": "Single-line, human-readable address of the location."
+          },
+          "bounding_box": {
+            "type": "array",
+            "description": "Extent of the feature as `[lat_min, lat_max, lon_min, lon_max]` (south, north, west, east) in WGS84 decimal degrees.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        }
+      },
+      "PointOfInterest": {
+        "type": "object",
+        "description": "A point of interest located at or near a geocoded result.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the point of interest."
+          },
+          "category": {
+            "type": "string",
+            "description": "High-level category of the point of interest, e.g. amenity, place, natural, building, highway."
+          },
+          "type": {
+            "type": "string",
+            "description": "Specific kind within the category, e.g. fast_food, city, park, residential, house_number."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,301 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Commodity Fluctuation API ",
+    "version": "1.0.0",
+    "description": "Calculate price change and percentage movement for any commodity over a custom date range. Returns the opening price, closing price, absolute change, and percentage change for each symbol. Accepts one or more comma-separated commodity symbols with a start and end date in YYYY-MM-DD format. Returns a 400 error for invalid dates or a date range where start is after end, and a 404 error for unsupported symbols or a date range with no available data.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Commodity Fluctuation API Server"
+    }
+  ],
+  "paths": {
+    "/commodity/fluctuation": {
+      "get": {
+        "tags": ["Commodity APIs"],
+        "summary": "Get commodity price fluctuations",
+        "description": "Returns price fluctuation metrics (start, end, change, percent change) for the requested commodity symbols over a date range.",
+        "operationId": "getCommodityFluctuation",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format. Currently only `json` is supported.",
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json"]
+            }
+          },
+          {
+            "name": "symbols",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of commodity symbols.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "description": "Start date in `YYYY-MM-DD` format.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "description": "End date in `YYYY-MM-DD` format.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommodityFluctuationResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "startDate": "2024-01-01",
+                      "endDate": "2024-01-31",
+                      "rates": {
+                        "WTIOIL-SPOT": {
+                          "startRate": 72.02,
+                          "endRate": 75.81,
+                          "change": 3.79,
+                          "changePercent": 5.26
+                        },
+                        "XAU": {
+                          "startRate": 2063.63,
+                          "endRate": 2039.83,
+                          "change": -23.8,
+                          "changePercent": -1.15
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing parameters or invalid dates",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingSymbols": {
+                    "summary": "Missing required symbols parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/commodity/fluctuation",
+                      "status": 400,
+                      "timestamp": "2026-07-27T11:37:24.273Z"
+                    }
+                  },
+                  "invalidDateFormat": {
+                    "summary": "Date is not in YYYY-MM-DD format",
+                    "value": {
+                      "timestamp": "2026-07-27T11:37:22.687Z",
+                      "path": "/rates/fluctuation",
+                      "code": 400,
+                      "error": "VALIDATION_ERROR",
+                      "message": "Invalid Date Format (YYYY-MM-DD)."
+                    }
+                  },
+                  "dateNotExist": {
+                    "summary": "Date does not exist on the calendar (e.g. Feb 30)",
+                    "value": {
+                      "timestamp": "2026-07-27T11:37:33.565Z",
+                      "path": "/rates/fluctuation",
+                      "code": 400,
+                      "error": "VALIDATION_ERROR",
+                      "message": "Invalid Date: The provided start date or end date does not exist."
+                    }
+                  },
+                  "startAfterEnd": {
+                    "summary": "startDate is after endDate",
+                    "value": {
+                      "timestamp": "2026-07-27T11:37:23.206Z",
+                      "path": "/rates/fluctuation",
+                      "code": 400,
+                      "error": "VALIDATION_ERROR",
+                      "message": "Start date cannot be after end date"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Symbol or data not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "symbolNotFound": {
+                    "summary": "Symbol Not Found",
+                    "value": {
+                      "timestamp": "2026-07-27T11:37:23.759Z",
+                      "path": "/rates/fluctuation",
+                      "code": 404,
+                      "error": "SYMBOL_NOT_FOUND",
+                      "message": "The symbol is not supported, please visit the documentation for a list of supported symbols"
+                    }
+                  },
+                  "noData": {
+                    "summary": "No data available for the given date range",
+                    "value": {
+                      "timestamp": "2026-07-27T11:37:34.167Z",
+                      "path": "/rates/fluctuation",
+                      "code": 404,
+                      "error": "DATA_NOT_FOUND",
+                      "message": "No data found for the given date range"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CommodityFluctuationResponse": {
+        "type": "object",
+        "required": ["success", "startDate", "endDate", "rates"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "`true` for successful requests."
+          },
+          "startDate": {
+            "type": "string",
+            "description": "Start date of the interval (YYYY-MM-DD)."
+          },
+          "endDate": {
+            "type": "string",
+            "description": "End date of the interval (YYYY-MM-DD)."
+          },
+          "rates": {
+            "$ref": "#/components/schemas/CommodityFluctuationRates"
+          }
+        },
+        "description": "Commodity fluctuation response containing price change data per symbol over a date range."
+      },
+      "CommodityFluctuationRates": {
+        "type": "object",
+        "description": "Map of requested commodity symbols to their fluctuation metrics. Each key is a commodity symbol (e.g. XAU).",
+        "additionalProperties": {
+          "title": "CommodityFluctuationItem",
+          "type": "object",
+          "description": "Fluctuation metrics for a single commodity over a date range.",
+          "required": ["startRate", "endRate", "change", "changePercent"],
+          "properties": {
+            "startRate": {
+              "type": "number",
+              "format": "float",
+              "description": "Price of the commodity on the start date."
+            },
+            "endRate": {
+              "type": "number",
+              "format": "float",
+              "description": "Price of the commodity on the end date."
+            },
+            "change": {
+              "type": "number",
+              "format": "float",
+              "description": "Absolute price difference between end and start dates. May be negative."
+            },
+            "changePercent": {
+              "type": "number",
+              "format": "float",
+              "description": "Percentage price change from start to end date. May be negative."
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests. Gateway-level validation errors populate status; commodity-service errors (date/symbol/data validation) populate code instead — check whichever is present.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type (e.g., Invalid Param Exception, VALIDATION_ERROR, SYMBOL_NOT_FOUND, DATA_NOT_FOUND)."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path (gateway errors) or internal service path (commodity-service errors) that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code. Present on gateway-level errors."
+          },
+          "code": {
+            "type": "integer",
+            "description": "HTTP status code. Present on commodity-service errors instead of status."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Flags API - Country & Organization Flags in Multiple Formats, Shapes, or Sizes",
+    "version": "1.0.0",
+    "description": "Retrieve country and international organization flag images in PNG, WEBP, or SVG format. Supports flat and round shapes in five sizes (16px to 64px, PNG/WEBP only — size is ignored for SVG). Requires a country code or organization identifier, the flag type (country or organization), and the shape (flat or round). Organization identifiers are case-sensitive and must exactly match an entry from the Supported Flags endpoint (e.g. NATO, European_Union, United_Nations) — lowercase or abbreviated forms are not recognized. Optional format (png, webp, svg) and size parameters control the output. Missing/invalid parameter values return a 400 error; unrecognized country or organization identifiers return a 404. On success the response body is the raw binary image, not JSON.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Flags API Server"
+    }
+  ],
+  "paths": {
+    "/flags": {
+      "get": {
+        "tags": ["Flags APIs"],
+        "summary": "Retrieve a country or organization flag image",
+        "description": "Returns a flag image for a specified country or international organization. Supports PNG, WEBP, and SVG formats with flat or round shapes.",
+        "operationId": "getFlag",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "required": true,
+            "description": "Country code in ISO 3166-1 alpha-2 format for country flags, or organization identifier for organization flags. Organization identifiers are case-sensitive and must exactly match an entry from the Supported Flags endpoint (e.g. NATO, European_Union) — lowercase or abbreviated forms return a 404.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "Type of flag to retrieve. Possible values: country, organization.",
+            "schema": {
+              "type": "string",
+              "enum": ["country", "organization"]
+            }
+          },
+          {
+            "name": "shape",
+            "in": "query",
+            "required": true,
+            "description": "Shape of the flag image. Possible values: flat, round.",
+            "schema": {
+              "type": "string",
+              "enum": ["flat", "round"]
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Image format. Possible values: png, webp, svg. Default: png.",
+            "schema": {
+              "type": "string",
+              "enum": ["png", "webp", "svg"],
+              "default": "png"
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "required": false,
+            "description": "Size of the flag image in pixels. Possible values: 16px, 24px, 32px, 48px, 64px. Default is 64px when omitted. Applies to PNG and WEBP formats only; silently ignored (no error) when format is svg, since SVG is vector-scalable.",
+            "schema": {
+              "type": "string",
+              "enum": ["16px", "24px", "32px", "48px", "64px"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with the flag image as raw binary data (not JSON) in the format requested",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSchemas"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSchemas"
+                }
+              },
+              "image/svg+xml": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseSchemas"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing required parameter, or type/shape/format/size is not one of the allowed enum values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingParams": {
+                    "summary": "Missing required name, type, or shape parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/flags",
+                      "status": 400,
+                      "timestamp": "2026-07-24T11:04:56.443Z"
+                    }
+                  },
+                  "InvalidType": {
+                    "summary": "type is not country or organization",
+                    "value": {
+                      "timestamp": "2026-07-24T11:04:56.981953+00:00",
+                      "path": "/flags",
+                      "status": 400,
+                      "error": "Bad Request",
+                      "message": "Invalid type"
+                    }
+                  },
+                  "InvalidShape": {
+                    "summary": "shape is not flat or round",
+                    "value": {
+                      "timestamp": "2026-07-24T11:04:57.507529+00:00",
+                      "path": "/flags",
+                      "status": 400,
+                      "error": "Bad Request",
+                      "message": "Invalid shape"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Country code or organization identifier not recognized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidCountryCode": {
+                    "summary": "Invalid country name or code",
+                    "value": {
+                      "timestamp": "2026-07-24T11:04:58.077767+00:00",
+                      "path": "/flags",
+                      "status": 404,
+                      "error": "Not Found",
+                      "message": "Invalid country name or code: ZZ"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ApiResponseSchemas": {
+        "type": "string",
+        "format": "binary",
+        "title": "Flag Image Response",
+        "description": "The flag image returned as raw binary data in the requested format (not JSON). Content-Type is one of image/png, image/webp, or image/svg+xml depending on the format parameter."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests. path and timestamp formatting differ between the missing-parameter case (versioned path, Z-suffixed timestamp) and the invalid-value/not-found cases (unversioned path, offset timestamp with microseconds), since this endpoint is served by a different backend than most of the API.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

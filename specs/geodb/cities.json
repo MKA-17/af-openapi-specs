@@ -1,0 +1,288 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Cities API - Get City Data for Any Country",
+    "version": "1.0.0",
+    "description": "Retrieve all cities for a given country with their latitude, longitude, administrative unit details, and ISO country code. Uses ISO 3166-1 alpha-2 country codes. Optionally filter by administrative unit code using the `admin_unit` parameter to narrow results to a specific region or province; an admin_unit code that doesn't exist for the country returns a 400 error here (unlike the Administrative Units endpoint's admin_level filter, which returns an empty array for an unknown level). Each city result includes name, coordinates, admin unit information (name, code, level), and the two-letter country code. There is no pagination: large countries return every city in one response. A valid country code is required.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Cities API Server"
+    }
+  ],
+  "paths": {
+    "/geo/cities": {
+      "get": {
+        "tags": ["GeoDB APIs"],
+        "summary": "Retrieve cities for a country with optional admin unit filtering",
+        "description": "Returns all cities for a country, optionally filtered by administrative unit. Each city includes name, coordinates, admin unit details, and ISO country code.",
+        "operationId": "getCities",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": true,
+            "description": "Country code in ISO 3166-1 alpha-2 format (e.g., US, PK).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "admin_unit",
+            "in": "query",
+            "required": false,
+            "description": "Administrative unit code used to filter cities within a specific region. An admin_unit code that doesn't exist for the specified country returns a 400 error, not an empty result.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of cities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitiesResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "cities": [
+                        {
+                          "name": "Aberdeen",
+                          "latitude": 57.14369,
+                          "longitude": -2.09814,
+                          "admin_unit": {
+                            "name": "Aberdeen",
+                            "admin_code": "ABE",
+                            "admin_level": "council area"
+                          },
+                          "iso_alpha_2": "GB"
+                        },
+                        {
+                          "name": "Balmedie",
+                          "latitude": 57.25052,
+                          "longitude": -2.06163,
+                          "admin_unit": {
+                            "name": "Aberdeen",
+                            "admin_code": "ABE",
+                            "admin_level": "council area"
+                          },
+                          "iso_alpha_2": "GB"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing country parameter, invalid country code, or admin_unit code not found for the country",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingCountry": {
+                    "summary": "Missing required country parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/geo/cities",
+                      "status": 400,
+                      "timestamp": "2026-07-24T10:56:41.424Z"
+                    }
+                  },
+                  "InvalidCountryCode": {
+                    "summary": "Malformed or unrecognized country code",
+                    "value": {
+                      "timestamp": "2026-07-24T10:56:41.913Z",
+                      "path": "/v1/cities",
+                      "status": 400,
+                      "error": "Invalid Country Code provided",
+                      "message": "Only ISO 3166-1 alpha-2 codes country codes are supported."
+                    }
+                  },
+                  "InvalidAdminCode": {
+                    "summary": "admin_unit code does not exist for the given country",
+                    "value": {
+                      "timestamp": "2026-07-24T10:56:42.419Z",
+                      "path": "/v1/cities",
+                      "status": 400,
+                      "error": "Invalid Admin Code provided",
+                      "message": "Please provide a valid admin code."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Country is a recognized ISO 3166-1 alpha-2 code but has no cities in the database (e.g. Vatican City)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NoCities": {
+                    "summary": "No cities for this country",
+                    "value": {
+                      "timestamp": "2026-07-24T10:56:42.941Z",
+                      "path": "/v1/cities",
+                      "status": 404,
+                      "error": "No Cities present in country",
+                      "message": "This country does not have any cities associated with it."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CitiesResponse": {
+        "type": "object",
+        "description": "Response containing every city for the requested country (optionally filtered by admin_unit), returned unpaginated in a single array.",
+        "required": ["cities"],
+        "properties": {
+          "cities": {
+            "type": "array",
+            "description": "An array of city objects for the specified country, optionally filtered by admin unit.",
+            "items": {
+              "$ref": "#/components/schemas/CityItem"
+            }
+          }
+        }
+      },
+      "CityItem": {
+        "type": "object",
+        "description": "A city object containing name, coordinates, admin unit, and country code.",
+        "required": [
+          "name",
+          "latitude",
+          "longitude",
+          "admin_unit",
+          "iso_alpha_2"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of the city."
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The geographic latitude of the city in decimal degrees."
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The geographic longitude of the city in decimal degrees."
+          },
+          "iso_alpha_2": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 country code the city belongs to."
+          },
+          "admin_unit": {
+            "$ref": "#/components/schemas/AdminUnit"
+          }
+        }
+      },
+      "AdminUnit": {
+        "type": "object",
+        "description": "An object describing the administrative unit the city belongs to.",
+        "required": ["name", "admin_code", "admin_level"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The full name of the administrative unit."
+          },
+          "admin_code": {
+            "type": "string",
+            "description": "The short code of the administrative unit."
+          },
+          "admin_level": {
+            "type": "string",
+            "description": "The administrative level type of the unit (e.g., province, council area)."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

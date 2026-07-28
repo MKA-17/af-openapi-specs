@@ -1,0 +1,362 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Timezone Converter API Reference",
+    "version": "1.0.0",
+    "description": "Convert a timestamp from one timezone to another using timezone names, GPS coordinates, location addresses, IATA/ICAO airport codes, or UN/LOCODEs. Returns the converted time, the original time, and the hour/minute difference between the two timezones. Supports pair-based lookups --- provide source and target using any supported identifier type (e.g., `tz_from` + `tz_to` for IANA names, `lat_from`/`long_from` + `lat_to`/`long_to` for coordinates, `iata_from` + `iata_to` for airport codes). If no `time` parameter is provided the API converts the current time.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Timezone Converter API Server"
+    }
+  ],
+  "paths": {
+    "/timezone/converter": {
+      "get": {
+        "tags": ["Timezone APIs"],
+        "summary": "Convert a timestamp from one timezone to another using any supported location identifier",
+        "description": "Convert a given time from one timezone to another using timezone names, GPS coordinates, location addresses, IATA/ICAO airport codes, or UN/LOCODEs.",
+        "operationId": "convertTimezone",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "time",
+            "in": "query",
+            "required": false,
+            "description": "Time to convert in yyyy-MM-dd HH:mm or yyyy-MM-dd HH:mm:ss format. Omit to convert the current time.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tz_from",
+            "in": "query",
+            "required": false,
+            "description": "Source timezone name in IANA format (e.g., Asia/Kolkata) to convert from.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tz_to",
+            "in": "query",
+            "required": false,
+            "description": "Target timezone name in IANA format (e.g., America/New_York) to convert to.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat_from",
+            "in": "query",
+            "required": false,
+            "description": "Latitude of source location for coordinate-based conversion.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "long_from",
+            "in": "query",
+            "required": false,
+            "description": "Longitude of source location for coordinate-based conversion.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "lat_to",
+            "in": "query",
+            "required": false,
+            "description": "Latitude of target location for coordinate-based conversion.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "long_to",
+            "in": "query",
+            "required": false,
+            "description": "Longitude of target location for coordinate-based conversion.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "location_from",
+            "in": "query",
+            "required": false,
+            "description": "Source location address (city and country) for address-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location_to",
+            "in": "query",
+            "required": false,
+            "description": "Target location address (city and country) for address-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "iata_from",
+            "in": "query",
+            "required": false,
+            "description": "Source IATA airport code (3-letter, e.g., JFK) for airport-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "iata_to",
+            "in": "query",
+            "required": false,
+            "description": "Target IATA airport code (3-letter) for airport-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "icao_from",
+            "in": "query",
+            "required": false,
+            "description": "Source ICAO airport code (4-letter, e.g., KJFK) for airport-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "icao_to",
+            "in": "query",
+            "required": false,
+            "description": "Target ICAO airport code (4-letter) for airport-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locode_from",
+            "in": "query",
+            "required": false,
+            "description": "Source UN/LOCODE (5-letter) for location code-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locode_to",
+            "in": "query",
+            "required": false,
+            "description": "Target UN/LOCODE (5-letter) for location code-based conversion.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful timezone conversion response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimezoneConversionResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Whole-hour offset (tz_from/tz_to)",
+                    "value": {
+                      "original_time": "2026-07-24 12:00:00",
+                      "converted_time": "2026-07-24 17:00:00",
+                      "diff_hour": 5,
+                      "diff_min": 300
+                    }
+                  },
+                  "fractionalHourOffset": {
+                    "summary": "Half-hour timezone offset — diff_hour is not always a whole number (e.g. Asia/Kolkata is UTC+5:30)",
+                    "value": {
+                      "original_time": "2026-07-24 12:00:00",
+                      "converted_time": "2026-07-24 02:30:00",
+                      "diff_hour": 9.5,
+                      "diff_min": 570
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Incomplete parameter combination, invalid timezone name, invalid coordinates, or location address not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "IncompleteParameters": {
+                    "summary": "Incomplete parameters combination",
+                    "value": {
+                      "message": "Parameters' combination is not complete. 'tz_from' and 'tz_to' or 'location_from' and 'location_to' or 'lat_from' and 'long_from' and 'lat_to' and 'long_to' or 'locode_from' and 'locode_to' or 'iata_from' and 'iata_to' or 'icao_from' and 'icao_to' combinations must be provided."
+                    }
+                  },
+                  "InvalidSourceTimezone": {
+                    "summary": "Invalid source timezone",
+                    "value": {
+                      "message": "Check whether your input values are correct; source_time_zone = Invalid/TZ, destined_time_zone = Asia/Karachi, date_time = null"
+                    }
+                  },
+                  "InvalidCoordinates": {
+                    "summary": "Invalid coordinates range",
+                    "value": {
+                      "message": "Provided  lat_from (999) or long_from (0) is not valid. Latitude must be between -90.0 and +90.0 and longitude must be between -180.0 and +180.0."
+                    }
+                  },
+                  "FromLocationNotFound": {
+                    "summary": "Source (from) location address not found",
+                    "value": {
+                      "message": "We couldn't find the (from) location (ZZZNOTEXIST). Try a city or state level address only."
+                    }
+                  },
+                  "ToLocationNotFound": {
+                    "summary": "Target (to) location address not found",
+                    "value": {
+                      "message": "We couldn't find the (to) location (ZZZNOTEXIST). Try a city or state level address only."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Airport (IATA/ICAO) code or UN/LOCODE has no matching data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidAirportCode": {
+                    "summary": "IATA/ICAO airport code not found",
+                    "value": {
+                      "message": "'Data not found for the provided airport code: XXX Please contact at support@ipgeolocation.io if provided airport code exists.'"
+                    }
+                  },
+                  "InvalidLocode": {
+                    "summary": "UN/LOCODE not found",
+                    "value": {
+                      "message": "'Data not found for the provided LO code: ZZZZZ Please contact at support@ipgeolocation.io if provided LO code exists.'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "TimezoneConversionResponse": {
+        "type": "object",
+        "description": "Timezone conversion result containing original and converted timestamps with the difference.",
+        "required": [
+          "original_time",
+          "converted_time",
+          "diff_hour",
+          "diff_min"
+        ],
+        "properties": {
+          "original_time": {
+            "type": "string",
+            "description": "The original date and time before any conversion, in yyyy-MM-dd HH:mm:ss format."
+          },
+          "converted_time": {
+            "type": "string",
+            "description": "The date and time after conversion to the target timezone, in yyyy-MM-dd HH:mm:ss format."
+          },
+          "diff_hour": {
+            "type": "number",
+            "format": "float",
+            "description": "The absolute difference in hours between the source and target timezones, always non-negative regardless of conversion direction. Can be fractional for half-hour/quarter-hour offset timezones (e.g. 9.5 for Asia/Kolkata to America/New_York)."
+          },
+          "diff_min": {
+            "type": "integer",
+            "description": "The absolute difference between the source and target timezones expressed in total minutes (not a remainder — always diff_hour * 60), always non-negative regardless of conversion direction."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests. ",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

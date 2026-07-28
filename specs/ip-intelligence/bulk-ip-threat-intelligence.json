@@ -1,0 +1,417 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bulk IP Threat Intelligence API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve threat intelligence and security profiles for up to 50,000 IP addresses in a single request. Each entry in the response array includes a composite 0-100 threat score plus per-signal flags for VPN, proxy, residential proxy, Tor exit node, bot, spam, and known-attacker activity, along with confidence scores and provider names where available. Use the `fields` and `excludes` query parameters to control which security signals are returned, reducing payload size for bulk workflows. A bad or bogon IP in the batch returns a per-item error object instead of failing the entire request, so you can process mixed-validity inputs in one call.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "IP Threat Intelligence API Server"
+    }
+  ],
+  "paths": {
+    "/ip/security": {
+      "post": {
+        "tags": ["IP Geolocation APIs"],
+        "summary": "Retrieve threat intelligence data for multiple IP addresses in a single request",
+        "description": "Get security profiles including threat score, VPN, proxy, Tor, bot, and spam detection for up to 50,000 IPs per request. Each item in the response array corresponds to one requested IP; invalid or bogon IPs return a per-item error object.",
+        "operationId": "bulkIpSecurityLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of fields to return. Supports dot notation (e.g. security.threat_score).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "excludes",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of fields to remove from the response. Supports dot notation (e.g. security.is_tor).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIpSecurityRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Typical bulk threat intelligence request",
+                  "value": {
+                    "ips": ["8.8.8.8", "1.1.1.1", "45.33.32.156"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful threat intelligence response. The response array always contains one item for each input IP, preserving order; an IP that fails validation (invalid, bogon, reserved, or not found) yields an error item instead of a security result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkIpSecurityResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": [
+                      {
+                        "ip": "8.8.8.8",
+                        "security": {
+                          "threat_score": 5,
+                          "is_tor": false,
+                          "is_proxy": false,
+                          "proxy_provider_names": [],
+                          "proxy_confidence_score": 0,
+                          "proxy_last_seen": "",
+                          "is_residential_proxy": false,
+                          "is_vpn": false,
+                          "vpn_provider_names": [],
+                          "vpn_confidence_score": 0,
+                          "vpn_last_seen": "",
+                          "is_relay": false,
+                          "relay_provider_name": "",
+                          "is_anonymous": false,
+                          "is_known_attacker": false,
+                          "is_bot": false,
+                          "is_spam": false,
+                          "is_cloud_provider": true,
+                          "cloud_provider_name": "Google LLC"
+                        }
+                      },
+                      {
+                        "ip": "1.1.1.1",
+                        "security": {
+                          "threat_score": 5,
+                          "is_tor": false,
+                          "is_proxy": false,
+                          "proxy_provider_names": [],
+                          "proxy_confidence_score": 0,
+                          "proxy_last_seen": "",
+                          "is_residential_proxy": false,
+                          "is_vpn": false,
+                          "vpn_provider_names": [],
+                          "vpn_confidence_score": 0,
+                          "vpn_last_seen": "",
+                          "is_relay": false,
+                          "relay_provider_name": "",
+                          "is_anonymous": false,
+                          "is_known_attacker": false,
+                          "is_bot": false,
+                          "is_spam": false,
+                          "is_cloud_provider": true,
+                          "cloud_provider_name": "Cloudflare, Inc."
+                        }
+                      }
+                    ]
+                  },
+                  "partialFailure": {
+                    "summary": "Response with an invalid IP mixed in - that item returns an error object instead of security data",
+                    "value": [
+                      {
+                        "message": "Provided IP address 'not-an-ip' is not valid"
+                      },
+                      {
+                        "ip": "8.8.8.8",
+                        "security": {
+                          "threat_score": 5,
+                          "is_tor": false,
+                          "is_proxy": false,
+                          "proxy_provider_names": [],
+                          "proxy_confidence_score": 0,
+                          "proxy_last_seen": "",
+                          "is_residential_proxy": false,
+                          "is_vpn": false,
+                          "vpn_provider_names": [],
+                          "vpn_confidence_score": 0,
+                          "vpn_last_seen": "",
+                          "is_relay": false,
+                          "relay_provider_name": "",
+                          "is_anonymous": false,
+                          "is_known_attacker": false,
+                          "is_bot": false,
+                          "is_spam": false,
+                          "is_cloud_provider": true,
+                          "cloud_provider_name": "Google LLC"
+                        }
+                      }
+                    ]
+                  },
+                  "bogonIp": {
+                    "summary": "Bogon or reserved IP - returns an error object for that item",
+                    "value": [
+                      {
+                        "message": "'127.0.0.1' is a bogon IP address."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Missing, empty, or malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidRequestBody": {
+                    "summary": "Missing, empty, or malformed `ips` in the request body",
+                    "value": {
+                      "error": "Invalid request body Exception",
+                      "message": "Please provide data in required format in request body",
+                      "path": "/v1.0/ip/security",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:03:26.577Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "BulkIpSecurityRequest": {
+        "type": "object",
+        "required": ["ips"],
+        "description": "Request body for bulk IP threat intelligence lookup.",
+        "properties": {
+          "ips": {
+            "type": "array",
+            "description": "List of 1–50,000 IPv4 and/or IPv6 addresses to look up for threat intelligence data.",
+            "maxItems": 50000,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "BulkIpSecurityItemError": {
+        "type": "object",
+        "description": "Per-item error, returned in place of a security result when an individual IP is invalid, bogon/reserved, or not found in the database.",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable reason this IP could not be resolved."
+          }
+        }
+      },
+      "BulkIpSecurityResultItem": {
+        "type": "object",
+        "description": "Threat intelligence result for one successfully resolved IP address.",
+        "required": ["ip", "security"],
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "The IP address used for the lookup (IPv4 or IPv6)."
+          },
+          "security": {
+            "$ref": "#/components/schemas/Security"
+          }
+        }
+      },
+      "BulkIpSecurityResponse": {
+        "type": "array",
+        "description": "Array of per-IP results, one entry per requested IP, in the same order as the request. Each entry is either a security result or, if that IP could not be resolved, an error object.",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/BulkIpSecurityResultItem"
+            },
+            {
+              "$ref": "#/components/schemas/BulkIpSecurityItemError"
+            }
+          ]
+        }
+      },
+      "Security": {
+        "type": "object",
+        "description": "Threat intelligence and security information for the IP.",
+        "required": [
+          "threat_score",
+          "is_tor",
+          "is_proxy",
+          "proxy_confidence_score",
+          "is_residential_proxy",
+          "is_vpn",
+          "vpn_confidence_score",
+          "is_relay",
+          "is_anonymous",
+          "is_known_attacker",
+          "is_bot",
+          "is_spam",
+          "is_cloud_provider"
+        ],
+        "properties": {
+          "threat_score": {
+            "type": "number",
+            "description": "Overall threat score for the IP address. Ranges from 0 to 100. 100 indicates the highest risk."
+          },
+          "is_tor": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is a Tor exit node."
+          },
+          "is_proxy": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with a proxy network."
+          },
+          "proxy_provider_names": {
+            "type": "array",
+            "description": "List of detected proxy provider names, when available.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "proxy_confidence_score": {
+            "type": "number",
+            "description": "Confidence score (0-100) for proxy detection, when flag is true. Defaults to 0."
+          },
+          "proxy_last_seen": {
+            "type": "string",
+            "description": "Last seen date (YYYY-MM-DD) for proxy activity, when available."
+          },
+          "is_residential_proxy": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with a residential proxy network."
+          },
+          "is_vpn": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with a VPN network."
+          },
+          "vpn_provider_names": {
+            "type": "array",
+            "description": "List of detected VPN provider names, when available.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "vpn_confidence_score": {
+            "type": "number",
+            "description": "Confidence score (0-100) for VPN detection, when flag is true. Defaults to 0."
+          },
+          "vpn_last_seen": {
+            "type": "string",
+            "description": "Last seen date (YYYY-MM-DD) for VPN activity, when available."
+          },
+          "is_relay": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with a relay network."
+          },
+          "relay_provider_name": {
+            "type": "string",
+            "description": "Relay provider name, when available."
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is anonymous. True if VPN, proxy, Tor, or relay is detected."
+          },
+          "is_known_attacker": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is flagged for known attacker behavior."
+          },
+          "is_bot": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with bot activity."
+          },
+          "is_spam": {
+            "type": "boolean",
+            "description": "Indicates whether the IP is associated with spam activity."
+          },
+          "is_cloud_provider": {
+            "type": "boolean",
+            "description": "Indicates whether the IP belongs to a cloud provider."
+          },
+          "cloud_provider_name": {
+            "type": "string",
+            "description": "Name of the cloud provider, if the IP address belongs to a cloud provider."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

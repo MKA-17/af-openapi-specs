@@ -1,0 +1,1110 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "IP WHOIS Lookup API - Organization, CIDR & Abuse Contact Data",
+    "version": "1.0.0",
+    "description": "Retrieve WHOIS registration and ownership data for any IPv4 or IPv6 address from the appropriate Regional Internet Registry (ARIN, RIPE NCC, APNIC, LACNIC, or AFRINIC). Returns the IP range (inet_num) with CIDR blocks, net name, allocation status, and parent blocks; the registering organization with full address and contact handles; technical and abuse contacts with email and phone; BGP route objects; and the raw WHOIS response. The irt (IRT) object is included when available, containing the internet response team's address, abuse mailbox, and linked contacts.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "IP WHOIS Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/ip/whois/live": {
+      "get": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Retrieve WHOIS registration and ownership data for an IP address",
+        "description": "Returns WHOIS details for an IPv4 or IPv6 address including IP range, organization, contacts, routes, and raw WHOIS output.",
+        "operationId": "lookupIpWhois",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "required": true,
+            "description": "IPv4 or IPv6 address to look up.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful WHOIS lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IpWhoisResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "status": true,
+                      "ip_address": "8.8.8.8",
+                      "query_time": "2026-07-23 08:23:30",
+                      "whois_server": "whois.arin.net",
+                      "inet_nums": [
+                        {
+                          "start_ip": "8.8.8.0",
+                          "end_ip": "8.8.8.255",
+                          "cidr": ["8.8.8.0/24"],
+                          "net_name": "GOGL",
+                          "net_handle": "NET-8-8-8-0-2",
+                          "status": "Direct Allocation",
+                          "organization": "Google LLC (GOGL)",
+                          "date_created": "2023-12-28",
+                          "date_updated": "2023-12-28",
+                          "source": "https://rdap.arin.net/registry/ip/8.8.8.0",
+                          "parents": ["NET8 (NET-8-0-0-0-0)"]
+                        }
+                      ],
+                      "organization": {
+                        "handle": "GOGL",
+                        "name": "Google LLC",
+                        "address": [
+                          "1600 Amphitheatre Parkway",
+                          "Mountain View",
+                          "CA",
+                          "94043",
+                          "US"
+                        ],
+                        "street": "Amphitheatre Parkway",
+                        "city": "Mountain View",
+                        "state": "CA",
+                        "zip_code": "94043",
+                        "country": ["US"],
+                        "date_created": "2000-03-30",
+                        "date_updated": "2019-10-31",
+                        "source": "https://rdap.arin.net/registry/entity/GOGL"
+                      },
+                      "technical_contacts": [
+                        {
+                          "handle": "ZG39-ARIN",
+                          "name": "Google LLC",
+                          "email": ["arin-contact@google.com"],
+                          "phone": ["+1-650-253-0000"],
+                          "source": "https://rdap.arin.net/registry/entity/ZG39-ARIN"
+                        }
+                      ],
+                      "abuse_contacts": [
+                        {
+                          "handle": "ABUSE5250-ARIN",
+                          "name": "Abuse",
+                          "email": ["network-abuse@google.com"],
+                          "phone": ["+1-650-253-0000"],
+                          "source": "https://rdap.arin.net/registry/entity/ABUSE5250-ARIN"
+                        }
+                      ],
+                      "routes": [
+                        {
+                          "source": "https://rdap.arin.net/registry/ip/8.8.8.0"
+                        }
+                      ],
+                      "whois_raw_response": "\n#\n# ARIN WHOIS data and services are subject to the Terms of Use\n# available at: https://www.arin.net/resources/registry/whois/tou/\n#\n# If you see inaccuracies in the results, please report at\n# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/\n#\n# Copyright 1997-2026, American Registry for Internet Numbers, Ltd.\n#\n\n\nNetRange:       8.8.8.0 - 8.8.8.255\nCIDR:           8.8.8.0/24\nNetName:        GOGL\nNetHandle:      NET-8-8-8-0-2\nParent:         NET8 (NET-8-0-0-0-0)\nNetType:        Direct Allocation\nOriginAS:       \nOrganization:   Google LLC (GOGL)\nRegDate:        2023-12-28\nUpdated:        2023-12-28\nRef:            https://rdap.arin.net/registry/ip/8.8.8.0\n\n\n\nOrgName:        Google LLC\nOrgId:          GOGL\nAddress:        1600 Amphitheatre Parkway\nCity:           Mountain View\nStateProv:      CA\nPostalCode:     94043\nCountry:        US\nRegDate:        2000-03-30\nUpdated:        2019-10-31\nComment:        Please note that the recommended way to file abuse complaints are located in the following links. \nComment:        \nComment:        To report abuse and illegal activity: https://www.google.com/contact/\nComment:        \nComment:        For legal requests: http://support.google.com/legal \nComment:        \nComment:        Regards, \nComment:        The Google Team\nRef:            https://rdap.arin.net/registry/entity/GOGL\n\n\nOrgAbuseHandle: ABUSE5250-ARIN\nOrgAbuseName:   Abuse\nOrgAbusePhone:  +1-650-253-0000 \nOrgAbuseEmail:  network-abuse@google.com\nOrgAbuseRef:    https://rdap.arin.net/registry/entity/ABUSE5250-ARIN\n\nOrgTechHandle: ZG39-ARIN\nOrgTechName:   Google LLC\nOrgTechPhone:  +1-650-253-0000 \nOrgTechEmail:  arin-contact@google.com\nOrgTechRef:    https://rdap.arin.net/registry/entity/ZG39-ARIN\n\n\n#\n# ARIN WHOIS data and services are subject to the Terms of Use\n# available at: https://www.arin.net/resources/registry/whois/tou/\n#\n# If you see inaccuracies in the results, please report at\n# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/\n#\n# Copyright 1997-2026, American Registry for Internet Numbers, Ltd.\n#\n"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial Content -- The WHOIS server returned an incomplete response. Some fields may be missing or truncated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "partialResponse": {
+                    "summary": "Partial WHOIS response",
+                    "value": {
+                      "timestamp": "2025-08-14T09:25:32.271Z",
+                      "status": 206,
+                      "error": "Partial Response",
+                      "message": "Partial response due to an error occurred while processing the request.",
+                      "path": "/v1.0/ip/whois/live"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- Missing or invalid ip parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingIp": {
+                    "summary": "Missing ip parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/ip/whois/live",
+                      "status": 400,
+                      "timestamp": "2026-07-23T07:50:28.230Z"
+                    }
+                  },
+                  "invalidIp": {
+                    "summary": "Invalid IP address format",
+                    "value": {
+                      "timestamp": "2026-07-23T08:03:38.179Z",
+                      "status": 400,
+                      "error": "Input parameter is not valid",
+                      "message": "Request-param 'ip' (not-an-ip) is not an IP address",
+                      "path": "/v1.0/ip-whois"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "IpWhoisResponse": {
+        "type": "object",
+        "description": "WHOIS lookup response containing IP registration data, organization, contacts, routes, and raw WHOIS output.",
+        "required": [
+          "status",
+          "ip_address",
+          "query_time",
+          "whois_server",
+          "whois_raw_response"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "Indicates whether the WHOIS response from the WHOIS server is complete."
+          },
+          "ip_address": {
+            "type": "string",
+            "description": "IP address (IPv4 or IPv6) that was queried."
+          },
+          "query_time": {
+            "type": "string",
+            "description": "Date and time of the WHOIS query in YYYY-MM-DD HH:mm:ss format."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS host server used to query the IP address."
+          },
+          "inet_nums": {
+            "type": "array",
+            "description": "IP range allocations (inetnum/aut-num objects) associated with this IP address.",
+            "items": {
+              "$ref": "#/components/schemas/InetNum"
+            }
+          },
+          "irt": {
+            "$ref": "#/components/schemas/IrtObject"
+          },
+          "organization": {
+            "$ref": "#/components/schemas/IpWhoisOrganization"
+          },
+          "technical_contacts": {
+            "type": "array",
+            "description": "Technical contact persons or roles for this IP allocation.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContactRef"
+            }
+          },
+          "abuse_contacts": {
+            "type": "array",
+            "description": "Abuse contact persons or roles for reporting network abuse.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContactRef"
+            }
+          },
+          "routes": {
+            "type": "array",
+            "description": "BGP route objects announced by this IP's network.",
+            "items": {
+              "$ref": "#/components/schemas/RouteObject"
+            }
+          },
+          "whois_raw_response": {
+            "type": "string",
+            "description": "Unparsed WHOIS response from the WHOIS server."
+          },
+          "r_whois_raw_response": {
+            "type": ["string", "null"],
+            "description": "WHOIS response from the rwhois server, if available."
+          }
+        }
+      },
+      "InetNum": {
+        "type": "object",
+        "description": "IP range allocation record (inetnum object) containing the allocated block, network name, status, and organizational linkage.",
+        "required": ["start_ip", "end_ip", "cidr", "net_name", "source"],
+        "properties": {
+          "start_ip": {
+            "type": "string",
+            "description": "Starting IP address of the allocated range."
+          },
+          "end_ip": {
+            "type": "string",
+            "description": "Ending IP address of the allocated range."
+          },
+          "cidr": {
+            "type": "array",
+            "description": "IP range in CIDR notation.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "net_name": {
+            "type": "string",
+            "description": "Network name (unique identifier) of this inetnum in WHOIS data."
+          },
+          "net_handle": {
+            "type": ["string", "null"],
+            "description": "Net-Handle (unique ID) of this inetnum, primarily from ARIN responses."
+          },
+          "description": {
+            "type": ["array", "null"],
+            "description": "Description values from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "countries": {
+            "type": ["array", "null"],
+            "description": "ISO 3166-1 alpha-2 country codes where the IP block is allocated.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "geofeed": {
+            "type": ["string", "null"],
+            "description": "URL to the geofeed (RFC 8805) for this prefix."
+          },
+          "latitude": {
+            "type": ["number", "null"],
+            "format": "float",
+            "description": "Latitude parsed from the geoloc field."
+          },
+          "longitude": {
+            "type": ["number", "null"],
+            "format": "float",
+            "description": "Longitude parsed from the geoloc field."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "City of allocation, primarily from LACNIC responses."
+          },
+          "languages": {
+            "type": ["array", "null"],
+            "description": "Regional languages in countries of allocation.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": ["string", "null"],
+            "description": "Allocation or assignment status (e.g., 'Direct Allocation')."
+          },
+          "organization": {
+            "type": ["string", "null"],
+            "description": "Handle (unique ID) of the organization managing this inetnum."
+          },
+          "sponsoring_organization": {
+            "type": ["string", "null"],
+            "description": "Handle of the sponsoring organization for this inetnum."
+          },
+          "admin_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of admin persons or roles in WHOIS data.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tech_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of technical persons or roles in WHOIS data.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of abuse persons or roles in WHOIS data.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remarks": {
+            "type": ["array", "null"],
+            "description": "Remarks from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "assignment_size": {
+            "type": ["string", "null"],
+            "description": "Allocation or assignment size of the IP network or block."
+          },
+          "notify": {
+            "type": ["array", "null"],
+            "description": "Notify email addresses from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_by": {
+            "type": ["array", "null"],
+            "description": "Maintainer handles from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_lower": {
+            "type": ["array", "null"],
+            "description": "Lower-level maintainer handles from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_domains": {
+            "type": ["array", "null"],
+            "description": "Domain maintainer handles from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_routes": {
+            "type": ["array", "null"],
+            "description": "Route maintainer handles from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_irt": {
+            "type": ["array", "null"],
+            "description": "IRT maintainer handles from the inetnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration date of this inetnum object (YYYY-MM-DD)."
+          },
+          "date_updated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date of this inetnum object (YYYY-MM-DD)."
+          },
+          "source": {
+            "type": "string",
+            "description": "WHOIS data source (RIR registry URL) for this object."
+          },
+          "parents": {
+            "type": ["array", "null"],
+            "description": "Parent allocation or assignment blocks of this inetnum.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "IrtObject": {
+        "type": "object",
+        "description": "IRT (Internet Response Team) object containing the response team's address, abuse mailbox, contacts, and linked organizations.",
+        "required": [
+          "handle",
+          "address",
+          "email",
+          "abuse_mailbox",
+          "admin_contacts",
+          "tech_contacts",
+          "source"
+        ],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle or unique identifier of this IRT in WHOIS data."
+          },
+          "address": {
+            "type": "array",
+            "description": "Address lines of the IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "street": {
+            "type": ["string", "null"],
+            "description": "Parsed street address from the address field."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "Parsed city from the address field."
+          },
+          "district": {
+            "type": ["string", "null"],
+            "description": "Parsed district from the address field."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Parsed state from the address field."
+          },
+          "zip_code": {
+            "type": ["string", "null"],
+            "description": "Parsed ZIP code from the address field."
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Parsed country from the address field."
+          },
+          "email": {
+            "type": "array",
+            "description": "Email addresses for the IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_mailbox": {
+            "type": "array",
+            "description": "Abuse mailbox email addresses for the IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phone": {
+            "type": ["array", "null"],
+            "description": "Phone numbers for the IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fax_no": {
+            "type": ["array", "null"],
+            "description": "Fax numbers for the IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organizations": {
+            "type": ["array", "null"],
+            "description": "Handles of organization objects linked to this IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "admin_contacts": {
+            "type": "array",
+            "description": "Handles of admin persons or roles linked to this IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tech_contacts": {
+            "type": "array",
+            "description": "Handles of technical persons or roles linked to this IRT.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remarks": {
+            "type": ["array", "null"],
+            "description": "Remarks for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "signature": {
+            "type": ["array", "null"],
+            "description": "Cryptographic signatures for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "encryption": {
+            "type": ["array", "null"],
+            "description": "Encryption keys for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "auth": {
+            "type": ["array", "null"],
+            "description": "Authentication methods for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notify": {
+            "type": ["array", "null"],
+            "description": "Notify email addresses for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "irt_nfy": {
+            "type": ["array", "null"],
+            "description": "IRT-specific notification email addresses.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_by": {
+            "type": ["array", "null"],
+            "description": "Maintainer handles for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_ref": {
+            "type": ["array", "null"],
+            "description": "Referenced maintainer handles for this IRT object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration date of this IRT object (YYYY-MM-DD)."
+          },
+          "date_updated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date of this IRT object (YYYY-MM-DD)."
+          },
+          "source": {
+            "type": "string",
+            "description": "WHOIS data source for this IRT object."
+          },
+          "organization": {
+            "$ref": "#/components/schemas/IpWhoisOrganization"
+          },
+          "administrative_contacts": {
+            "type": ["array", "null"],
+            "description": "Administrative contacts linked to this IRT.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContactRef"
+            }
+          },
+          "technical_contacts": {
+            "type": ["array", "null"],
+            "description": "Technical contacts linked to this IRT.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContactRef"
+            }
+          },
+          "abuse_contacts": {
+            "type": ["array", "null"],
+            "description": "Abuse contacts linked to this IRT.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContactRef"
+            }
+          }
+        }
+      },
+      "IpWhoisOrganization": {
+        "type": "object",
+        "description": "Organization object containing the registrant's handle, name, address, contact details, and linked admin/tech/abuse contacts.",
+        "required": ["handle", "name", "source"],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle or unique identifier of this organization in WHOIS data."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the organization."
+          },
+          "type": {
+            "type": ["string", "null"],
+            "description": "Type of the organization (e.g., BUSINESS, REGISTRY)."
+          },
+          "description": {
+            "type": ["array", "null"],
+            "description": "Description values from the organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "address": {
+            "type": ["array", "null"],
+            "description": "Full address lines of the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "street": {
+            "type": ["string", "null"],
+            "description": "Parsed street address from the address field."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "Parsed city from the address field."
+          },
+          "district": {
+            "type": ["string", "null"],
+            "description": "Parsed district from the address field."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Parsed state from the address field."
+          },
+          "zip_code": {
+            "type": ["string", "null"],
+            "description": "Parsed ZIP code from the address field."
+          },
+          "country": {
+            "type": ["array", "null"],
+            "description": "ISO 3166-1 alpha-2 country codes for the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "latitude": {
+            "type": ["number", "null"],
+            "format": "float",
+            "description": "Latitude parsed from the geoloc field."
+          },
+          "longitude": {
+            "type": ["number", "null"],
+            "format": "float",
+            "description": "Longitude parsed from the geoloc field."
+          },
+          "email": {
+            "type": ["array", "null"],
+            "description": "Email addresses for the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_mailbox": {
+            "type": ["array", "null"],
+            "description": "Abuse mailbox email addresses for the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phone": {
+            "type": ["array", "null"],
+            "description": "Phone numbers for the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fax_no": {
+            "type": ["array", "null"],
+            "description": "Fax numbers for the organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "admin_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of admin persons or roles linked to this organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tech_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of technical persons or roles linked to this organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of abuse persons or roles linked to this organization.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remarks": {
+            "type": ["array", "null"],
+            "description": "Remarks for this organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notify": {
+            "type": ["array", "null"],
+            "description": "Notify email addresses for this organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ref_nfy": {
+            "type": ["array", "null"],
+            "description": "Reference notification email addresses for this organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_by": {
+            "type": ["array", "null"],
+            "description": "Maintainer handles for this organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_ref": {
+            "type": ["array", "null"],
+            "description": "Referenced maintainer handles for this organization object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration date of this organization object (YYYY-MM-DD)."
+          },
+          "date_updated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date of this organization object (YYYY-MM-DD)."
+          },
+          "source": {
+            "type": "string",
+            "description": "WHOIS data source (RIR registry URL) for this object."
+          }
+        }
+      },
+      "WhoisContactRef": {
+        "type": "object",
+        "description": "Contact person or role object with handle, name, email, phone, and source reference.",
+        "required": ["handle", "source"],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Handle or unique identifier of this contact in WHOIS data."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Name of the contact person or role."
+          },
+          "address": {
+            "type": ["array", "null"],
+            "description": "Address lines for this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "street": {
+            "type": ["string", "null"],
+            "description": "Parsed street address from the address field."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "Parsed city from the address field."
+          },
+          "district": {
+            "type": ["string", "null"],
+            "description": "Parsed district from the address field."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Parsed state from the address field."
+          },
+          "zip_code": {
+            "type": ["string", "null"],
+            "description": "Parsed ZIP code from the address field."
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Parsed country from the address field."
+          },
+          "email": {
+            "type": ["array", "null"],
+            "description": "Email addresses for this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_mailbox": {
+            "type": ["array", "null"],
+            "description": "Abuse mailbox email addresses for this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phone": {
+            "type": ["array", "null"],
+            "description": "Phone numbers for this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fax_no": {
+            "type": ["array", "null"],
+            "description": "Fax numbers for this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organizations": {
+            "type": ["array", "null"],
+            "description": "Handles of organization objects managing this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "admin_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of admin persons or roles linked to this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tech_contacts": {
+            "type": ["array", "null"],
+            "description": "Handles of technical persons or roles linked to this contact.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remarks": {
+            "type": ["array", "null"],
+            "description": "Remarks for this contact object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notify": {
+            "type": ["array", "null"],
+            "description": "Notify email addresses for this contact object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_by": {
+            "type": ["array", "null"],
+            "description": "Maintainer handles for this contact object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_ref": {
+            "type": ["array", "null"],
+            "description": "Referenced maintainer handles for this contact object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration date of this contact object (YYYY-MM-DD)."
+          },
+          "date_updated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date of this contact object (YYYY-MM-DD)."
+          },
+          "source": {
+            "type": "string",
+            "description": "WHOIS data source (RIR registry URL) for this object."
+          }
+        }
+      },
+      "RouteObject": {
+        "type": "object",
+        "description": "BGP route object containing the route prefix, origin AS, and related metadata.",
+        "required": [],
+        "properties": {
+          "route": {
+            "type": ["string", "null"],
+            "description": "BGP route prefix (e.g., 8.8.8.0/24)."
+          },
+          "origin": {
+            "type": ["string", "null"],
+            "description": "Origin AS number for this route."
+          },
+          "description": {
+            "type": ["array", "null"],
+            "description": "Description values for this route object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Country of the organization managing this route."
+          },
+          "pingable": {
+            "type": ["array", "null"],
+            "description": "Pingable IP addresses in this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ping_hdl": {
+            "type": ["array", "null"],
+            "description": "Handles of pingable contacts for this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "holes": {
+            "type": ["array", "null"],
+            "description": "Sub-allocation holes (more specific routes) within this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "member_of": {
+            "type": ["array", "null"],
+            "description": "Route sets this route is a member of.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "inject": {
+            "type": ["array", "null"],
+            "description": "Injection details for this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "aggr_mtd": {
+            "type": ["string", "null"],
+            "description": "Aggregation method for this route."
+          },
+          "aggr_bndry": {
+            "type": ["string", "null"],
+            "description": "Aggregation boundary for this route."
+          },
+          "export_comps": {
+            "type": ["string", "null"],
+            "description": "Export composition for this route."
+          },
+          "components": {
+            "type": ["string", "null"],
+            "description": "Route components."
+          },
+          "organizations": {
+            "type": ["array", "null"],
+            "description": "Handles of organization objects related to this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "remarks": {
+            "type": ["array", "null"],
+            "description": "Remarks for this route object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "notify": {
+            "type": ["array", "null"],
+            "description": "Notify email addresses for this route object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_lower": {
+            "type": ["array", "null"],
+            "description": "Lower-level maintainer handles for this route.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mnt_by": {
+            "type": ["array", "null"],
+            "description": "Maintainer handles for this route object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Registration date of this route object (YYYY-MM-DD)."
+          },
+          "date_updated": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date of this route object (YYYY-MM-DD)."
+          },
+          "source": {
+            "type": ["string", "null"],
+            "description": "WHOIS data source for this route object."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

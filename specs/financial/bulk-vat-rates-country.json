@@ -1,0 +1,341 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bulk VAT Rates by Country API Reference",
+    "version": "1.0.0",
+    "description": "Get VAT rates for up to 100 countries or country/state combinations in a single API call. Returns a JSON array of VAT rate results, one entry per country that resolves successfully — entries with an invalid country/state are silently omitted rather than returned as per-item errors, so the array can be shorter than the requested list. Returns a 400 for a missing/malformed request body and a 413 if the payload exceeds the size limit.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Bulk VAT Rates by Country API Server"
+    }
+  ],
+  "paths": {
+    "/vat/rates/country": {
+      "post": {
+        "tags": ["Financial APIs"],
+        "summary": "Bulk VAT lookup by country",
+        "description": "Retrieves VAT details for multiple countries or country-state combinations in a single request. Maximum of `100` entries per request are allowed.",
+        "operationId": "bulkVatRatesByCountry",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specify the desired response format. Options: 'json' (default) or 'xml'."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkVatRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Typical bulk VAT lookup request",
+                  "value": {
+                    "countries": [
+                      {
+                        "country": "DE"
+                      },
+                      {
+                        "country": "United_States",
+                        "state": "New_York"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response — a JSON array of VAT results, one entry per country that resolved successfully, in request order. Countries that fail to resolve are omitted rather than represented as error entries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatCountryBulkResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "All requested countries resolved",
+                    "value": [
+                      {
+                        "country": "DE",
+                        "type": "vat",
+                        "currency": "EUR",
+                        "standard_rate": 0.19,
+                        "reduced_rate": [0.07, 0],
+                        "categories": {
+                          "books": 0.07,
+                          "newspapers": 0.07,
+                          "periodicals": 0.07,
+                          "broadcasting": 0
+                        }
+                      },
+                      {
+                        "country": "United_States",
+                        "state": "New_York",
+                        "type": "vat",
+                        "currency": "",
+                        "standard_rate": 0.04
+                      }
+                    ]
+                  },
+                  "partialMatch": {
+                    "summary": "One of two requested countries resolved — the unresolved one is simply absent",
+                    "value": [
+                      {
+                        "country": "DE",
+                        "type": "vat",
+                        "currency": "EUR",
+                        "standard_rate": 0.19,
+                        "reduced_rate": [0.07, 0],
+                        "categories": {
+                          "books": 0.07,
+                          "newspapers": 0.07,
+                          "periodicals": 0.07,
+                          "broadcasting": 0
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidBody": {
+                    "summary": "countries field missing or malformed",
+                    "value": {
+                      "error": "Invalid request body Exception",
+                      "message": "Please provide data in required format in request body",
+                      "path": "/v1.0/vat/rates/country",
+                      "status": 400,
+                      "timestamp": "2026-07-27T11:46:29.315Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large — Request body exceeds the size limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "PayloadTooLarge": {
+                    "summary": "Too many entries / body too large",
+                    "value": {
+                      "error": "Payload too large Exception",
+                      "message": "Maximum request body size limit exceeded",
+                      "path": "/v1.0/vat/rates/country",
+                      "status": 413,
+                      "timestamp": "2026-07-27T11:46:29.925Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "VatCountryBulkResponse": {
+        "type": "array",
+        "description": "Array of VAT rate results, one entry per country that resolved successfully, in request order. Countries that fail to resolve are omitted, so this array can be shorter than the requested countries list.",
+        "items": {
+          "$ref": "#/components/schemas/VatBulkResponseItem"
+        }
+      },
+      "VatBulkResponseItem": {
+        "type": "object",
+        "description": "A VAT rate result for a single country or state in a bulk response.",
+        "required": ["country", "type", "currency", "standard_rate"],
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country identifier returned in the result item."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or region returned for sub-national lookups. Only present when the request included a state."
+          },
+          "type": {
+            "type": "string",
+            "description": "Tax type applied for the country or state."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code for the returned location. Can be an empty string for some state-level entries."
+          },
+          "standard_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Standard VAT or sales tax rate for the returned location."
+          },
+          "reduced_rate": {
+            "type": "array",
+            "description": "Reduced VAT rates when defined for the location.",
+            "items": {
+              "$ref": "#/components/schemas/VatRateDecimal"
+            }
+          },
+          "super_reduced_rate": {
+            "type": "array",
+            "description": "Super-reduced VAT rates for specific categories, when defined.",
+            "items": {
+              "$ref": "#/components/schemas/VatRateDecimal"
+            }
+          },
+          "parking_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Parking rate, when applicable."
+          },
+          "categories": {
+            "description": "Category-specific VAT rates, where defined (EU/UK only).",
+            "$ref": "#/components/schemas/VatCategories"
+          }
+        }
+      },
+      "VatRateDecimal": {
+        "type": "number",
+        "format": "float",
+        "description": "A VAT rate expressed as a decimal (e.g., 0.19 = 19%)."
+      },
+      "VatCategories": {
+        "type": "object",
+        "description": "Category-specific VAT rates, where defined (EU/UK only). Keys vary by country.",
+        "properties": {
+          "books": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for books, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "newspapers": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for newspapers, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "periodicals": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for periodicals, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "broadcasting": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for broadcasting services, as a decimal (e.g., 0.19 = 19%)."
+          }
+        }
+      },
+      "BulkVatRequest": {
+        "type": "object",
+        "description": "Request body for bulk VAT rate lookup by country.",
+        "required": ["countries"],
+        "properties": {
+          "countries": {
+            "type": "array",
+            "description": "Array of country entries to look up. Maximum 100 entries.",
+            "items": {
+              "$ref": "#/components/schemas/BulkVatRequestItem"
+            }
+          }
+        }
+      },
+      "BulkVatRequestItem": {
+        "type": "object",
+        "description": "A single country entry in a bulk VAT request.",
+        "required": ["country"],
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country identifier in Alpha-2, Alpha-3, or full name."
+          },
+          "state": {
+            "type": "string",
+            "description": "Optional state or region for sub-national VAT."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,168 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Resource Download API Reference",
+    "version": "1.0.0",
+    "description": "Download PDF files or ZIP archives from the server using their unique resource ID. Returns the file as a binary stream for direct download. Supports PDF and ZIP output formats depending on the requested resource.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Resource Download API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/resource/download": {
+      "get": {
+        "tags": ["PDF Upload and Download APIs"],
+        "summary": "Download PDF resource",
+        "description": "This API downloads PDF files or ZIP archives from the server using their unique resource ID.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Response format: 'json' (default) or 'xml'."
+          },
+          {
+            "name": "resource_id",
+            "in": "query",
+            "description": "The unique identifier of the file or ZIP archive to download.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File download successful. Returns the raw file bytes with Content-Disposition: attachment, not a JSON body.",
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "application/zip": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing required resource_id parameter",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingResourceId": {
+                    "summary": "Missing resource_id parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/resource/download",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:47:12.356Z"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource ID Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "Resource ID not found",
+                    "value": {
+                      "timestamp": "2026-07-27T10:47:12.926Z",
+                      "path": "/v1.0/pdf/resource",
+                      "status": 404,
+                      "error": "Resource ID Not Found",
+                      "message": "Please provide a valid resource ID."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "downloadResource"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,304 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Compress API - Reduce PDF File Size Programmatically",
+    "version": "1.0.0",
+    "description": "Compress a PDF file to reduce its file size. Supports four compression levels: low (preserves quality), balanced (optimal ratio), high (significant reduction), and extreme (maximum compression). Accepts a file upload or an existing file ID. Returns a task ID for tracking the compression progress.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Compress API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/compress": {
+      "post": {
+        "tags": [
+          "PDF Operations APIs"
+        ],
+        "summary": "Compress a PDF file",
+        "description": "This API compresses a given PDF file to reduce its file serize.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "compressed_pdf"
+            },
+            "description": "Name of the output PDF."
+          },
+          {
+            "name": "compression_level",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "low",
+                "balanced",
+                "high",
+                "extreme"
+              ],
+              "default": "balanced"
+            },
+            "description": "Controls how aggressively the PDF is compressed. Lower levels preserve more quality, while higher levels reduce file size more."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to true, the input file(s) will be deleted from the server immediately after the output is generated."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to compress. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Compression task created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PdfTaskResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "ce4b1a38-6cfc-4373-9bd7-ff186fbd8e7e",
+                      "inputIds": [
+                        "f2ba4b50-6f8a-43ae-b42d-96937f50cd89"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingCompressionLevel": {
+                    "summary": "Missing required compression_level parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/compress",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:50:09.307Z"
+                    }
+                  },
+                  "MissingFileOrID": {
+                    "summary": "Neither a file nor a file ID was provided",
+                    "value": {
+                      "timestamp": "2026-07-27T10:50:09.886Z",
+                      "path": "/v1.0/pdf/compress",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/v1.0/pdf/compress",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:50:25.910Z"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 File type not supported",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "InvalidPDF": {
+                    "summary": "Uploaded file is not a supported type",
+                    "value": {
+                      "timestamp": "2026-07-27T10:50:18.409Z",
+                      "path": "/v1.0/pdf/compress",
+                      "status": 415,
+                      "error": "Unsupported File Type",
+                      "message": "The provided file type is not supported. Refer to the documentation for valid file types."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "compressPdf"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "PdfTaskResponse": {
+        "type": "object",
+        "description": "Response containing the task ID and input file IDs for a PDF processing task.",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "Task ID of the requested task, used to check the task status."
+          },
+          "inputIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "File IDs for the input files provided for the task. Not returned when destroy parameter is true."
+          }
+        }
+      },
+      "PdfFileUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the PDF file to process.",
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Raw PDF file bytes sent as a multipart/form-data field named 'file'. Omit this field entirely and pass file_id in the query string instead to use an already-uploaded file."
+          }
+        },
+        "required": []
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

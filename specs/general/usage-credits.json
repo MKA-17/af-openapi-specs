@@ -1,0 +1,218 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Credits Usage API",
+    "version": "1.0.0",
+    "description": "Retrieve the remaining and consumed API credit balances for the authenticated organization. Returns subscription-plan credits, subscription surcharge (overage) credits, and one-off credit purchases as separate balances, each with allowed and used counts. Only an organization admin API key can call this endpoint; all other keys receive a 403. There are no optional data modules for this endpoint — the response always includes the full credit breakdown.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Credits Usage API Server"
+    }
+  ],
+  "paths": {
+    "/credits/usage/info": {
+      "get": {
+        "tags": ["General APIs"],
+        "summary": "Get remaining and consumed API credit balances for the organization",
+        "description": "Returns subscription, subscription-surcharge, and one-off credit balances for the authenticated organization's account.",
+        "operationId": "getCreditsUsage",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with credit balances",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditsUsageResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Typical response",
+                    "value": {
+                      "apiKey": "demo",
+                      "userStatus": "active",
+                      "subActive": true,
+                      "subStatus": "active",
+                      "subAllowedCredits": 10000,
+                      "subUsedCredits": 2500,
+                      "subSurchargeStatus": "none",
+                      "subSurchargeAllowedCredits": 0,
+                      "subSurchargeUsedCredits": 0,
+                      "subSurchargeAllowed": false,
+                      "oneOffCreditsActive": true,
+                      "oneOffAllowedCredits": 5000,
+                      "oneOffUsedCredits": 1000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — Caller is not an organization admin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "notOrgAdmin": {
+                    "summary": "Not an organization admin",
+                    "value": {
+                      "timestamp": "2026-07-27T10:23:16.548Z",
+                      "path": "/v1.0/credits/usage/info",
+                      "status": 403,
+                      "error": "API Access Exception",
+                      "message": "You need to be organization admin to access this endpoint."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CreditsUsageResponse": {
+        "type": "object",
+        "description": "Credit balances for the organization's subscription, subscription surcharge, and one-off purchases.",
+        "required": [
+          "apiKey",
+          "userStatus",
+          "oneOffCreditsActive",
+          "oneOffAllowedCredits",
+          "oneOffUsedCredits"
+        ],
+        "properties": {
+          "apiKey": {
+            "type": "string",
+            "description": "The API key the credit balances belong to."
+          },
+          "userStatus": {
+            "type": "string",
+            "enum": ["active", "inactive", "deleted"],
+            "description": "Status of the user account."
+          },
+          "subActive": {
+            "type": ["boolean", "null"],
+            "description": "Whether a subscription plan is currently active. Null if the account has no subscription."
+          },
+          "subStatus": {
+            "type": ["string", "null"],
+            "enum": ["active", "overdue", "cancelled", "deactivated", null],
+            "description": "Status of the subscription credits. Null if the account has no subscription."
+          },
+          "subAllowedCredits": {
+            "type": ["integer", "null"],
+            "description": "Total credits allowed under the subscription plan. Null if the account has no subscription."
+          },
+          "subUsedCredits": {
+            "type": ["integer", "null"],
+            "description": "Credits consumed under the subscription plan. Null if the account has no subscription."
+          },
+          "subSurchargeStatus": {
+            "type": ["string", "null"],
+            "enum": ["none", "payment_added", "payment_cleared", null],
+            "description": "Status of the subscription surcharge (overage) credits. Null if the account has no subscription."
+          },
+          "subSurchargeAllowedCredits": {
+            "type": ["integer", "null"],
+            "description": "Total surcharge credits allowed. Null if the account has no subscription."
+          },
+          "subSurchargeUsedCredits": {
+            "type": ["integer", "null"],
+            "description": "Surcharge credits consumed. Null if the account has no subscription."
+          },
+          "subSurchargeAllowed": {
+            "type": ["boolean", "null"],
+            "description": "Whether surcharge (overage) usage is allowed on the subscription. Null if the account has no subscription."
+          },
+          "oneOffCreditsActive": {
+            "type": "boolean",
+            "description": "Whether the account has active one-off (pay-as-you-go) credits."
+          },
+          "oneOffAllowedCredits": {
+            "type": "integer",
+            "description": "Total one-off credits purchased."
+          },
+          "oneOffUsedCredits": {
+            "type": "integer",
+            "description": "One-off credits consumed."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

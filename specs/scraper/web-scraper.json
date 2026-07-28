@@ -1,0 +1,674 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Web Scraper API - JavaScript Rendering, Proxy Rotation & CAPTCHA Solving",
+    "version": "1.0.0",
+    "description": "Executes a sequence of scraping instructions against a target URL and returns the extracted data. Two modes are available via the `jsEnabled` query parameter: `jsEnabled=true` renders the page in a real browser and supports `fill`, `click`, `wait`, iframe switching, image/audio CAPTCHA solving, and other interactive instructions, plus request-level `blockUrl` and `cookies`; `jsEnabled=false` fetches static HTML and supports `postForm`, `getForm`, `getPage`, and `extract`. Every mode's response is an `extractedData` object keyed by the field names used in your `extract` instructions --- each value is a string when its selector matched exactly one element, or an array of strings when it matched more than one; a selector that matches nothing is omitted from the response entirely. The `text` query parameter strips HTML tags from extracted values; under `jsEnabled=true`, single-element matches are always returned as plain text regardless of `text`, while multi-element matches keep tags unless `text=true` is set.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Web Scraper API Server"
+    }
+  ],
+  "paths": {
+    "/scraping": {
+      "post": {
+        "tags": ["Scraping APIs"],
+        "summary": "Execute a sequence of web scraping instructions against a target URL",
+        "description": "Runs form-filling, clicking, data-extraction, and CAPTCHA-solving instructions against a target URL and returns the extracted data. Behavior and available instructions depend on the jsEnabled query parameter.",
+        "operationId": "performScraping",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "description": "Target URL to scrape.",
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          {
+            "name": "text",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to strip HTML tags from extracted values (plain text). Set to false to keep HTML tags. Default is false. Under jsEnabled=true, single-element matches are always plain text regardless of this flag.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "jsEnabled",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to render the page in a real browser for dynamic/JavaScript-driven pages (enables fill, click, wait, CAPTCHA-solving, and related instructions). Set to false to fetch static HTML only (enables postForm, getForm, getPage, extract). Default is false.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "proxy",
+            "in": "query",
+            "required": false,
+            "description": "Use a proxy for the request. Pass true/false to toggle the default proxy pool, or a proxy URL string to use a specific proxy.",
+            "schema": {
+              "oneOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          {
+            "name": "sslIgnore",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to ignore SSL certificate errors on the target site. Only works when jsEnabled is true.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "windowSize",
+            "in": "query",
+            "required": false,
+            "description": "Browser window size in the format 'width,height' (e.g. '1920,1080'). Only works when jsEnabled is true.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "adBlock",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to block ads on the target page. Only works when jsEnabled is true.",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "captcha",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to allow CAPTCHA-solving instructions (generalImageCaptcha, fillImageCaptcha, resolveAudioCaptcha) in the request body. Only works when jsEnabled is true.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "The request body shape depends on the jsEnabled query parameter, not on any field inside the body itself. Pass jsEnabled=true for the interactive/browser instruction set (JsEnabledTrueBody: fill, click, wait, blockUrl, cookies, CAPTCHA solving, and more). Pass jsEnabled=false (or omit it) for the static-HTML instruction set (JsEnabledFalseBody: postForm, getForm, getPage, extract). instructions is an ordered array executed sequentially.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/JsEnabledTrueBody"
+                  },
+                  {
+                    "$ref": "#/components/schemas/JsEnabledFalseBody"
+                  }
+                ]
+              },
+              "examples": {
+                "jsEnabledTrue": {
+                  "summary": "Example body for jsEnabled=true (fill, click, wait, extract)",
+                  "value": {
+                    "blockUrl": [
+                      "https://example.com/ads.js",
+                      "https://tracker.example.com/*"
+                    ],
+                    "cookies": [
+                      {
+                        "name": "sessionid",
+                        "value": "abc123"
+                      }
+                    ],
+                    "instructions": [
+                      {
+                        "fill": {
+                          "place": "#username",
+                          "value": "myuser"
+                        }
+                      },
+                      {
+                        "fill": {
+                          "place": "#password",
+                          "value": "mypassword"
+                        }
+                      },
+                      {
+                        "click": "input[type=submit]"
+                      },
+                      {
+                        "wait": 1000
+                      },
+                      {
+                        "extract": {
+                          "pageTitle": "title",
+                          "welcomeText": "h1"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "jsEnabledFalse": {
+                  "summary": "Example body for jsEnabled=false (extract only)",
+                  "value": {
+                    "instructions": [
+                      {
+                        "extract": {
+                          "pageTitle": "title",
+                          "paragraphs": "p"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful scraping operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScrapingResponse"
+                },
+                "examples": {
+                  "jsEnabledFalseResult": {
+                    "summary": "Static HTML extract (jsEnabled=false)",
+                    "value": {
+                      "extractedData": {
+                        "pageTitle": "<title>Example Domain</title>",
+                        "paragraphs": [
+                          "<p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p>",
+                          "<p><a href=\"https://iana.org/domains/example\">Learn more</a></p>"
+                        ]
+                      }
+                    }
+                  },
+                  "jsEnabledTrueResult": {
+                    "summary": "Rendered-page extract with a single-match and a multi-match field (jsEnabled=true)",
+                    "value": {
+                      "extractedData": {
+                        "firstQuote": "“The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.”",
+                        "authors": [
+                          "<small class=\"author\" itemprop=\"author\">Albert Einstein</small>",
+                          "<small class=\"author\" itemprop=\"author\">J.K. Rowling</small>",
+                          "<small class=\"author\" itemprop=\"author\">Albert Einstein</small>",
+                          "<small class=\"author\" itemprop=\"author\">Jane Austen</small>",
+                          "<small class=\"author\" itemprop=\"author\">Marilyn Monroe</small>",
+                          "<small class=\"author\" itemprop=\"author\">Albert Einstein</small>",
+                          "<small class=\"author\" itemprop=\"author\">André Gide</small>",
+                          "<small class=\"author\" itemprop=\"author\">Thomas A. Edison</small>",
+                          "<small class=\"author\" itemprop=\"author\">Eleanor Roosevelt</small>",
+                          "<small class=\"author\" itemprop=\"author\">Steve Martin</small>"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing/invalid parameters, malformed request body, unparseable selectors, or the target URL could not be fetched",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingOrInvalidParams": {
+                    "summary": "Missing or invalid url parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/scraping",
+                      "status": 400,
+                      "timestamp": "2026-07-23T11:50:14.427Z"
+                    }
+                  },
+                  "malformedRequestBody": {
+                    "summary": "Malformed JSON request body",
+                    "value": {
+                      "timestamp": "2026-07-23T11:47:47.907+00:00",
+                      "status": 400,
+                      "error": "JSON Parse Error",
+                      "message": "Invalid or malformed JSON. Please check your request body format and ensure it's valid JSON.",
+                      "path": "/v1/scraping/params"
+                    }
+                  },
+                  "missingInstructions": {
+                    "summary": "Empty or missing instructions body",
+                    "value": {
+                      "timestamp": "2026-07-23T11:47:54.568+00:00",
+                      "status": 400,
+                      "error": "Bad Request",
+                      "message": "Arguments are missing or wrong",
+                      "path": "/v1/scraping/params"
+                    }
+                  },
+                  "invalidSelector": {
+                    "summary": "Unparseable CSS or XPath selector",
+                    "value": {
+                      "timestamp": "2026-07-23T11:50:15.539+00:00",
+                      "status": 400,
+                      "error": "Bad Request",
+                      "message": "Check the Css Selectors or Xpath, Some of them are wrong",
+                      "path": "/v1/scraping/params"
+                    }
+                  },
+                  "targetUnreachable": {
+                    "summary": "Target URL could not be reached (DNS/connection failure)",
+                    "value": {
+                      "timestamp": "2026-07-23T11:50:16.120+00:00",
+                      "status": 400,
+                      "error": "IO Exception",
+                      "message": "Error while reading the datathisdomaindoesnotexist12345xyz.com",
+                      "path": "/v1/scraping/params"
+                    }
+                  },
+                  "targetNonOkStatus": {
+                    "summary": "Target URL returned a non-200 HTTP response",
+                    "value": {
+                      "timestamp": "2026-07-23T11:50:26.224+00:00",
+                      "status": 400,
+                      "error": "Bad Request",
+                      "message": "Check the url or links",
+                      "path": "/v1/scraping/params"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Wrong HTTP method or path used against this endpoint",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "wrongMethodOrPath": {
+                    "summary": "Endpoint called with a non-POST method",
+                    "value": {
+                      "error": "Resource Not Found",
+                      "message": "The requested resource could not be found. Please verify the URL and try again.",
+                      "path": "/v1.0/scraping",
+                      "status": 404,
+                      "timestamp": "2026-07-23T11:51:33.926Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "JsEnabledTrueBody": {
+        "type": "object",
+        "description": "Request body for jsEnabled=true: renders the page in a real browser and supports interactive instructions.",
+        "properties": {
+          "blockUrl": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of script or URL patterns to block during network requests."
+          },
+          "cookies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Cookie"
+            },
+            "description": "List of cookies to be set in the browser session."
+          },
+          "instructions": {
+            "type": "array",
+            "description": "An ordered list of step-by-step scraping instructions to be executed in the browser. Each item is one Instruction object, with exactly one action field set.",
+            "items": {
+              "$ref": "#/components/schemas/Instruction"
+            }
+          }
+        }
+      },
+      "Instruction": {
+        "type": "object",
+        "description": "A single browser scraping step. Exactly one of these action fields is set per instruction; every other field is absent.",
+        "properties": {
+          "fill": {
+            "$ref": "#/components/schemas/PlaceValue",
+            "description": "Fill action: fills an input field with a value using a CSS or XPath selector."
+          },
+          "click": {
+            "type": "string",
+            "description": "Click action: CSS selector or XPath identifying the element to click."
+          },
+          "clickIfExist": {
+            "type": "string",
+            "description": "Click if exists action: CSS selector or XPath identifying the element to click, only if it appears on the page within a short timeout."
+          },
+          "enter": {
+            "type": "string",
+            "description": "Enter key action: CSS selector or XPath identifying the element to send an Enter keystroke to."
+          },
+          "newTab": {
+            "type": "boolean",
+            "description": "New tab action: set to true to switch focus to a newly opened browser tab."
+          },
+          "moveToRelativeTab": {
+            "type": "integer",
+            "description": "Move to relative tab action: relative tab index to move to (e.g. 1 for the next tab, -1 for the previous tab)."
+          },
+          "wait": {
+            "type": "integer",
+            "description": "Wait action: pauses execution for this many milliseconds."
+          },
+          "waitFor": {
+            "type": "string",
+            "description": "Wait for element action: CSS selector or XPath identifying the element to wait for before continuing."
+          },
+          "select": {
+            "$ref": "#/components/schemas/PlaceValue",
+            "description": "Select dropdown action: selects an option from a dropdown element by selector and matching value."
+          },
+          "jsExe": {
+            "type": "string",
+            "description": "Execute JavaScript action: JavaScript code to execute inside the page context."
+          },
+          "conditionalCheck": {
+            "type": "array",
+            "description": "Conditional check action: list of conditional steps, each supporting if-<method> and else-<method> keys with conditions, executed based on element state.",
+            "items": {
+              "type": "object",
+              "description": "A single conditional step, supporting if-<method> and else-<method> keys with conditions."
+            }
+          },
+          "clickButtonByValue": {
+            "$ref": "#/components/schemas/PlaceValue",
+            "description": "Click button by value action: clicks a button that matches a specific text or value attribute."
+          },
+          "generalImageCaptcha": {
+            "type": "array",
+            "description": "Image captcha solver action: instructions for solving image-based captchas using a selected model.",
+            "items": {
+              "$ref": "#/components/schemas/ImageCaptchaInstruction"
+            }
+          },
+          "blockElement": {
+            "type": "array",
+            "description": "Block element action: list of CSS selectors or XPaths for elements to block or hide on the page.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "extract": {
+            "$ref": "#/components/schemas/ExtractInstruction",
+            "description": "Extract data action: defines what data to extract and how, keyed by whatever field names you choose."
+          },
+          "fillImageCaptcha": {
+            "type": "array",
+            "description": "Fill image captcha action: captures and fills image-based captcha values automatically.",
+            "items": {
+              "$ref": "#/components/schemas/ImageCaptchaInstruction"
+            }
+          },
+          "switchToIframe": {
+            "type": "string",
+            "description": "Switch to iframe action: switches the browser context into an iframe identified by name or ID."
+          },
+          "switchToParentFrame": {
+            "type": "boolean",
+            "description": "Switch to parent frame action: returns the browser context from an iframe back to its parent frame."
+          },
+          "resolveAudioCaptcha": {
+            "$ref": "#/components/schemas/AudioCaptchaInstruction",
+            "description": "Resolve audio captcha action: solves audio-based captcha challenges and fills the resolved text into the target field."
+          },
+          "screenshot": {
+            "type": "string",
+            "description": "Screenshot action: captures a screenshot of the current page state. Can be a boolean-like value or a selector."
+          },
+          "saveimage": {
+            "type": "string",
+            "description": "Save image action: saves an image from the page by CSS selector or element ID."
+          }
+        }
+      },
+      "Cookie": {
+        "type": "object",
+        "description": "A single cookie to set in the browser session before running instructions.",
+        "required": ["name", "value"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Cookie name."
+          },
+          "value": {
+            "type": "string",
+            "description": "Cookie value."
+          }
+        }
+      },
+      "PlaceValue": {
+        "type": "object",
+        "description": "A selector/value pair used by fill, select, and clickButtonByValue instructions.",
+        "required": ["place", "value"],
+        "properties": {
+          "place": {
+            "type": "string",
+            "description": "CSS or XPath selector identifying the target element."
+          },
+          "value": {
+            "type": "string",
+            "description": "Value to fill, select, or match against."
+          }
+        }
+      },
+      "ImageCaptchaInstruction": {
+        "type": "object",
+        "description": "Instructions for locating and solving a single image CAPTCHA challenge.",
+        "properties": {
+          "imagePath": {
+            "type": "string",
+            "description": "Selector for the CAPTCHA image element."
+          },
+          "textField": {
+            "type": "string",
+            "description": "Selector for the field where the CAPTCHA text is entered."
+          },
+          "imageUpdatePath": {
+            "type": "string",
+            "description": "Selector to refresh or update the CAPTCHA image."
+          },
+          "captchaFailedPath": {
+            "type": "string",
+            "description": "Selector indicating a CAPTCHA failure so the solver can retry."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model used for CAPTCHA solving.",
+            "enum": [
+              "Model_1",
+              "Model_2",
+              "Model_3",
+              "Model_4",
+              "Model_5",
+              "Model_6",
+              "basicTnImageProcessing",
+              "basicPhImageProcessing"
+            ]
+          }
+        }
+      },
+      "AudioCaptchaInstruction": {
+        "type": "object",
+        "description": "Selectors for locating and solving a single audio CAPTCHA challenge.",
+        "properties": {
+          "audioPath": {
+            "type": "string",
+            "description": "Selector for the audio CAPTCHA element."
+          },
+          "textField": {
+            "type": "string",
+            "description": "Selector for the field where the resolved audio CAPTCHA text is entered."
+          }
+        }
+      },
+      "ExtractInstruction": {
+        "type": "object",
+        "description": "Maps arbitrary output field names to CSS or XPath selectors. Each key becomes a field in the response's extractedData object.",
+        "additionalProperties": {
+          "title": "SelectorForField",
+          "type": "string",
+          "description": "CSS selector or XPath identifying the element(s) to extract for this output field. Example: 'h1' or '/html/body/div/div[2]'."
+        }
+      },
+      "JsEnabledFalseBody": {
+        "type": "object",
+        "description": "Request body for jsEnabled=false (or omitted): fetches static HTML only, no browser rendering.",
+        "properties": {
+          "instructions": {
+            "type": "array",
+            "description": "A list of sequential instructions to execute against the static HTML response. Each item is one StaticInstruction object, with exactly one action field set.",
+            "items": {
+              "$ref": "#/components/schemas/StaticInstruction"
+            }
+          }
+        }
+      },
+      "StaticInstruction": {
+        "type": "object",
+        "description": "A single static-HTML scraping step. Exactly one of these action fields is set per instruction; every other field is absent.",
+        "properties": {
+          "postForm": {
+            "$ref": "#/components/schemas/FormSubmission",
+            "description": "POST form action: submits a form using the POST method. Provide the form's XPath/CSS selector and input values."
+          },
+          "getForm": {
+            "$ref": "#/components/schemas/FormSubmission",
+            "description": "GET form action: submits a form using the GET method. Provide the form's XPath/CSS selector and input values."
+          },
+          "extract": {
+            "$ref": "#/components/schemas/ExtractInstruction",
+            "description": "Extract data action: defines what data to extract and how, keyed by whatever field names you choose."
+          },
+          "getPage": {
+            "type": "string",
+            "description": "Get page action: retrieves the full page content. Optionally provide a URL or selector to target a specific page."
+          }
+        }
+      },
+      "FormSubmission": {
+        "type": "object",
+        "description": "Form selector and field values to submit via postForm or getForm.",
+        "properties": {
+          "selector": {
+            "type": "string",
+            "description": "CSS or XPath selector identifying the form element."
+          },
+          "data": {
+            "type": "object",
+            "description": "Form field name/value pairs to submit.",
+            "additionalProperties": {
+              "title": "FormFieldValue",
+              "type": "string",
+              "description": "Value to submit for this form field."
+            }
+          }
+        }
+      },
+      "ScrapingResponse": {
+        "type": "object",
+        "description": "Result of running the scraping instructions against the target URL.",
+        "required": ["extractedData"],
+        "properties": {
+          "extractedData": {
+            "type": "object",
+            "description": "Container keyed by the field names used in your extract instructions. A field is present only if its selector matched at least one element on the page.",
+            "$ref": "#/components/schemas/ExtractedField"
+          }
+        }
+      },
+      "ExtractedField": {
+        "type": ["string", "array"],
+        "title": "ExtractedField",
+        "description": "The value scraped for one field of an extract instruction. A string when the selector matched exactly one element (content depends on the text query parameter and, under jsEnabled=true, is always plain text). An array of strings, in document order, when the selector matched more than one element (each entry keeps HTML tags unless text=true is set). A field whose selector matched nothing is omitted from extractedData entirely rather than appearing as an empty value.",
+        "items": {
+          "type": "string"
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error response returned when a request fails.",
+        "required": ["error", "message", "path", "status", "timestamp"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

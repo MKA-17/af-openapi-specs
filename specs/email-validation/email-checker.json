@@ -1,0 +1,586 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Email Checker API - Real-Time Validation, Deliverability & Risk Signals",
+    "version": "1.0.0",
+    "description": "Validate a single email address and receive comprehensive results including syntax validation, domain verification, account detection, DNS records (MX and A records), and optional IP-based geolocation and security enrichment. Returns deliverability assessment with valid/invalid/unknown/risky status.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Email Checker API Server"
+    }
+  ],
+  "paths": {
+    "/email-validation/single": {
+      "post": {
+        "tags": ["Email Validation APIs"],
+        "summary": "Validate a single email",
+        "description": "Validates a single email address and returns result.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"]
+            },
+            "description": "Format of the response"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailCheckRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with Email Validation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleEmailValidationResponse"
+                },
+                "examples": {
+                  "validEmail": {
+                    "summary": "Valid, deliverable email",
+                    "value": {
+                      "success": true,
+                      "email": "abc.def@gmail.com",
+                      "validEmail": "valid",
+                      "validSyntax": true,
+                      "domain": {
+                        "name": "gmail.com",
+                        "disposable": false,
+                        "spam": false,
+                        "free": true,
+                        "validDomain": true,
+                        "catchAll": false
+                      },
+                      "account": {
+                        "role": false,
+                        "fullMailBox": false
+                      },
+                      "dns": {
+                        "mxRecords": [
+                          "gmail-smtp-in.l.google.com.",
+                          "alt1.gmail-smtp-in.l.google.com.",
+                          "alt2.gmail-smtp-in.l.google.com.",
+                          "alt3.gmail-smtp-in.l.google.com.",
+                          "alt4.gmail-smtp-in.l.google.com."
+                        ]
+                      }
+                    }
+                  },
+                  "invalidSyntax": {
+                    "summary": "Syntactically invalid email — domain/account/dns are minimal or absent",
+                    "value": {
+                      "success": true,
+                      "email": "not-an-email",
+                      "validEmail": "INVALID_EMAIL",
+                      "validSyntax": false,
+                      "domain": {
+                        "name": "not-an-email",
+                        "validDomain": false
+                      }
+                    }
+                  },
+                  "noMxRecord": {
+                    "summary": "Valid syntax, domain has no MX record",
+                    "value": {
+                      "success": true,
+                      "email": "test@nonexistentdomainxyz123abc.com",
+                      "validEmail": "invalid",
+                      "validSyntax": true,
+                      "reason": "mx record does not exist.",
+                      "domain": {
+                        "name": "nonexistentdomainxyz123abc.com",
+                        "disposable": false,
+                        "spam": false,
+                        "free": false,
+                        "validDomain": false,
+                        "catchAll": false
+                      },
+                      "account": {
+                        "role": false
+                      }
+                    }
+                  },
+                  "withIp": {
+                    "summary": "With ip — adds geolocation/security enrichment under address",
+                    "value": {
+                      "success": true,
+                      "email": "abc.def@gmail.com",
+                      "validEmail": "valid",
+                      "validSyntax": true,
+                      "domain": {
+                        "name": "gmail.com",
+                        "disposable": false,
+                        "spam": false,
+                        "free": true,
+                        "validDomain": true,
+                        "catchAll": false
+                      },
+                      "account": {
+                        "role": false,
+                        "fullMailBox": false
+                      },
+                      "dns": {
+                        "mxRecords": [
+                          "gmail-smtp-in.l.google.com.",
+                          "alt1.gmail-smtp-in.l.google.com.",
+                          "alt2.gmail-smtp-in.l.google.com.",
+                          "alt3.gmail-smtp-in.l.google.com.",
+                          "alt4.gmail-smtp-in.l.google.com."
+                        ]
+                      },
+                      "ip": "8.8.8.8",
+                      "address": {
+                        "validIpAddress": true,
+                        "location": {
+                          "city": "Mountain View",
+                          "district": "Santa Clara",
+                          "confidence": "low",
+                          "zipcode": "94043-1351",
+                          "state_prov": "California",
+                          "country_name": "United States",
+                          "continent_name": "North America",
+                          "continent_code": "NA",
+                          "country_code2": "US",
+                          "country_code3": "USA",
+                          "country_name_official": "United States of America",
+                          "accuracy_radius": "27.42",
+                          "is_eu": false
+                        },
+                        "security": {
+                          "threat_score": 5,
+                          "is_tor": false,
+                          "is_proxy": false,
+                          "proxy_type": "",
+                          "proxy_provider": "",
+                          "is_anonymous": false,
+                          "is_known_attacker": false,
+                          "is_spam": false,
+                          "is_bot": false,
+                          "is_cloud_provider": true,
+                          "cloud_provider": "Google LLC"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Invalid request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingEmail": {
+                    "summary": "email field missing from request body",
+                    "value": {
+                      "timestamp": "2026-07-27T12:51:23.593986185Z",
+                      "path": "/v2.0/email-validation/single",
+                      "status": 400,
+                      "error": "External API Error",
+                      "message": "Please pass valid value for 'email' in body."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Request Timeout": {
+                    "value": {
+                      "timestamp": "2026-06-06T13:00:00.000Z",
+                      "path": "/v1.0/email-validation/single",
+                      "status": 408,
+                      "error": "Request Timeout",
+                      "message": "Timed out while connecting to the remote URL."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate Limit Exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Rate Limit Exceeded": {
+                    "value": {
+                      "timestamp": "2026-06-06T13:00:00.000Z",
+                      "path": "/v1.0/email-validation/single",
+                      "status": 429,
+                      "error": "Too Many Requests",
+                      "message": "API rate limit exceeded."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "checkEmail"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SingleEmailValidationResponse": {
+        "type": "object",
+        "required": ["success", "email", "validEmail", "validSyntax", "domain"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates the processing status of the validation request. true: completed successfully."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "The email address submitted for validation."
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional identifier or label provided in the request for record tracking."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Detailed explanation returned when validEmail is not valid."
+          },
+          "validEmail": {
+            "type": "string",
+            "enum": ["valid", "invalid", "INVALID_EMAIL", "unknown", "risky"],
+            "description": "Comprehensive deliverability assessment. Casing is inconsistent in the live API: syntactically invalid addresses return INVALID_EMAIL, while semantically invalid (undeliverable) addresses return lowercase invalid. unknown/risky are documented possibilities not observed during testing."
+          },
+          "validSyntax": {
+            "type": "boolean",
+            "description": "Validates email address format compliance with RFC 5322 standards."
+          },
+          "domain": {
+            "$ref": "#/components/schemas/DomainObject"
+          },
+          "account": {
+            "$ref": "#/components/schemas/AccountObject"
+          },
+          "dns": {
+            "$ref": "#/components/schemas/DnsObject"
+          },
+          "address": {
+            "$ref": "#/components/schemas/AddressObject"
+          },
+          "ip": {
+            "type": "string",
+            "format": "ip",
+            "description": "IP address provided for geolocation and security enrichment."
+          }
+        },
+        "description": "Email validation response containing deliverability assessment and metadata."
+      },
+      "DomainObject": {
+        "type": "object",
+        "required": ["name", "validDomain"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Extracted domain component from the email address."
+          },
+          "validDomain": {
+            "type": "boolean",
+            "description": "Domain validation status confirming DNS resolution capability."
+          },
+          "disposable": {
+            "type": "boolean",
+            "description": "Classification flag identifying domains from temporary email service providers."
+          },
+          "spam": {
+            "type": "boolean",
+            "description": "Reputation indicator flagging domains on spam databases."
+          },
+          "free": {
+            "type": "boolean",
+            "description": "Classification indicating free or consumer-grade email service providers."
+          },
+          "catchAll": {
+            "type": "boolean",
+            "description": "Detection flag for domains configured to accept mail for any recipient address."
+          }
+        },
+        "description": "Domain validation details for the email address."
+      },
+      "AccountObject": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": {
+            "type": "boolean",
+            "description": "Detection flag identifying role-based email addresses (e.g., admin@, support@)."
+          },
+          "fullMailBox": {
+            "type": "boolean",
+            "description": "Storage capacity status indicator for the recipient mailbox."
+          }
+        },
+        "description": "Account-level validation details."
+      },
+      "DnsObject": {
+        "type": "object",
+        "required": ["mxRecords"],
+        "properties": {
+          "mxRecords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Collection of MX (Mail Exchange) hostname records from DNS queries."
+          },
+          "aRecords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Collection of A (Address) records for the domain. Not observed in testing — may be rarely or never populated."
+          }
+        },
+        "description": "DNS records for the email domain."
+      },
+      "AddressObject": {
+        "type": "object",
+        "properties": {
+          "validIpAddress": {
+            "type": "boolean",
+            "description": "IP recognized/reachable by the geolocation provider."
+          },
+          "location": {
+            "$ref": "#/components/schemas/EmailLocation"
+          },
+          "security": {
+            "$ref": "#/components/schemas/EmailSecurity"
+          }
+        },
+        "description": "Geolocation and security enrichment data for the IP address.",
+        "required": []
+      },
+      "EmailLocation": {
+        "type": "object",
+        "description": "Geolocation data derived from the IP address.",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "Municipal or city name."
+          },
+          "district": {
+            "type": "string",
+            "description": "District or neighborhood."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "Postal or ZIP code."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State or province."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Common country name."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official country name."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "Two-character ISO country code."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "Three-character ISO country code."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Continental region name."
+          },
+          "continent_code": {
+            "type": "string",
+            "description": "Continental region identifier."
+          },
+          "accuracy_radius": {
+            "type": "string",
+            "description": "Geolocation precision radius."
+          },
+          "confidence": {
+            "type": "string",
+            "description": "Confidence score for geolocation accuracy."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "European Union membership status."
+          }
+        },
+        "required": []
+      },
+      "EmailSecurity": {
+        "type": "object",
+        "description": "Threat and anonymity profile for the IP address.",
+        "required": [
+          "threat_score",
+          "is_tor",
+          "is_proxy",
+          "proxy_type",
+          "proxy_provider",
+          "is_anonymous",
+          "is_known_attacker",
+          "is_spam",
+          "is_bot",
+          "is_cloud_provider",
+          "cloud_provider"
+        ],
+        "properties": {
+          "threat_score": {
+            "type": "integer",
+            "description": "Quantitative risk assessment score. Higher values indicate elevated security risk."
+          },
+          "is_tor": {
+            "type": "boolean",
+            "description": "Detection flag for IP addresses routed through the Tor anonymity network."
+          },
+          "is_proxy": {
+            "type": "boolean",
+            "description": "Detection flag identifying IP addresses operating as proxy servers."
+          },
+          "proxy_type": {
+            "type": "string",
+            "description": "Classification of detected proxy infrastructure type (e.g. VPN, HTTP, SOCKS)."
+          },
+          "proxy_provider": {
+            "type": "string",
+            "description": "Identified service provider operating the proxy infrastructure."
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "description": "Anonymization detection flag for IP addresses using identity obfuscation techniques."
+          },
+          "is_known_attacker": {
+            "type": "boolean",
+            "description": "Threat intelligence flag for IP addresses documented as confirmed malicious sources."
+          },
+          "is_spam": {
+            "type": "boolean",
+            "description": "Reputation flag for IP addresses associated with spam transmission."
+          },
+          "is_bot": {
+            "type": "boolean",
+            "description": "Automated traffic detection flag for IP addresses from bot networks."
+          },
+          "is_cloud_provider": {
+            "type": "boolean",
+            "description": "Infrastructure classification flag for IP addresses from cloud computing providers."
+          },
+          "cloud_provider": {
+            "type": "string",
+            "description": "Identified cloud infrastructure or hosting service provider name."
+          }
+        }
+      },
+      "EmailCheckRequest": {
+        "type": "object",
+        "description": "Request body for email validation.",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email address to validate."
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional name or label for record tracking."
+          },
+          "ip": {
+            "type": "string",
+            "format": "ip",
+            "description": "Optional IP address for geolocation and security enrichment."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

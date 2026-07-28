@@ -1,0 +1,261 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Currency Converter API - Convert 970+ Fiat & Crypto Currencies at Live or Historical Rates",
+    "version": "1.0.0",
+    "description": "Convert an amount from one currency to another using the latest exchange rates. Supports fiat, crypto, and metals. Specify source currency, target currency, and amount to receive the current rate and converted amount with timestamp. All parameters are case-insensitive for both fiat/currency codes and crypto/symbols.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Currency Converter API Server"
+    }
+  ],
+  "paths": {
+    "/currency/converter/latest/prices": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Convert currency with latest rates",
+        "description": "Converts an amount from one currency to another using the latest exchange rates.",
+        "operationId": "convertLatest",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "description": "Source currency code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "description": "Target currency code.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "in": "query",
+            "required": false,
+            "description": "Amount to convert, as a decimal. Defaults to `1`. Must be numeric — non-numeric values return a 400 (negative values are accepted despite the error message's wording).",
+            "schema": {
+              "type": "string",
+              "default": "1"
+            }
+          },
+          {
+            "name": "updates",
+            "in": "query",
+            "required": false,
+            "description": "Update frequency: `1m` (default), `10m`, `1h`, or `1d`.",
+            "schema": {
+              "type": "string",
+              "enum": ["1m", "10m", "1h", "1d"],
+              "default": "1m"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LatestCurrencyConverterResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "date": "2026-07-27 12:05:00+00",
+                      "from": "USD",
+                      "to": "EUR",
+                      "rate": "0.87800",
+                      "givenAmount": "100.0",
+                      "convertedAmount": "87.800"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid amount or updates parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingParams": {
+                    "summary": "Missing required from/to parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/currency/converter/latest/prices",
+                      "status": 400,
+                      "timestamp": "2026-07-27T12:05:29.609Z"
+                    }
+                  },
+                  "invalidAmount": {
+                    "summary": "amount is not numeric",
+                    "value": {
+                      "timestamp": 1785153941995,
+                      "status": 400,
+                      "error": "Method Argument Type Mismatch",
+                      "message": "Invalid Amount. Please provide amount in decimal format and greater than 0!",
+                      "path": "/v2.0/convert/latest"
+                    }
+                  },
+                  "invalidUpdates": {
+                    "summary": "updates is not one of 1m/10m/1h/1d",
+                    "value": {
+                      "timestamp": 1785153942533,
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please provide valid updates parameter (1d,1h,10m,1m)",
+                      "path": "/v2.0/convert/latest"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Currency not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidBase": {
+                    "summary": "from currency not supported",
+                    "value": {
+                      "timestamp": 1785153930704,
+                      "status": 404,
+                      "error": "Not Found Exception",
+                      "message": "Rates of provided currency ZZZ are not available in our database!",
+                      "path": "/v2.0/convert/latest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "LatestCurrencyConverterResponse": {
+        "type": "object",
+        "required": [
+          "date",
+          "from",
+          "to",
+          "rate",
+          "givenAmount",
+          "convertedAmount"
+        ],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date and time with timezone (UTC) when the rate was recorded."
+          },
+          "from": {
+            "type": "string",
+            "description": "Source currency code."
+          },
+          "to": {
+            "type": "string",
+            "description": "Target currency code."
+          },
+          "rate": {
+            "type": "string",
+            "description": "Conversion rate from source to target currency."
+          },
+          "givenAmount": {
+            "type": "string",
+            "description": "The amount provided for conversion."
+          },
+          "convertedAmount": {
+            "type": "string",
+            "description": "The converted amount in the target currency."
+          }
+        },
+        "description": "Currency conversion response containing the exchange rate and converted amount."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests. Gateway-level validation errors use an ISO 8601 timestamp and the public endpoint path; currency-service errors use a Unix millisecond timestamp and an internal service path instead.",
+        "required": ["message"],
+        "properties": {
+          "timestamp": {
+            "type": ["string", "integer"],
+            "description": "Timestamp when the error occurred — ISO 8601 string for gateway errors, Unix milliseconds integer for currency-service errors."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "error": {
+            "type": "string",
+            "description": "Specific error type (e.g., Invalid Param Exception, Method Argument Type Mismatch, Not Found Exception)."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path (gateway errors) or internal service path (currency-service errors) that produced the error."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

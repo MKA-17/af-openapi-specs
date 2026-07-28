@@ -1,0 +1,229 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Exchange Rate API - Real-Time Forex & Crypto Rates for 1,000+ Assets",
+    "version": "1.0.0",
+    "description": "Get the latest exchange rates for any base currency. Returns rates for all available currencies or a filtered set of symbols. Supports fiat, crypto, and metals. Accepts an optional updates parameter for rate freshness (1m, 10m, 1h, 1d). Returns a 400 error for invalid parameters and a 404 error for unsupported currencies or symbols.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Exchange Rate API Server"
+    }
+  ],
+  "paths": {
+    "/currency/rates/latest": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Get the latest exchange rates",
+        "description": "Returns the latest exchange rates for the requested base currency and symbols.",
+        "operationId": "getLatestExchangeRates",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "base",
+            "in": "query",
+            "required": false,
+            "description": "Base currency code. Defaults to `USD`. Supports fiat, crypto, and metals.",
+            "schema": {
+              "type": "string",
+              "default": "USD"
+            }
+          },
+          {
+            "name": "symbols",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated currency codes. Omit to get all available rates.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "updates",
+            "in": "query",
+            "required": false,
+            "description": "Update frequency: `1m` (default), `10m`, `1h`, or `1d`.",
+            "schema": {
+              "type": "string",
+              "enum": ["1m", "10m", "1h", "1d"],
+              "default": "1m"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LatestExchangeRatesResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "date": "2026-07-27 12:01:00+00",
+                      "base": "USD",
+                      "rates": {
+                        "EUR": "0.878156",
+                        "PKR": "277.863"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidUpdates": {
+                    "summary": "updates is not one of 1m/10m/1h/1d",
+                    "value": {
+                      "timestamp": 1785153665906,
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please provide valid updates parameter (1d,1h,10m,1m)",
+                      "path": "/v2.0/rates/latest"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - Currency or symbol not available",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidBase": {
+                    "summary": "base currency not supported",
+                    "value": {
+                      "timestamp": 1785153666449,
+                      "status": 404,
+                      "error": "Not Found Exception",
+                      "message": "Rates of provided currency ZZZ are not available in our database!",
+                      "path": "/v2.0/rates/latest"
+                    }
+                  },
+                  "invalidSymbols": {
+                    "summary": "symbols not supported",
+                    "value": {
+                      "timestamp": 1785153666998,
+                      "status": 404,
+                      "error": "Not Found Exception",
+                      "message": "Rates of provided Symbols are not available in our database!",
+                      "path": "/v2.0/rates/latest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "LatestExchangeRatesResponse": {
+        "type": "object",
+        "required": ["date", "base", "rates"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "description": "Date and time with timezone (UTC) when the rates were recorded."
+          },
+          "base": {
+            "type": "string",
+            "description": "Base currency used for calculating exchange rates."
+          },
+          "rates": {
+            "type": "object",
+            "description": "Map of currency codes to their exchange rate against the base currency. Each key is a currency code and the value is an exchange rate string.",
+            "additionalProperties": {
+              "title": "ExchangeRateString",
+              "type": "string",
+              "description": "Exchange rate value as a string for this currency code."
+            }
+          }
+        },
+        "description": "Exchange rate response containing date, base currency, and rates map."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["timestamp", "status", "error", "message", "path"],
+        "properties": {
+          "timestamp": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unix timestamp in milliseconds when the error occurred."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "error": {
+            "type": "string",
+            "description": "Specific error type (e.g., `Invalid Param Exception`, `Not Found Exception`)."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          }
+        },
+        "description": "Standard error envelope returned by the API on failed requests."
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

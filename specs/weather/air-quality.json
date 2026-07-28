@@ -1,0 +1,779 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Air Quality API - Real-Time AQI & Pollution Monitoring",
+    "version": "1.0.0",
+    "description": "Monitor and predict air quality conditions using European (0-100+) and US (0-500) AQI standards. Returns current air quality readings and hourly forecast data up to 5 days ahead depending on the date range provided. Tracks pollutant concentrations including PM10, PM2.5, carbon monoxide, nitrogen dioxide, sulphur dioxide, ozone, and dust particles, plus UV index and aerosol optical depth measurements. Accepts location by city name, GPS coordinates, or IP address. Start/end dates are optional; without them only current conditions are returned.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0/weather",
+      "description": "Air Quality API Server"
+    }
+  ],
+  "paths": {
+    "/air-quality": {
+      "get": {
+        "tags": ["Weather APIs"],
+        "summary": "Air pollution monitoring and quality forecasts",
+        "description": "Monitor and predict air quality conditions using European and US AQI standards. Track pollutant concentrations including PM10, PM2.5, carbon monoxide, nitrogen dioxide, sulfur dioxide, ozone, and dust particles. Get current readings plus hourly forecasts up to 5 days ahead, complete with UV index and aerosol measurements for comprehensive air quality assessment.",
+        "operationId": "getAirQuality",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json.",
+            "schema": {
+              "type": "string",
+              "enum": ["json"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Starting date for AQI forecast data in YYYY-MM-DD format. Must be supplied together with endDate — passing only one of the two returns a 400 error. Both dates must fall within a rolling window from today through 5 days ahead.",
+            "required": false
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date for AQI forecast data in YYYY-MM-DD format. Must be supplied together with startDate — passing only one of the two returns a 400 error, and endDate cannot be earlier than startDate. Both dates must fall within a rolling window from today through 5 days ahead.",
+            "required": false
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "City name, place name, or full address.",
+            "required": false
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Latitude of the location. Must be supplied together with long — passing only one of the two returns a 400 error.",
+            "required": false
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Longitude of the location. Must be supplied together with lat — passing only one of the two returns a 400 error.",
+            "required": false
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IP(v4 or v6) address for location inference.",
+            "required": false
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Timezone for the results.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AirQualityResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Current AQI by IP (auto-detected)",
+                    "value": {
+                      "location": {
+                        "continent_code": "AS",
+                        "continent_name": "Asia",
+                        "country_code2": "PK",
+                        "country_code3": "PAK",
+                        "country_name": "Pakistan",
+                        "country_name_official": "Islamic Republic of Pakistan",
+                        "is_eu": false,
+                        "state_prov": "Punjab",
+                        "state_code": "PK-PB",
+                        "district": "Lahore",
+                        "city": "Lahore",
+                        "zipcode": "54000",
+                        "latitude": "31.52037",
+                        "longitude": "74.35875",
+                        "locality": "Gulberg",
+                        "elevation": "",
+                        "timezone": "Asia/Karachi",
+                        "timezone_abbreviation": "GMT+5"
+                      },
+                      "current": {
+                        "timestamp": "2026-07-24T16:00",
+                        "european_aqi": 67,
+                        "us_aqi": 99,
+                        "pm10": 27.4,
+                        "pm2_5": 27.2,
+                        "carbon_monoxide": 493,
+                        "nitrogen_dioxide": 6.2,
+                        "sulphur_dioxide": 8.6,
+                        "ozone": 169,
+                        "dust": 0,
+                        "uv_index": 1.95,
+                        "aerosol_optical_depth": 0.71,
+                        "uv_index_clear_sky": 2.25
+                      }
+                    }
+                  },
+                  "forecastSuccess": {
+                    "summary": "Forecast AQI by location and date range",
+                    "value": {
+                      "location": {
+                        "location_string": "Paris,France",
+                        "country_name": "France",
+                        "state_prov": "Ile-de-France",
+                        "city": "Paris",
+                        "locality": "",
+                        "latitude": "48.85889",
+                        "longitude": "2.32004",
+                        "elevation": "0",
+                        "timezone": "Europe/Paris",
+                        "timezone_abbreviation": "GMT+2"
+                      },
+                      "forecast": {
+                        "2026-07-25": {
+                          "hourly": [
+                            {
+                              "timestamp": "2026-07-25T00:00",
+                              "pm10": 14.8,
+                              "carbon_monoxide": 200,
+                              "pm2_5": 8.5,
+                              "carbon_dioxide": 446,
+                              "nitrogen_dioxide": 17.1,
+                              "sulphur_dioxide": 1,
+                              "ozone": 63,
+                              "dust": 0,
+                              "uv_index": 0,
+                              "aerosol_optical_depth": 0.2,
+                              "uv_index_clear_sky": 0
+                            },
+                            {
+                              "timestamp": "2026-07-25T01:00",
+                              "pm10": 16.1,
+                              "carbon_monoxide": 202,
+                              "pm2_5": 8.4,
+                              "carbon_dioxide": 449,
+                              "nitrogen_dioxide": 15.9,
+                              "sulphur_dioxide": 0.9,
+                              "ozone": 60,
+                              "dust": 0,
+                              "uv_index": 0,
+                              "aerosol_optical_depth": 0.2,
+                              "uv_index_clear_sky": 0
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid or incomplete parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidCoordinates": {
+                    "summary": "Coordinates out of range",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:36.550Z",
+                      "status": 400,
+                      "message": "Invalid latitude or longitude values. Latitude must be between -90 and 90, and longitude must be between -180 and 180",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  },
+                  "InvalidIP": {
+                    "summary": "Malformed IP address",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:37.632Z",
+                      "status": 400,
+                      "message": "Invalid IP address",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  },
+                  "InvalidTimezone": {
+                    "summary": "Invalid timezone",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:38.657Z",
+                      "status": 400,
+                      "message": "Check whether your input value is correct; timezone = NotATimezone",
+                      "error": "error",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  },
+                  "MissingPairedParam": {
+                    "summary": "Only one of a required pair supplied",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/weather/air-quality",
+                      "status": 400,
+                      "timestamp": "2026-07-24T11:34:56.768Z"
+                    }
+                  },
+                  "InvalidDateFormat": {
+                    "summary": "Date not in YYYY-MM-DD format",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:41.151Z",
+                      "status": 400,
+                      "message": "startDate must be in yyyy-mm-dd format",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  },
+                  "InvalidDateOrder": {
+                    "summary": "endDate before startDate",
+                    "value": {
+                      "timestamp": "2026-07-24T11:36:03.105Z",
+                      "status": 400,
+                      "message": "startDate must be before or equal to endDate",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  },
+                  "DateRangeOutOfBounds": {
+                    "summary": "Date range outside allowed window",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:45.616Z",
+                      "status": 400,
+                      "message": "Forecast date range must be within 2026-07-24 to 2026-07-29",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Location could not be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "LocationNotFound": {
+                    "summary": "Location not found",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:37.139Z",
+                      "status": 404,
+                      "message": "Location not found",
+                      "error": "error",
+                      "path": "/v1.0/weather/air-quality"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "AirQualityResponse": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/WeatherLocation"
+          },
+          "current": {
+            "$ref": "#/components/schemas/AirQuality",
+            "description": "Current air quality data, present when the request omits startDate/endDate."
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/AirQualityForecast",
+            "description": "Date-keyed forecast data, present when the request includes startDate/endDate."
+          }
+        },
+        "required": ["location"],
+        "description": "Air quality response containing location data plus either current observations or date-keyed forecast data. current and forecast are mutually exclusive — a single request never returns both."
+      },
+      "LocationByCoordinates": {
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "country_name",
+          "state_prov",
+          "city",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude coordinate in decimal degrees, ranging from -90 (South Pole) to +90 (North Pole). Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude coordinate in decimal degrees, ranging from -180 (West) to +180 (East). Returned as a string, not a number."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full name of the country corresponding to the provided coordinates."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division name for the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name associated with the coordinate location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, district, or village name within the broader area."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Height above mean sea level in meters for the specified coordinates. Returned as a string, not a number, and can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the location (e.g., America/New_York, Europe/London)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Abbreviated timezone representation based on current offset (e.g., EST, GMT, PST)."
+          }
+        },
+        "description": "Location data when the target is specified by GPS coordinates (lat/long)."
+      },
+      "LocationByIP": {
+        "type": "object",
+        "required": [
+          "continent_code",
+          "continent_name",
+          "country_code2",
+          "country_code3",
+          "country_name",
+          "country_name_official",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "continent_code": {
+            "type": "string",
+            "description": "Two-letter continent code (e.g., NA for North America, EU for Europe, AS for Asia)."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Full name of the continent where the IP address is registered."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 two-letter country code (e.g., US, GB, FR)."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 three-letter country code (e.g., USA, GBR, FRA)."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Common name of the country associated with the IP address."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official long-form country name as recognized internationally (e.g., United States of America)."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Boolean flag indicating whether the country is a member state of the European Union."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division associated with the IP location."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "ISO 3166-2 subdivision code for the state or province (e.g., CA for California)."
+          },
+          "district": {
+            "type": "string",
+            "description": "District, county, or secondary administrative division within the region."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or urban area name where the IP address is geographically registered."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "Postal code or ZIP code for the approximate location of the IP address."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees for the IP geolocation, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees for the IP geolocation, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, or small area designation within the city."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters for the IP geolocation. Returned as a string, not a number, and can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the IP location (e.g., America/Chicago, Asia/Tokyo)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation based on local offset (e.g., CST, JST, UTC)."
+          }
+        },
+        "description": "Location data when the target is inferred from an IP address."
+      },
+      "LocationByAddress": {
+        "type": "object",
+        "required": [
+          "location_string",
+          "country_name",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "Original location query string as submitted, including full address or place name."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Resolved country name derived from the geocoded location query."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division identified from the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name extracted from the geocoded location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, suburb, or village within the geocoded area."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geocoded latitude coordinate in decimal degrees, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geocoded longitude coordinate in decimal degrees, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters at the geocoded coordinates. Returned as a string, not a number, and can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the geocoded location (e.g., America/Los_Angeles)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation for the location based on local offset (e.g., PDT, CET)."
+          }
+        },
+        "description": "Location data when the target is specified by a city name or address string."
+      },
+      "AirQuality": {
+        "type": "object",
+        "required": [
+          "timestamp",
+          "european_aqi",
+          "us_aqi",
+          "pm10",
+          "pm2_5",
+          "carbon_monoxide",
+          "nitrogen_dioxide",
+          "sulphur_dioxide",
+          "ozone",
+          "dust",
+          "uv_index",
+          "aerosol_optical_depth",
+          "uv_index_clear_sky"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp (iso8601)."
+          },
+          "european_aqi": {
+            "type": "integer",
+            "description": "Consolidated European Air Quality Index representing the highest value among individual pollutant indices. Ranges: 0-20 (good), 20-40 (fair), 40-60 (moderate), 60-80 (poor), 80-100 (very poor), >100 (extremely poor)."
+          },
+          "us_aqi": {
+            "type": "integer",
+            "description": "Consolidated U.S. Air Quality Index representing the highest value among individual pollutant indices. Ranges: 0-50 (good), 51-100 (moderate), 101-150 (unhealthy for sensitive groups), 151-200 (unhealthy), 201-300 (very unhealthy), 301-500 (hazardous)."
+          },
+          "pm10": {
+            "type": "number",
+            "format": "float",
+            "description": "Particulate matter with diameter less than 10 micrometers (μg/m³) measured at 10 meters above ground."
+          },
+          "pm2_5": {
+            "type": "number",
+            "format": "float",
+            "description": "Particulate matter with diameter less than 2.5 micrometers (μg/m³) measured at 10 meters above ground."
+          },
+          "carbon_monoxide": {
+            "type": "number",
+            "format": "float",
+            "description": "Atmospheric carbon monoxide gas concentration (μg/m³) at 10 meters above ground."
+          },
+          "nitrogen_dioxide": {
+            "type": "number",
+            "format": "float",
+            "description": "Atmospheric nitrogen dioxide gas concentration (μg/m³) at 10 meters above ground."
+          },
+          "sulphur_dioxide": {
+            "type": "number",
+            "format": "float",
+            "description": "Atmospheric sulphur dioxide gas concentration (μg/m³) at 10 meters above ground."
+          },
+          "ozone": {
+            "type": "number",
+            "format": "float",
+            "description": "Atmospheric ozone gas concentration (μg/m³) at 10 meters above ground."
+          },
+          "dust": {
+            "type": "number",
+            "format": "float",
+            "description": "Saharan dust particle concentration (μg/m³) at 10 meters above ground."
+          },
+          "uv_index": {
+            "type": "number",
+            "format": "float",
+            "description": "Ultraviolet radiation intensity index accounting for cloud coverage."
+          },
+          "aerosol_optical_depth": {
+            "type": "number",
+            "format": "float",
+            "description": "Aerosol optical depth at 550 nm wavelength indicating atmospheric haze levels."
+          },
+          "uv_index_clear_sky": {
+            "type": "number",
+            "format": "float",
+            "description": "Ultraviolet radiation intensity index assuming cloud-free conditions."
+          }
+        },
+        "description": "Air quality metrics including European and US AQI indices plus individual pollutant concentrations."
+      },
+      "AirQualityHourly": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp"
+          },
+          "pm10": {
+            "type": "number",
+            "description": "Concentration of particulate matter ≤10 micrometers (μg/m³)"
+          },
+          "carbon_monoxide": {
+            "type": "number",
+            "description": "Concentration of carbon monoxide (μg/m³)"
+          },
+          "pm2_5": {
+            "type": "number",
+            "description": "Concentration of particulate matter ≤2.5 micrometers (μg/m³)"
+          },
+          "carbon_dioxide": {
+            "type": "number",
+            "description": "Concentration of carbon dioxide (ppm)"
+          },
+          "nitrogen_dioxide": {
+            "type": "number",
+            "description": "Concentration of nitrogen dioxide (μg/m³)"
+          },
+          "sulphur_dioxide": {
+            "type": "number",
+            "description": "Concentration of sulphur dioxide (μg/m³)"
+          },
+          "ozone": {
+            "type": "number",
+            "description": "Concentration of ozone (μg/m³)"
+          },
+          "dust": {
+            "type": "number",
+            "description": "Concentration of dust particles (μg/m³)"
+          },
+          "uv_index": {
+            "type": "number",
+            "description": "Ultraviolet radiation index"
+          },
+          "aerosol_optical_depth": {
+            "type": "number",
+            "description": "Aerosol optical depth"
+          },
+          "uv_index_clear_sky": {
+            "type": "number",
+            "description": "Ultraviolet radiation index under clear sky conditions"
+          }
+        },
+        "required": [
+          "timestamp",
+          "pm10",
+          "carbon_monoxide",
+          "pm2_5",
+          "carbon_dioxide",
+          "nitrogen_dioxide",
+          "sulphur_dioxide",
+          "ozone",
+          "dust",
+          "uv_index",
+          "aerosol_optical_depth",
+          "uv_index_clear_sky"
+        ],
+        "description": "Hourly air quality forecast reading with pollutant concentrations and UV index."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "WeatherLocation": {
+        "type": "object",
+        "description": "Location information",
+        "oneOf": [
+          {
+            "description": "Location data when the target is specified by GPS coordinates (lat/long).",
+            "$ref": "#/components/schemas/LocationByCoordinates"
+          },
+          {
+            "description": "Location data when the target is inferred from an IP address.",
+            "$ref": "#/components/schemas/LocationByIP"
+          },
+          {
+            "description": "Location data when the target is specified by a city name or address string.",
+            "$ref": "#/components/schemas/LocationByAddress"
+          }
+        ]
+      },
+      "AirQualityForecast": {
+        "type": "object",
+        "description": "Forecast data object keyed by date (YYYY-MM-DD), one key per day in the requested startDate/endDate range. The key names are dynamic dates, not a fixed schema property.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/AirQualityForecastDay"
+        }
+      },
+      "AirQualityForecastDay": {
+        "type": "object",
+        "description": "Air quality forecast data for a single day, containing hourly readings.",
+        "required": ["hourly"],
+        "properties": {
+          "hourly": {
+            "type": "array",
+            "description": "Array of hourly air quality readings for this day.",
+            "items": {
+              "$ref": "#/components/schemas/AirQualityHourly"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

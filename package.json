@@ -1,0 +1,49 @@
+{
+  "name": "@apifreaks/openapi-specs",
+  "version": "0.1.0",
+  "description": "Public OpenAPI 3.1 specifications for all APIFreaks API products",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./specs/*.json": "./specs/*.json",
+    "./specs/*/*.json": "./specs/*/*.json"
+  },
+  "files": [
+    "dist",
+    "specs"
+  ],
+  "scripts": {
+    "generate": "tsx scripts/generate-manifest.ts",
+    "build": "npm run generate && tsup src/index.ts --format esm,cjs --dts --clean --tsconfig tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test test/validate.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "openapi",
+    "api-specification",
+    "apifreaks",
+    "rest-api",
+    "openapi-3.1"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/api-freaks/af-openapi-specs.git"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "tsup": "^8.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

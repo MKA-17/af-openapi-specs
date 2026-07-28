@@ -1,0 +1,161 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Currency Symbols API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the complete map of all supported currency codes to their full names. Returns an object where each key is a currency code (USD, EUR, GBP, PKR, BTC, XAU, etc.) and the value is the corresponding currency name. Covers fiat currencies, cryptocurrencies, and precious metals.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Currency Symbols API Server"
+    }
+  ],
+  "paths": {
+    "/currency/symbols": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Get all currency symbols",
+        "description": "Returns a map of currency codes to their full names.",
+        "operationId": "getCurrencySymbols",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencySymbolsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "currencySymbols": {
+                        "USD": "US Dollar",
+                        "EUR": "Euro",
+                        "GBP": "British Pound Sterling",
+                        "PKR": "Pakistani Rupee",
+                        "BTC": "Bitcoin",
+                        "XAU": "Gold (troy ounce)"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported Media Type — format is not json or xml",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "badFormat": {
+                    "summary": "format value not supported",
+                    "value": {
+                      "error": "Unsupported Media Type",
+                      "message": "The media type specified in the request is not supported. For more details, please refer to the API documentation.",
+                      "path": "/v1.0/currency/symbols",
+                      "status": 406,
+                      "timestamp": "2026-07-27T12:13:24.369Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CurrencySymbolsResponse": {
+        "type": "object",
+        "required": ["currencySymbols"],
+        "properties": {
+          "currencySymbols": {
+            "type": "object",
+            "description": "Map of currency codes to their full names. Each key is a currency code and the value is the currency name string.",
+            "additionalProperties": {
+              "title": "CurrencySymbolName",
+              "type": "string",
+              "description": "Full name of the currency (e.g., US Dollar, Euro)."
+            }
+          }
+        },
+        "description": "Currency symbols response containing the map of all currency codes to their names."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

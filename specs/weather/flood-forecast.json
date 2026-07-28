@@ -1,0 +1,693 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Flood Forecast API - River Discharge & Flood Risk Monitoring",
+    "version": "1.0.0",
+    "description": "Get daily flood risk and river discharge forecast data for any location, up to 16 days ahead. Returns a `location` block plus a `forecast` object keyed by date, each day carrying river discharge statistics (`river_discharge`, mean, median, max, min, and the p25/p75 percentiles) in m³/s. Accepts the target location as a `location` string, `lat`/`long` coordinates, or an `ip` address; the `timezone` param controls the returned timezone abbreviation. If none of `location`, `lat`/`long`, or `ip` are supplied, the location is auto-detected from the caller's IP address. Locations without a nearby monitored river return a `200` response with all discharge values at `0` rather than an error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0/weather",
+      "description": "Flood Forecast API Server"
+    }
+  ],
+  "paths": {
+    "/flood": {
+      "get": {
+        "tags": ["Weather APIs"],
+        "summary": "Get flood risk and river discharge forecast",
+        "description": "Provides flood forecast data for a given location, including river discharge metrics such as mean, median, maximum, minimum, and percentile values (p25, p75). Requires a startDate and endDate, with the date range limited to 16 days. Location can be specified using city name, latitude/longitude, or IP address; if omitted entirely, the caller's IP is used.",
+        "operationId": "getFloodForecast",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json.",
+            "schema": {
+              "type": "string",
+              "enum": ["json"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Starting date for flood forecast data in YYYY-MM-DD format. Forecast dates must be current or future dates only. Past dates are not allowed for forecast data. The difference between endDate and startDate must not exceed 16 days."
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date for flood forecast data in YYYY-MM-DD format. Forecast dates must be current or future dates only. Past dates are not allowed for forecast data. The difference between endDate and startDate must not exceed 16 days."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "City name, place name, or full address.",
+            "required": false
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Latitude of the location.",
+            "required": false
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "Longitude of the location.",
+            "required": false
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IP(v4 or v6) address for location inference.",
+            "required": false
+          },
+          {
+            "name": "precision",
+            "in": "query",
+            "required": false,
+            "description": "Forecast data granularity. Only 'daily' is supported; any other value returns a 400 error.",
+            "schema": {
+              "type": "string",
+              "enum": ["daily"],
+              "default": "daily"
+            }
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Timezone for the results.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful flood forecast response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FloodResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "location": {
+                        "location_string": "London",
+                        "country_name": "United Kingdom",
+                        "state_prov": "England",
+                        "city": "London",
+                        "locality": "",
+                        "latitude": "51.50745",
+                        "longitude": "-0.12777",
+                        "elevation": "12",
+                        "timezone": "Europe/London",
+                        "timezone_abbreviation": "GMT+1"
+                      },
+                      "forecast": {
+                        "2026-07-25": {
+                          "daily": {
+                            "timestamp": "2026-07-25",
+                            "river_discharge": 5.47,
+                            "river_discharge_mean": 5.47,
+                            "river_discharge_median": 5.47,
+                            "river_discharge_max": 5.68,
+                            "river_discharge_min": 5.44,
+                            "river_discharge_p25": 5.46,
+                            "river_discharge_p75": 5.47
+                          }
+                        },
+                        "2026-07-26": {
+                          "daily": {
+                            "timestamp": "2026-07-26",
+                            "river_discharge": 5.46,
+                            "river_discharge_mean": 5.47,
+                            "river_discharge_median": 5.46,
+                            "river_discharge_max": 6.06,
+                            "river_discharge_min": 5.4,
+                            "river_discharge_p25": 5.46,
+                            "river_discharge_p75": 5.47
+                          }
+                        },
+                        "2026-07-27": {
+                          "daily": {
+                            "timestamp": "2026-07-27",
+                            "river_discharge": 5.4,
+                            "river_discharge_mean": 5.4,
+                            "river_discharge_median": 5.4,
+                            "river_discharge_max": 6.11,
+                            "river_discharge_min": 5.3,
+                            "river_discharge_p25": 5.35,
+                            "river_discharge_p75": 5.42
+                          }
+                        },
+                        "2026-07-28": {
+                          "daily": {
+                            "timestamp": "2026-07-28",
+                            "river_discharge": 5.37,
+                            "river_discharge_mean": 5.98,
+                            "river_discharge_median": 5.36,
+                            "river_discharge_max": 22.99,
+                            "river_discharge_min": 5.27,
+                            "river_discharge_p25": 5.31,
+                            "river_discharge_p75": 5.54
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "noRiverDataNearby": {
+                    "summary": "Location with no nearby monitored river",
+                    "value": {
+                      "location": {
+                        "latitude": "23.40000",
+                        "longitude": "11.50000",
+                        "country_name": "Algeria",
+                        "state_prov": "Djanet",
+                        "city": "Djanet",
+                        "locality": "",
+                        "elevation": "",
+                        "timezone": "Africa/Algiers",
+                        "timezone_abbreviation": "GMT+1"
+                      },
+                      "forecast": {
+                        "2026-07-25": {
+                          "daily": {
+                            "timestamp": "2026-07-25",
+                            "river_discharge": 0,
+                            "river_discharge_mean": 0,
+                            "river_discharge_median": 0,
+                            "river_discharge_max": 0,
+                            "river_discharge_min": 0,
+                            "river_discharge_p25": 0,
+                            "river_discharge_p75": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing, malformed, or out-of-range parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingParams": {
+                    "summary": "Missing or incomplete location parameters",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/weather/flood",
+                      "status": 400,
+                      "timestamp": "2026-07-24T11:35:53.121Z"
+                    }
+                  },
+                  "InvalidCoordinates": {
+                    "summary": "Latitude or longitude out of range",
+                    "value": {
+                      "timestamp": "2026-07-24T11:34:58.755Z",
+                      "status": 400,
+                      "message": "Invalid latitude or longitude values. Latitude must be between -90 and 90, and longitude must be between -180 and 180",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "UnresolvedCoordinates": {
+                    "summary": "In-range coordinates over open ocean/uninhabited area",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:26.119Z",
+                      "status": 400,
+                      "message": "Please provide both lat and long parameters.",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "InvalidIp": {
+                    "summary": "Malformed IP address",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:53.649Z",
+                      "status": 400,
+                      "message": "Invalid IP address",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "InvalidPrecision": {
+                    "summary": "Unsupported precision value",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:40.099Z",
+                      "status": 400,
+                      "message": "'hourly' precision is not supported on this endpoint",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "BadDateFormat": {
+                    "summary": "Bad date format",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:10.570Z",
+                      "status": 400,
+                      "message": "startDate must be in yyyy-mm-dd format",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "EndBeforeStart": {
+                    "summary": "End date before start date",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:11.115Z",
+                      "status": 400,
+                      "message": "startDate must be before or equal to endDate",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  },
+                  "DateRangeExceeded": {
+                    "summary": "Date range exceeds 16 days, or a past date was requested",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:11.610Z",
+                      "status": 400,
+                      "message": "Forecast date range must be within 2026-07-24 to 2026-08-08",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Location could not be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "LocationNotFound": {
+                    "summary": "Location not found",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:12.674Z",
+                      "status": 404,
+                      "message": "Location not found",
+                      "error": "error",
+                      "path": "/v1.0/weather/flood"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "FloodResponse": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/WeatherLocation"
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/FloodForecastData"
+          }
+        },
+        "required": ["location", "forecast"],
+        "description": "Flood forecast response containing location data and date-keyed river discharge forecasts."
+      },
+      "LocationByCoordinates": {
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "country_name",
+          "state_prov",
+          "city",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude coordinate in decimal degrees, ranging from -90 (South Pole) to +90 (North Pole). Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude coordinate in decimal degrees, ranging from -180 (West) to +180 (East). Returned as a string, not a number."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full name of the country corresponding to the provided coordinates."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division name for the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name associated with the coordinate location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, district, or village name within the broader area."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Height above mean sea level in meters for the specified coordinates, returned as a string. Can be an empty string when elevation data is unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the location (e.g., America/New_York, Europe/London)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Abbreviated timezone representation based on current offset (e.g., EST, GMT, PST)."
+          }
+        },
+        "description": "Location data when the target is specified by GPS coordinates (lat/long)."
+      },
+      "LocationByIP": {
+        "type": "object",
+        "required": [
+          "continent_code",
+          "continent_name",
+          "country_code2",
+          "country_code3",
+          "country_name",
+          "country_name_official",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "continent_code": {
+            "type": "string",
+            "description": "Two-letter continent code (e.g., NA for North America, EU for Europe, AS for Asia)."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Full name of the continent where the IP address is registered."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 two-letter country code (e.g., US, GB, FR)."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 three-letter country code (e.g., USA, GBR, FRA)."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Common name of the country associated with the IP address."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official long-form country name as recognized internationally (e.g., United States of America)."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Boolean flag indicating whether the country is a member state of the European Union."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division associated with the IP location."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "ISO 3166-2 subdivision code for the state or province (e.g., CA for California)."
+          },
+          "district": {
+            "type": "string",
+            "description": "District, county, or secondary administrative division within the region."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or urban area name where the IP address is geographically registered."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "Postal code or ZIP code for the approximate location of the IP address."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees for the IP geolocation, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees for the IP geolocation, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, or small area designation within the city."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters for the IP geolocation, returned as a string. Can be an empty string when elevation data is unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the IP location (e.g., America/Chicago, Asia/Tokyo)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation based on local offset (e.g., CST, JST, UTC)."
+          }
+        },
+        "description": "Location data when the target is inferred from an IP address."
+      },
+      "LocationByAddress": {
+        "type": "object",
+        "required": [
+          "location_string",
+          "country_name",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "Original location query string as submitted, including full address or place name."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Resolved country name derived from the geocoded location query."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division identified from the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name extracted from the geocoded location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, suburb, or village within the geocoded area."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geocoded latitude coordinate in decimal degrees, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geocoded longitude coordinate in decimal degrees, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters at the geocoded coordinates, returned as a string. Can be an empty string when elevation data is unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the geocoded location (e.g., America/Los_Angeles)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation for the location based on local offset (e.g., PDT, CET)."
+          }
+        },
+        "description": "Location data when the target is specified by a city name or address string."
+      },
+      "FloodDaily": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date",
+            "description": "Forecast date in YYYY-MM-DD format. Returned as a date only, with no time component despite the parent object being keyed by the same date."
+          },
+          "river_discharge": {
+            "type": "number",
+            "description": "The observed river discharge value (m³/s)"
+          },
+          "river_discharge_mean": {
+            "type": "number",
+            "description": "The mean river discharge (m³/s)"
+          },
+          "river_discharge_median": {
+            "type": "number",
+            "description": "The median river discharge (m³/s)"
+          },
+          "river_discharge_max": {
+            "type": "number",
+            "description": "The maximum river discharge (m³/s)"
+          },
+          "river_discharge_min": {
+            "type": "number",
+            "description": "The minimum river discharge (m³/s)"
+          },
+          "river_discharge_p25": {
+            "type": "number",
+            "description": "The 25th percentile of river discharge (m³/s)"
+          },
+          "river_discharge_p75": {
+            "type": "number",
+            "description": "The 75th percentile of river discharge (m³/s)"
+          }
+        },
+        "required": [
+          "timestamp",
+          "river_discharge",
+          "river_discharge_mean",
+          "river_discharge_median",
+          "river_discharge_max",
+          "river_discharge_min",
+          "river_discharge_p25",
+          "river_discharge_p75"
+        ],
+        "description": "Daily river discharge forecast data with discharge statistics and percentiles."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "WeatherLocation": {
+        "type": "object",
+        "description": "Location information",
+        "oneOf": [
+          {
+            "description": "Location data when the target is specified by GPS coordinates (lat/long).",
+            "$ref": "#/components/schemas/LocationByCoordinates"
+          },
+          {
+            "description": "Location data when the target is inferred from an IP address.",
+            "$ref": "#/components/schemas/LocationByIP"
+          },
+          {
+            "description": "Location data when the target is specified by a city name or address string.",
+            "$ref": "#/components/schemas/LocationByAddress"
+          }
+        ]
+      },
+      "FloodForecastData": {
+        "type": "object",
+        "description": "Flood forecast data object keyed by date (YYYY-MM-DD); each key's value is a FloodForecastDay object.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/FloodForecastDay"
+        }
+      },
+      "FloodForecastDay": {
+        "type": "object",
+        "description": "Flood forecast data for a single day, containing river discharge metrics.",
+        "required": ["daily"],
+        "properties": {
+          "daily": {
+            "$ref": "#/components/schemas/FloodDaily"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

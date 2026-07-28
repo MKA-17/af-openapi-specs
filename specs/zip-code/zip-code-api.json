@@ -1,0 +1,299 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "ZIP Code API - Global ZIP & Postal Code Lookup and Validation",
+    "version": "1.0.0",
+    "description": "Look up and validate a single ZIP or postal code worldwide, returning every location that uses it. Returns city, region, region code, locality, country code, latitude, and longitude for each matching location. A postal code can map to multiple locations across different countries (e.g. \"90210\" matches places in the US, Ukraine, Kenya, Mexico, and Pakistan) unless the optional `country` parameter narrows the search to one country. Only one code is accepted per request — for multiple codes in one call, use the Bulk ZIP Code Lookup API instead. Invalid country codes return a 400, and codes with no match return a 404.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "ZIP Code Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/zipcode/lookup": {
+      "get": {
+        "tags": ["ZIP Code APIs"],
+        "summary": "Look up a ZIP/postal code",
+        "description": "Returns every location worldwide that matches the given postal/ZIP code, optionally narrowed to one country.",
+        "operationId": "lookupZipCode",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response. Possible values: json, xml."
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The postal/ZIP code to look up. Only one code is accepted per request."
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Country code in ISO 3166-1 alpha-2 format. Limits results to that country. If not provided, matching locations from all countries are returned."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with matching ZIP code locations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZipcodeLookupResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Code matched in one country",
+                    "value": {
+                      "results": [
+                        {
+                          "code": "90210",
+                          "country_code": "US",
+                          "region": "California",
+                          "region_code": "CA",
+                          "city": "Los Angeles",
+                          "locality": "Beverly Hills (Beverly Hills)",
+                          "latitude": 34.10313,
+                          "longitude": -118.41625
+                        }
+                      ]
+                    }
+                  },
+                  "multipleCountryMatches": {
+                    "summary": "Same code matched across multiple countries (no country filter)",
+                    "value": {
+                      "results": [
+                        {
+                          "code": "90210",
+                          "country_code": "US",
+                          "region": "California",
+                          "region_code": "CA",
+                          "city": "Los Angeles",
+                          "locality": "Beverly Hills (Beverly Hills)",
+                          "latitude": 34.10313,
+                          "longitude": -118.41625
+                        },
+                        {
+                          "code": "90210",
+                          "country_code": "UA",
+                          "region": "Zakarpattia Oblast",
+                          "region_code": "21",
+                          "city": "Batovo Settlement Hromada",
+                          "locality": "Svoboda",
+                          "latitude": 48.35717,
+                          "longitude": 22.367962
+                        },
+                        {
+                          "code": "90210",
+                          "country_code": "KE",
+                          "region": "Kitui",
+                          "region_code": "18",
+                          "city": "Matinyani",
+                          "locality": "Kalia",
+                          "latitude": -1.310763,
+                          "longitude": 37.969997
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing code or invalid country code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingCode": {
+                    "summary": "Missing required code parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/zipcode/lookup",
+                      "status": 400,
+                      "timestamp": "2026-07-27T11:17:13.351Z"
+                    }
+                  },
+                  "InvalidCountryCode": {
+                    "summary": "country is not a valid ISO 3166-1 alpha-2 code",
+                    "value": {
+                      "timestamp": "2026-07-27T11:17:13.872Z",
+                      "path": "/v1.0/zipcode/lookup",
+                      "status": 400,
+                      "error": "Invalid Country Code Provided",
+                      "message": "Only ISO 3166-1 alpha-2 codes country codes are supported."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — No location matches the given code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "ZipNotFound": {
+                    "summary": "Postal/ZIP code not found",
+                    "value": {
+                      "timestamp": "2026-07-27T11:17:14.474Z",
+                      "path": "/v1.0/zipcode/lookup",
+                      "status": 404,
+                      "error": "Postal/Zip Code Not Found",
+                      "message": "Provided postal/zip code was not found in our database."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ZipcodeLookupResponse": {
+        "type": "object",
+        "description": "ZIP code lookup result containing an array of matching postal codes with location details.",
+        "required": ["results"],
+        "properties": {
+          "results": {
+            "type": "array",
+            "description": "Array of ZIP code results matching the requested code. When multiple locations worldwide share the same postal code, each appears as a separate entry.",
+            "items": {
+              "$ref": "#/components/schemas/ZipResultItem"
+            }
+          }
+        }
+      },
+      "ZipResultItem": {
+        "type": "object",
+        "description": "A ZIP code result containing location details.",
+        "required": [
+          "code",
+          "country_code",
+          "region",
+          "region_code",
+          "city",
+          "latitude",
+          "longitude"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Postal/ZIP code of the location."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "Country code in ISO 3166-1 alpha-2 format."
+          },
+          "region": {
+            "type": "string",
+            "description": "Region, state, or province associated with the postal code."
+          },
+          "region_code": {
+            "type": "string",
+            "description": "Region code or abbreviation."
+          },
+          "city": {
+            "type": "string",
+            "description": "City associated with the postal code."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Locality or neighborhood associated with the postal code. Can be an empty string when no locality-level data exists."
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "description": "Latitude coordinate of the postal code location."
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "description": "Longitude coordinate of the postal code location."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Currency Historical Data Limits API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the date range for which historical exchange rate data is available for each supported currency. Returns a map of currency codes to their availability period in YYYY-MM-DD to YYYY-MM-DD format. Covers fiat currencies, cryptocurrencies, and precious metals.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Currency Historical Data Limits API Server"
+    }
+  ],
+  "paths": {
+    "/currency/historical/data/limits": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Get historical data availability limits",
+        "description": "Returns the date range when historical data is available for each currency.",
+        "operationId": "getHistoricalDataLimits",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HistoricalDataLimitsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "availabilityPeriod": {
+                        "FJD": "1989-08-18 to 2026-07-27",
+                        "SCR": "1998-07-31 to 2026-07-27",
+                        "STPT": "2025-02-27 to 2025-05-28"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported Media Type — format is not json or xml",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "badFormat": {
+                    "summary": "format value not supported",
+                    "value": {
+                      "error": "Unsupported Media Type",
+                      "message": "The media type specified in the request is not supported. For more details, please refer to the API documentation.",
+                      "path": "/v1.0/currency/historical/data/limits",
+                      "status": 406,
+                      "timestamp": "2026-07-27T12:14:01.189Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "HistoricalDataLimitsResponse": {
+        "type": "object",
+        "required": ["availabilityPeriod"],
+        "properties": {
+          "availabilityPeriod": {
+            "type": "object",
+            "description": "Map of currency codes to their historical data availability range. Each key is a currency code and the value is a date range string.",
+            "additionalProperties": {
+              "title": "AvailabilityPeriodString",
+              "type": "string",
+              "description": "Historical data availability date range in YYYY-MM-DD to YYYY-MM-DD format."
+            }
+          }
+        },
+        "description": "Historical data limits response containing the availability period map."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,729 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "ASN Lookup API - WHOIS Records, CIDR Blocks & BGP Peer Data",
+    "version": "1.0.0",
+    "description": "Retrieve complete WHOIS registration data for an Autonomous System Number (ASN), covering the operating organization, every advertised IPv4 and IPv6 route object, and both a structured JSON breakdown and the raw WHOIS text returned by the authoritative Regional Internet Registry. The response also includes the ASN's upstream providers, downstream customers, and BGP peer relationships when the registry publishes them, plus direct technical and abuse contact details. Pass the `asn` parameter with or without the `AS` prefix (e.g. `15169` or `AS15169`). An unallocated or unrecognized ASN returns a `404` error instead of an empty result, and a non-numeric or malformed `asn` value returns a `400` error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "ASN Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/asn/whois/live": {
+      "get": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Retrieve WHOIS registration data, CIDR block inventory, and BGP peer relationships for an Autonomous System Number",
+        "description": "Returns the WHOIS record for the specified ASN, including organization details, IPv4/IPv6 route objects, upstream/downstream/peer relationships, and both parsed and raw WHOIS text. Accepts the ASN with or without the 'AS' prefix.",
+        "operationId": "asnLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "asn",
+            "in": "query",
+            "required": true,
+            "description": "Autonomous System Number to retrieve WHOIS data for, with or without the 'AS' prefix (e.g. 15169 or AS15169).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful ASN WHOIS response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ASNLookupResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "asNumber": "15",
+                      "asName": "NET-DYNAMICS-EXP",
+                      "orgName": "DYNAMICS",
+                      "description": "",
+                      "orgHandle": "dynami-109",
+                      "country": "US",
+                      "domain": "nisc.sri.com",
+                      "website": "",
+                      "allocationStatus": "",
+                      "numOfIPv4Routes": "0",
+                      "numOfIPv6Routes": "0",
+                      "whoisHost": "ARIN",
+                      "dateAllocated": "",
+                      "type": "ISP",
+                      "routeObjects": [],
+                      "whoisResponse": "\n#\n# ARIN WHOIS data and services are subject to the Terms of Use\n# available at: https://www.arin.net/resources/registry/whois/tou/\n#\n# If you see inaccuracies in the results, please report at\n# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/\n#\n# Copyright 1997-2026, American Registry for Internet Numbers, Ltd.\n#\n\n\nASNumber:       15\nASName:         NET-DYNAMICS-EXP\nASHandle:       AS15\nRegDate:        \nUpdated:        1991-06-27\nRef:            https://rdap.arin.net/registry/autnum/15\n\n\nOrgName:        DYNAMICS\nOrgId:          DYNAMI-109\nCity:           \nStateProv:      \nPostalCode:     \nCountry:        US\nRegDate:        \nUpdated:        2012-10-10\nRef:            https://rdap.arin.net/registry/entity/DYNAMI-109\n\n\nOrgTechHandle: ZSU-ARIN\nOrgTechName:   Su, Zaw-Sing \nOrgTechPhone:  +1-415-859-4576 \nOrgTechEmail:  zsu@nisc.sri.com\nOrgTechRef:    https://rdap.arin.net/registry/entity/ZSU-ARIN\n\nOrgAbuseHandle: ZSU-ARIN\nOrgAbuseName:   Su, Zaw-Sing \nOrgAbusePhone:  +1-415-859-4576 \nOrgAbuseEmail:  zsu@nisc.sri.com\nOrgAbuseRef:    https://rdap.arin.net/registry/entity/ZSU-ARIN\n\nRTechHandle: ZSU-ARIN\nRTechName:   Su, Zaw-Sing \nRTechPhone:  +1-415-859-4576 \nRTechEmail:  zsu@nisc.sri.com\nRTechRef:    https://rdap.arin.net/registry/entity/ZSU-ARIN\n\n\n#\n# ARIN WHOIS data and services are subject to the Terms of Use\n# available at: https://www.arin.net/resources/registry/whois/tou/\n#\n# If you see inaccuracies in the results, please report at\n# https://www.arin.net/resources/registry/whois/inaccuracy_reporting/\n#\n# Copyright 1997-2026, American Registry for Internet Numbers, Ltd.\n#\n",
+                      "downstreams": [],
+                      "parsedWhoisResponse": {
+                        "status": true,
+                        "whois_server": "whois.arin.net",
+                        "aut_nums": [
+                          {
+                            "aut_num": "15",
+                            "as_handle": "AS15",
+                            "as_name": "NET-DYNAMICS-EXP",
+                            "tech_contacts": ["ZSU-ARIN", "ZSU-ARIN"],
+                            "abuse_contacts": ["ZSU-ARIN"],
+                            "date_updated": "1991-06-27",
+                            "source": "https://rdap.arin.net/registry/autnum/15"
+                          }
+                        ],
+                        "organization": {
+                          "handle": "DYNAMI-109",
+                          "name": "DYNAMICS",
+                          "address": ["US"],
+                          "country": ["US"],
+                          "date_updated": "2012-10-10",
+                          "source": "https://rdap.arin.net/registry/entity/DYNAMI-109",
+                          "addressCountry": "US"
+                        },
+                        "technical_contacts": [
+                          {
+                            "handle": "ZSU-ARIN",
+                            "name": "Su, Zaw-Sing",
+                            "email": ["zsu@nisc.sri.com"],
+                            "phone": ["+1-415-859-4576"],
+                            "source": "https://rdap.arin.net/registry/entity/ZSU-ARIN"
+                          }
+                        ],
+                        "abuse_contacts": [
+                          {
+                            "handle": "ZSU-ARIN",
+                            "name": "Su, Zaw-Sing",
+                            "email": ["zsu@nisc.sri.com"],
+                            "phone": ["+1-415-859-4576"],
+                            "source": "https://rdap.arin.net/registry/entity/ZSU-ARIN"
+                          }
+                        ]
+                      },
+                      "upstreams": [],
+                      "peers": [],
+                      "contacts": {
+                        "emailContacts": ["zsu@nisc.sri.com"],
+                        "abuseContacts": []
+                      },
+                      "legacyRoutes": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid asn parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidAsn": {
+                    "summary": "Non-numeric asn value",
+                    "value": {
+                      "timestamp": "2026-07-23T07:47:06.640Z",
+                      "status": 400,
+                      "error": "Input parameter is not valid",
+                      "message": "Request-param 'asn' (ABC123) is not valid",
+                      "path": "/v2.0/asn-whois"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — ASN could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "asnNotFound": {
+                    "summary": "ASN not allocated or unrecognized",
+                    "value": {
+                      "timestamp": "2026-07-23T07:47:45.427Z",
+                      "status": 404,
+                      "error": "Data Not Found",
+                      "message": "ASN data for 999999999 could not be found.",
+                      "path": "/v2.0/asn-whois"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "ASNLookupResponse": {
+        "type": "object",
+        "description": "WHOIS registration record for the requested Autonomous System Number.",
+        "required": [
+          "asNumber",
+          "asName",
+          "orgName",
+          "orgHandle",
+          "country",
+          "allocationStatus",
+          "numOfIPv4Routes",
+          "numOfIPv6Routes",
+          "whoisHost",
+          "type",
+          "routeObjects",
+          "whoisResponse",
+          "downstreams",
+          "parsedWhoisResponse",
+          "upstreams",
+          "peers",
+          "contacts",
+          "legacyRoutes"
+        ],
+        "properties": {
+          "asNumber": {
+            "type": "string",
+            "description": "The Autonomous System Number, without the 'AS' prefix."
+          },
+          "asName": {
+            "type": "string",
+            "description": "Registered short name for the Autonomous System."
+          },
+          "orgName": {
+            "type": "string",
+            "description": "Name of the organization the ASN is registered to."
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text description associated with the organization, when published."
+          },
+          "orgHandle": {
+            "type": "string",
+            "description": "Registry handle identifying the organization record."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code of the registered organization."
+          },
+          "domain": {
+            "type": "string",
+            "description": "Domain name associated with the organization, when published."
+          },
+          "website": {
+            "type": "string",
+            "description": "Organization website URL, when published."
+          },
+          "allocationStatus": {
+            "type": "string",
+            "description": "Allocation status of the ASN as published by the registry."
+          },
+          "numOfIPv4Routes": {
+            "type": "string",
+            "description": "Count of IPv4 route objects currently advertised by this ASN."
+          },
+          "numOfIPv6Routes": {
+            "type": "string",
+            "description": "Count of IPv6 route objects currently advertised by this ASN."
+          },
+          "whoisHost": {
+            "type": "string",
+            "description": "Regional Internet Registry (RIR) that hosts the authoritative WHOIS record (e.g. ARIN, RIPE, APNIC)."
+          },
+          "dateAllocated": {
+            "type": "string",
+            "description": "Date the ASN was allocated, in YYYY-MM-DD format; empty if not published."
+          },
+          "type": {
+            "type": "string",
+            "description": "ASN category (e.g. ISP, BUSINESS, HOSTING, EDUCATION)."
+          },
+          "routeObjects": {
+            "type": "array",
+            "description": "IPv4 and IPv6 route objects (CIDR blocks) currently advertised by this ASN.",
+            "items": {
+              "$ref": "#/components/schemas/RouteObject"
+            }
+          },
+          "whoisResponse": {
+            "type": "string",
+            "description": "Raw WHOIS text response returned by the authoritative registry for this ASN."
+          },
+          "downstreams": {
+            "type": "array",
+            "description": "Downstream customer ASNs that receive routes from this ASN, when published.",
+            "items": {
+              "$ref": "#/components/schemas/AsnRelation"
+            }
+          },
+          "parsedWhoisResponse": {
+            "$ref": "#/components/schemas/ParsedWhoisResponse"
+          },
+          "upstreams": {
+            "type": "array",
+            "description": "Upstream provider ASNs that this ASN receives transit from, when published.",
+            "items": {
+              "$ref": "#/components/schemas/AsnRelation"
+            }
+          },
+          "peers": {
+            "type": "array",
+            "description": "BGP peer ASNs with a settlement-free peering relationship to this ASN, when published.",
+            "items": {
+              "$ref": "#/components/schemas/AsnRelation"
+            }
+          },
+          "contacts": {
+            "$ref": "#/components/schemas/Contacts"
+          },
+          "legacyRoutes": {
+            "type": "array",
+            "description": "Legacy (pre-RIR) route objects associated with this ASN, in CIDR notation.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RouteObject": {
+        "type": "object",
+        "description": "A single IPv4 or IPv6 route object (CIDR block) advertised by the ASN.",
+        "required": ["route", "origin", "originName", "isp", "numberOfIps"],
+        "properties": {
+          "route": {
+            "type": "string",
+            "description": "Route prefix in CIDR notation."
+          },
+          "origin": {
+            "type": "string",
+            "description": "Originating ASN for this route, in AS<number> format."
+          },
+          "originName": {
+            "type": "string",
+            "description": "Organization name for the originating ASN."
+          },
+          "isp": {
+            "type": "string",
+            "description": "ISP or organization name associated with this route."
+          },
+          "numberOfIps": {
+            "type": "integer",
+            "description": "Total number of IP addresses contained in this route's prefix."
+          }
+        }
+      },
+      "AsnRelation": {
+        "type": "object",
+        "description": "A related Autonomous System (upstream provider, downstream customer, or BGP peer).",
+        "required": ["asNumber"],
+        "properties": {
+          "asNumber": {
+            "type": "string",
+            "description": "ASN of the related Autonomous System, without the 'AS' prefix."
+          },
+          "description": {
+            "type": "string",
+            "description": "Free-text description of the related Autonomous System, when published."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code of the related Autonomous System, when published."
+          }
+        }
+      },
+      "ParsedWhoisResponse": {
+        "type": "object",
+        "description": "Structured breakdown of the raw WHOIS response into individual records and contacts.",
+        "required": [
+          "status",
+          "whois_server",
+          "aut_nums",
+          "organization",
+          "technical_contacts",
+          "abuse_contacts"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "true if the WHOIS response was parsed successfully."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS server that returned the raw response (e.g. whois.arin.net)."
+          },
+          "aut_nums": {
+            "type": "array",
+            "description": "Parsed autnum object(s) for the requested ASN.",
+            "items": {
+              "$ref": "#/components/schemas/AutNum"
+            }
+          },
+          "organization": {
+            "$ref": "#/components/schemas/Organization"
+          },
+          "technical_contacts": {
+            "type": "array",
+            "description": "Parsed technical contact records for the ASN.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContact"
+            }
+          },
+          "abuse_contacts": {
+            "type": "array",
+            "description": "Parsed abuse contact records for the ASN.",
+            "items": {
+              "$ref": "#/components/schemas/WhoisContact"
+            }
+          },
+          "whois_raw_response": {
+            "type": "string",
+            "description": "Unparsed raw WHOIS text, when returned separately from whoisResponse."
+          },
+          "r_whois_raw_response": {
+            "type": "string",
+            "description": "Raw referral WHOIS (rwhois) text, when the registry delegates to a referral server."
+          },
+          "query_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the WHOIS query was executed."
+          }
+        }
+      },
+      "AutNum": {
+        "type": "object",
+        "description": "Parsed autnum (Autonomous System Number) registry object and its routing policy attributes.",
+        "required": [
+          "aut_num",
+          "as_handle",
+          "as_name",
+          "tech_contacts",
+          "abuse_contacts",
+          "date_updated",
+          "source"
+        ],
+        "properties": {
+          "aut_num": {
+            "type": "string",
+            "description": "ASN identifier as recorded on the autnum object."
+          },
+          "as_handle": {
+            "type": "string",
+            "description": "Registry handle for the autnum object (e.g. AS15)."
+          },
+          "as_name": {
+            "type": "string",
+            "description": "Registered name for the autnum object."
+          },
+          "description": {
+            "type": "array",
+            "description": "Free-text description lines attached to the autnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code recorded on the autnum object."
+          },
+          "status": {
+            "type": "string",
+            "description": "Autnum object status as recorded by the registry."
+          },
+          "member_of": {
+            "type": "array",
+            "description": "Route-set or as-set objects this ASN is a member of.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "import_via": {
+            "type": "array",
+            "description": "BGP import-via routing policy statements.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "import": {
+            "type": "array",
+            "description": "BGP import routing policy statements.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mp_import": {
+            "type": "array",
+            "description": "Multiprotocol BGP import routing policy statements (mp-import).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "export_via": {
+            "type": "array",
+            "description": "BGP export-via routing policy statements.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "export": {
+            "type": "array",
+            "description": "BGP export routing policy statements.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mp_export": {
+            "type": "array",
+            "description": "Multiprotocol BGP export routing policy statements (mp-export).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "default": {
+            "type": "array",
+            "description": "BGP default routing policy statements.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mp_default": {
+            "type": "array",
+            "description": "Multiprotocol BGP default routing policy statements (mp-default).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organization": {
+            "type": "string",
+            "description": "Registry handle of the organization that holds the autnum object."
+          },
+          "sponsoring_organization": {
+            "type": "string",
+            "description": "Registry handle of the sponsoring organization, when applicable."
+          },
+          "admin_contacts": {
+            "type": "array",
+            "description": "Registry handles of administrative contacts for the autnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tech_contacts": {
+            "type": "array",
+            "description": "Registry handles of technical contacts for the autnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuse_contacts": {
+            "type": "array",
+            "description": "Registry handles of abuse contacts for the autnum object.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "date_created": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the autnum object was first registered."
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the autnum object was last updated."
+          },
+          "source": {
+            "type": "string",
+            "description": "URL of the registry record this autnum object was parsed from."
+          }
+        }
+      },
+      "Organization": {
+        "type": "object",
+        "description": "Parsed organization (org) registry object that holds the ASN.",
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Registry handle for the organization object."
+          },
+          "name": {
+            "type": "string",
+            "description": "Registered name of the organization."
+          },
+          "address": {
+            "type": "array",
+            "description": "Address lines for the organization, as published by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address of the organization, when published separately."
+          },
+          "city": {
+            "type": "string",
+            "description": "City of the organization, when published separately."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province of the organization, when published separately."
+          },
+          "zip_code": {
+            "type": "string",
+            "description": "Postal/ZIP code of the organization, when published separately."
+          },
+          "country": {
+            "type": "array",
+            "description": "Country line(s) of the organization address, as published by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "addressCountry": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code derived from the organization's address."
+          },
+          "date_created": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the organization object was first registered."
+          },
+          "date_updated": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the organization object was last updated."
+          },
+          "source": {
+            "type": "string",
+            "description": "URL of the registry record this organization object was parsed from."
+          }
+        }
+      },
+      "WhoisContact": {
+        "type": "object",
+        "description": "A parsed technical or abuse contact record from the registry.",
+        "required": ["handle", "name", "email"],
+        "properties": {
+          "handle": {
+            "type": "string",
+            "description": "Registry handle for the contact."
+          },
+          "name": {
+            "type": "string",
+            "description": "Contact's registered name."
+          },
+          "email": {
+            "type": "array",
+            "description": "Contact email address(es).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "phone": {
+            "type": "array",
+            "description": "Contact phone number(s).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source": {
+            "type": "string",
+            "description": "URL of the registry record this contact was parsed from."
+          }
+        }
+      },
+      "Contacts": {
+        "type": "object",
+        "description": "Direct contact addresses collected from the ASN's WHOIS record.",
+        "required": ["emailContacts", "abuseContacts"],
+        "properties": {
+          "emailContacts": {
+            "type": "array",
+            "description": "General contact email addresses for the ASN.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "abuseContacts": {
+            "type": "array",
+            "description": "Abuse-reporting contact email addresses for the ASN.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

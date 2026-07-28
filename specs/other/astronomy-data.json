@@ -1,0 +1,803 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Astronomy API - Location Based Astronomy Data",
+    "version": "1.0.0",
+    "description": "Retrieve sunrise and sunset times, current position of the moon, and other astronomical data for any location and date. Supports lookup by city name or address (location), GPS coordinates (lat/long), an explicit IP address (ip), or the requester's own client IP when none of those are provided. Returns comprehensive astronomy data including twilight times, blue hour, golden hour, sun and moon positions, distances, azimuths, and moon phase. The location object's field set varies by lookup mode: address lookups return a location_string plus basic fields, coordinate lookups return the same basic fields without location_string, and IP-based lookups (explicit ip or client-IP fallback) return a richer geo-IP field set (continent, country codes, EU membership, state code, district, zip code) plus a top-level ip field, but never location_string. Pass time_zone to convert all time fields into a specific IANA time zone.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v2.0",
+      "description": "Astronomy API Server"
+    }
+  ],
+  "paths": {
+    "/geolocation/astronomy": {
+      "get": {
+        "tags": ["Other APIs"],
+        "summary": "Returns sunrise, sunset, moon phase, and celestial positions for a given location and date.",
+        "description": "Retrieve sunrise and sunset times, current position of the moon, and other related information by specifying a location address, location coordinates, IP address, or using the client IP address if no parameter is passed.",
+        "operationId": "getAstronomyData",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "json",
+              "enum": ["json", "xml"]
+            },
+            "description": "Format of the response. Can be \"json\" or \"xml\"."
+          },
+          {
+            "in": "query",
+            "name": "location",
+            "schema": {
+              "type": "string",
+              "default": "New York, US"
+            },
+            "description": "Extract astronomy information using location (preferably city)",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "lat",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Latitude to extract astronomy information using location coordinates",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "long",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            },
+            "description": "Longitude to extract astronomy information using location coordinates",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "ip",
+            "schema": {
+              "type": "string"
+            },
+            "description": "IPv4 or IPv6 address to extract astronomy information using IP address",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string",
+              "default": "en",
+              "enum": [
+                "en",
+                "de",
+                "ru",
+                "ja",
+                "fr",
+                "cn",
+                "es",
+                "cs",
+                "it",
+                "ko",
+                "fa",
+                "pt"
+              ]
+            },
+            "description": "Response language of \"location\" field in case of lookup through IP address only.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Specific date (format YYYY-MM-DD) for which astronomy data is required",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "elevation",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "default": 0
+            },
+            "description": "Elevation above sea level at the location, in meters. The value should be between 0 meter and a maximum value of 10,000 meters. Negative value is set to 0.",
+            "required": false
+          },
+          {
+            "in": "query",
+            "name": "time_zone",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Time zone to receive all time-based data in your preferred local time.",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with astronomy data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AstronomyResponse"
+                },
+                "examples": {
+                  "geocodeLookup": {
+                    "summary": "Lookup by location address (location param)",
+                    "value": {
+                      "location": {
+                        "location_string": "New York, US",
+                        "country_name": "United States",
+                        "state_prov": "New York",
+                        "city": "New York",
+                        "locality": "Clinton",
+                        "latitude": "40.76473",
+                        "longitude": "-74.00084",
+                        "elevation": "9"
+                      },
+                      "astronomy": {
+                        "date": "2026-07-24",
+                        "current_time": "05:39:55.740",
+                        "mid_night": "01:02",
+                        "night_end": "03:50",
+                        "morning": {
+                          "astronomical_twilight_begin": "03:50",
+                          "astronomical_twilight_end": "04:34",
+                          "nautical_twilight_begin": "04:34",
+                          "nautical_twilight_end": "05:13",
+                          "civil_twilight_begin": "05:13",
+                          "civil_twilight_end": "05:44",
+                          "blue_hour_begin": "05:00",
+                          "blue_hour_end": "05:26",
+                          "golden_hour_begin": "05:26",
+                          "golden_hour_end": "06:24"
+                        },
+                        "sunrise": "05:44",
+                        "sunset": "20:20",
+                        "evening": {
+                          "golden_hour_begin": "19:39",
+                          "golden_hour_end": "20:38",
+                          "blue_hour_begin": "20:38",
+                          "blue_hour_end": "21:03",
+                          "civil_twilight_begin": "20:20",
+                          "civil_twilight_end": "20:50",
+                          "nautical_twilight_begin": "20:50",
+                          "nautical_twilight_end": "21:30",
+                          "astronomical_twilight_begin": "21:30",
+                          "astronomical_twilight_end": "22:14"
+                        },
+                        "night_begin": "22:14",
+                        "sun_status": "-",
+                        "solar_noon": "13:02",
+                        "day_length": "14:35",
+                        "sun_altitude": -1.724678050716447,
+                        "sun_distance": 151988138.3404624,
+                        "sun_azimuth": 61.7231663467785,
+                        "moon_phase": "WAXING_GIBBOUS",
+                        "moonrise": "16:59",
+                        "moonset": "01:05",
+                        "moon_status": "-",
+                        "moon_altitude": -47.89342665088803,
+                        "moon_distance": 404852.80222395214,
+                        "moon_azimuth": 275.0508821352747,
+                        "moon_parallactic_angle": 57.14257561268031,
+                        "moon_illumination_percentage": "76.99",
+                        "moon_angle": 122.67519000797743
+                      }
+                    }
+                  },
+                  "coordinatesLookup": {
+                    "summary": "Lookup by GPS coordinates (lat/long params) — no location_string, locality may be empty",
+                    "value": {
+                      "location": {
+                        "latitude": "40.71280",
+                        "longitude": "-74.00600",
+                        "country_name": "United States",
+                        "state_prov": "New York",
+                        "city": "New York City",
+                        "locality": "",
+                        "elevation": "6"
+                      },
+                      "astronomy": {
+                        "date": "2026-07-24",
+                        "current_time": "05:40:09.712",
+                        "mid_night": "01:02",
+                        "night_end": "03:50",
+                        "morning": {
+                          "astronomical_twilight_begin": "03:50",
+                          "astronomical_twilight_end": "04:34",
+                          "nautical_twilight_begin": "04:34",
+                          "nautical_twilight_end": "05:14",
+                          "civil_twilight_begin": "05:14",
+                          "civil_twilight_end": "05:45",
+                          "blue_hour_begin": "05:01",
+                          "blue_hour_end": "05:26",
+                          "golden_hour_begin": "05:26",
+                          "golden_hour_end": "06:25"
+                        },
+                        "sunrise": "05:45",
+                        "sunset": "20:19",
+                        "evening": {
+                          "golden_hour_begin": "19:39",
+                          "golden_hour_end": "20:38",
+                          "blue_hour_begin": "20:38",
+                          "blue_hour_end": "21:03",
+                          "civil_twilight_begin": "20:19",
+                          "civil_twilight_end": "20:50",
+                          "nautical_twilight_begin": "20:50",
+                          "nautical_twilight_end": "21:30",
+                          "astronomical_twilight_begin": "21:30",
+                          "astronomical_twilight_end": "22:13"
+                        },
+                        "night_begin": "22:13",
+                        "sun_status": "-",
+                        "solar_noon": "13:02",
+                        "day_length": "14:34",
+                        "sun_altitude": -1.7138810477761148,
+                        "sun_distance": 151988138.34046236,
+                        "sun_azimuth": 61.759759720006855,
+                        "moon_phase": "WAXING_GIBBOUS",
+                        "moonrise": "16:58",
+                        "moonset": "01:05",
+                        "moon_status": "-",
+                        "moon_altitude": -47.936765082140305,
+                        "moon_distance": 404853.01478817535,
+                        "moon_azimuth": 275.0302780092609,
+                        "moon_parallactic_angle": 57.21501710401273,
+                        "moon_illumination_percentage": "77.00",
+                        "moon_angle": 122.67696159469526
+                      }
+                    }
+                  },
+                  "ipLookup": {
+                    "summary": "Lookup by IP address (ip param, or default client IP) — full geo-IP location fields, includes top-level ip",
+                    "value": {
+                      "ip": "8.8.8.8",
+                      "location": {
+                        "continent_code": "NA",
+                        "continent_name": "North America",
+                        "country_code2": "US",
+                        "country_code3": "USA",
+                        "country_name": "United States",
+                        "country_name_official": "United States of America",
+                        "is_eu": false,
+                        "state_prov": "California",
+                        "state_code": "US-CA",
+                        "district": "Santa Clara",
+                        "city": "Mountain View",
+                        "zipcode": "94043-1351",
+                        "latitude": "37.42240",
+                        "longitude": "-122.08421",
+                        "locality": "Charleston Terrace",
+                        "elevation": "3"
+                      },
+                      "astronomy": {
+                        "date": "2026-07-24",
+                        "current_time": "02:40:09.167",
+                        "mid_night": "01:15",
+                        "night_end": "04:20",
+                        "morning": {
+                          "astronomical_twilight_begin": "04:20",
+                          "astronomical_twilight_end": "05:00",
+                          "nautical_twilight_begin": "05:00",
+                          "nautical_twilight_end": "05:36",
+                          "civil_twilight_begin": "05:36",
+                          "civil_twilight_end": "06:06",
+                          "blue_hour_begin": "05:25",
+                          "blue_hour_end": "05:48",
+                          "golden_hour_begin": "05:48",
+                          "golden_hour_end": "06:43"
+                        },
+                        "sunrise": "06:06",
+                        "sunset": "20:23",
+                        "evening": {
+                          "golden_hour_begin": "19:45",
+                          "golden_hour_end": "20:41",
+                          "blue_hour_begin": "20:41",
+                          "blue_hour_end": "21:04",
+                          "civil_twilight_begin": "20:23",
+                          "civil_twilight_end": "20:52",
+                          "nautical_twilight_begin": "20:52",
+                          "nautical_twilight_end": "21:28",
+                          "astronomical_twilight_begin": "21:28",
+                          "astronomical_twilight_end": "22:08"
+                        },
+                        "night_begin": "22:08",
+                        "sun_status": "-",
+                        "solar_noon": "13:14",
+                        "day_length": "14:17",
+                        "sun_altitude": -29.345451007769825,
+                        "sun_distance": 151988138.3404624,
+                        "sun_azimuth": 23.09240894097684,
+                        "moon_phase": "WAXING_GIBBOUS",
+                        "moonrise": "17:06",
+                        "moonset": "01:34",
+                        "moon_status": "-",
+                        "moon_altitude": -11.054713589548413,
+                        "moon_distance": 404853.00649734883,
+                        "moon_azimuth": 245.50238573115115,
+                        "moon_parallactic_angle": 53.576490644915204,
+                        "moon_illumination_percentage": "77.00",
+                        "moon_angle": 122.67689249117335
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2013 Invalid parameters provided",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidLatLong": {
+                    "summary": "Invalid latitude or longitude",
+                    "value": {
+                      "message": "Latitude must be between -90 and 90."
+                    }
+                  },
+                  "invalidIp": {
+                    "summary": "Invalid IP address",
+                    "value": {
+                      "message": "'999.999.999.999' is not an IP string literal."
+                    }
+                  },
+                  "invalidDate": {
+                    "summary": "Invalid date format",
+                    "value": {
+                      "message": "You must provide date in the 'yyyy-MM-dd' format"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "locationNotFound": {
+                    "summary": "Location not found",
+                    "value": {
+                      "message": "We couldn't find the location (ZZZNOTEXIST). Try a city or state level location address only."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "AstronomyResponse": {
+        "type": "object",
+        "required": ["astronomy"],
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "IPv4 or IPv6 address used for the geo-IP lookup. Present when the ip parameter is passed explicitly, or when no location, lat/long, or ip parameter is supplied at all (the API falls back to the requesting client's IP address). Absent when location or lat/long is used."
+          },
+          "location": {
+            "$ref": "#/components/schemas/AstronomyLocation"
+          },
+          "astronomy": {
+            "$ref": "#/components/schemas/AstronomyData"
+          }
+        },
+        "description": "Astronomy data response containing location information and astronomical data."
+      },
+
+      "AstronomyLocation": {
+        "type": "object",
+        "description": "Geographic location information for the astronomy calculation. The set of populated fields depends on which lookup mode the request used: (1) location param (geocode-by-address) returns location_string plus a basic field set (country_name, state_prov, city, locality, latitude, longitude, elevation); (2) lat + long params (geocode-by-coordinates) returns the same basic field set minus location_string, and locality may be an empty string when the coordinates don't resolve to a named sub-area; (3) ip param, or no location/lat/long/ip param at all (falls back to geo-IP lookup of the client's IP), returns the full geo-IP field set — continent_code, continent_name, country_code2, country_code3, country_name_official, is_eu, state_code, district, zipcode — in addition to the basic fields, but never location_string. elevation can be an empty string when elevation data is unavailable for the resolved location.",
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "The location query parameter echoed back as-is. Present only for geocode-by-address lookups (location param); absent for lat/long and ip-based lookups."
+          },
+          "continent_code": {
+            "type": "string",
+            "description": "The two-letter code of the continent (e.g., \"NA\"). Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "The full name of the continent (e.g., \"North America\"). Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 two-letter country code (e.g., \"US\"). Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-3 three-letter country code (e.g., \"USA\"). Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "The common name of the country (e.g., \"United States\"). Present in all lookup modes."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "The official full name of the country (e.g., \"United States of America\"). Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Whether the country belongs to the European Union. Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "Name of the state/province/region. Present in all lookup modes."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Code of the state/province/region. Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "district": {
+            "type": "string",
+            "description": "Name of the district or county. Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "city": {
+            "type": "string",
+            "description": "Name of the city. Present in all lookup modes."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "ZIP/Postal code of the place. Geo-IP field only: present for ip param or default client-IP lookups; absent for location/lat/long geocode lookups."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "The geographic latitude of the location. Present in all lookup modes."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "The geographic longitude of the location. Present in all lookup modes."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Smaller area, part or region of a city. Present in all lookup modes, but may be an empty string for lat/long or geo-IP lookups when no named sub-area resolves."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "The elevation of the geographical location, in meters. Present in all lookup modes, but may be an empty string when elevation data is unavailable for the resolved location."
+          }
+        },
+        "required": ["latitude", "longitude"]
+      },
+      "AstronomyData": {
+        "type": "object",
+        "description": "Complete astronomical data for the specified location and date.",
+        "required": [
+          "date",
+          "current_time",
+          "mid_night",
+          "night_end",
+          "morning",
+          "sunrise",
+          "sunset",
+          "evening",
+          "night_begin",
+          "sun_status",
+          "solar_noon",
+          "day_length",
+          "sun_altitude",
+          "sun_distance",
+          "sun_azimuth",
+          "moon_phase",
+          "moonrise",
+          "moonset",
+          "moon_status",
+          "moon_altitude",
+          "moon_distance",
+          "moon_azimuth",
+          "moon_parallactic_angle",
+          "moon_illumination_percentage",
+          "moon_angle"
+        ],
+        "properties": {
+          "time_zone": {
+            "type": "string",
+            "description": "Appears (with the provided value) only when the user includes a time_zone in the query to specify which time to observe."
+          },
+          "date": {
+            "type": "string",
+            "description": "The date astronomy data was calculated for. Defaults to today's date; reflects the date query parameter's value when that parameter is supplied."
+          },
+          "current_time": {
+            "type": "string",
+            "description": "The current time"
+          },
+          "mid_night": {
+            "type": "string",
+            "description": "The time of midnight (solar-based)"
+          },
+          "night_end": {
+            "type": "string",
+            "description": "The time when night ends (start of astronomical twilight)"
+          },
+          "morning": {
+            "$ref": "#/components/schemas/AstronomyMorning"
+          },
+          "sunrise": {
+            "type": "string",
+            "description": "The time of sunrise"
+          },
+          "sunset": {
+            "type": "string",
+            "description": "The time of sunset"
+          },
+          "evening": {
+            "$ref": "#/components/schemas/AstronomyEvening"
+          },
+          "night_begin": {
+            "type": "string",
+            "description": "The time when night begins (end of astronomical twilight)"
+          },
+          "sun_status": {
+            "type": "string",
+            "description": "The current status of the sun (e.g., \"rising\", \"setting\", \"-\")"
+          },
+          "solar_noon": {
+            "type": "string",
+            "description": "The time when the sun reaches its highest point in the sky"
+          },
+          "day_length": {
+            "type": "string",
+            "description": "The total duration of daylight"
+          },
+          "sun_altitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The altitude angle of the sun above the horizon in degrees"
+          },
+          "sun_distance": {
+            "type": "number",
+            "format": "float",
+            "description": "The distance from the Earth to the sun in kilometers"
+          },
+          "sun_azimuth": {
+            "type": "number",
+            "format": "float",
+            "description": "The azimuth angle of the sun in degrees from true north"
+          },
+          "moon_phase": {
+            "type": "string",
+            "description": "The current phase of the moon (e.g., \"WAXING_GIBBOUS\")"
+          },
+          "moonrise": {
+            "type": "string",
+            "description": "The time of moonrise"
+          },
+          "moonset": {
+            "type": "string",
+            "description": "The time of moonset"
+          },
+          "moon_status": {
+            "type": "string",
+            "description": "The current status of the moon (e.g., \"rising\", \"setting\", \"-\")"
+          },
+          "moon_altitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The altitude angle of the moon above the horizon in degrees"
+          },
+          "moon_distance": {
+            "type": "number",
+            "format": "float",
+            "description": "The distance from the Earth to the moon in kilometers"
+          },
+          "moon_azimuth": {
+            "type": "number",
+            "format": "float",
+            "description": "The azimuth angle of the moon in degrees from true north"
+          },
+          "moon_parallactic_angle": {
+            "type": "number",
+            "format": "float",
+            "description": "The parallactic angle of the moon in degrees"
+          },
+          "moon_illumination_percentage": {
+            "type": "string",
+            "description": "The percentage of the moon illuminated by sunlight. A negative value indicates the moon is in a waning phase."
+          },
+          "moon_angle": {
+            "type": "number",
+            "format": "float",
+            "description": "The geometric angle of the moon relative to the observer"
+          }
+        }
+      },
+      "AstronomyMorning": {
+        "type": "object",
+        "description": "Morning astronomical data including twilight, blue hour, and golden hour times.",
+        "required": [
+          "astronomical_twilight_begin",
+          "astronomical_twilight_end",
+          "nautical_twilight_begin",
+          "nautical_twilight_end",
+          "civil_twilight_begin",
+          "civil_twilight_end",
+          "blue_hour_begin",
+          "blue_hour_end",
+          "golden_hour_begin",
+          "golden_hour_end"
+        ],
+        "properties": {
+          "astronomical_twilight_begin": {
+            "type": "string",
+            "description": "The start time of astronomical twilight in the morning"
+          },
+          "astronomical_twilight_end": {
+            "type": "string",
+            "description": "The end time of astronomical twilight in the morning"
+          },
+          "nautical_twilight_begin": {
+            "type": "string",
+            "description": "The start time of nautical twilight in the morning"
+          },
+          "nautical_twilight_end": {
+            "type": "string",
+            "description": "The end time of nautical twilight in the morning"
+          },
+          "civil_twilight_begin": {
+            "type": "string",
+            "description": "The start time of civil twilight in the morning"
+          },
+          "civil_twilight_end": {
+            "type": "string",
+            "description": "The end time of civil twilight in the morning"
+          },
+          "blue_hour_begin": {
+            "type": "string",
+            "description": "The beginning of the blue hour in the morning"
+          },
+          "blue_hour_end": {
+            "type": "string",
+            "description": "The end of the blue hour in the morning"
+          },
+          "golden_hour_begin": {
+            "type": "string",
+            "description": "The beginning of the golden hour in the morning"
+          },
+          "golden_hour_end": {
+            "type": "string",
+            "description": "The end of the golden hour in the morning"
+          }
+        }
+      },
+      "AstronomyEvening": {
+        "type": "object",
+        "description": "Evening astronomical data including golden hour, blue hour, and twilight times.",
+        "required": [
+          "golden_hour_begin",
+          "golden_hour_end",
+          "blue_hour_begin",
+          "blue_hour_end",
+          "civil_twilight_begin",
+          "civil_twilight_end",
+          "nautical_twilight_begin",
+          "nautical_twilight_end",
+          "astronomical_twilight_begin",
+          "astronomical_twilight_end"
+        ],
+        "properties": {
+          "golden_hour_begin": {
+            "type": "string",
+            "description": "The beginning of the golden hour in the evening"
+          },
+          "golden_hour_end": {
+            "type": "string",
+            "description": "The end of the golden hour in the evening"
+          },
+          "blue_hour_begin": {
+            "type": "string",
+            "description": "The beginning of the blue hour in the evening"
+          },
+          "blue_hour_end": {
+            "type": "string",
+            "description": "The end of the blue hour in the evening"
+          },
+          "civil_twilight_begin": {
+            "type": "string",
+            "description": "The start of civil twilight in the evening"
+          },
+          "civil_twilight_end": {
+            "type": "string",
+            "description": "The end of civil twilight in the evening"
+          },
+          "nautical_twilight_begin": {
+            "type": "string",
+            "description": "The start of nautical twilight in the evening"
+          },
+          "nautical_twilight_end": {
+            "type": "string",
+            "description": "The end of nautical twilight in the evening"
+          },
+          "astronomical_twilight_begin": {
+            "type": "string",
+            "description": "The start of astronomical twilight in the evening"
+          },
+          "astronomical_twilight_end": {
+            "type": "string",
+            "description": "The end of astronomical twilight in the evening"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

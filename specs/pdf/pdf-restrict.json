@@ -1,0 +1,343 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Restrict API Reference",
+    "version": "1.0.0",
+    "description": "Restrict a PDF file with permission controls. Set printing, copying, and editing restrictions with an owner password.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Restrict API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/restrict": {
+      "post": {
+        "tags": [
+          "PDF Security APIs"
+        ],
+        "summary": "Apply permission restrictions on a PDF file",
+        "description": "This API applies permission restrictions on a PDF file, such as disabling printing, copying, or editing. This can include password protection to enforce restrictions.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output restricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "file_password",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The password to unlock the input file if it is already secured. Provide the owner password if available; otherwise, the user password. The owner password takes precedence. Password Length should be between 6 and 128 characters."
+          },
+          {
+            "name": "user_password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sets the password users will use to open the PDF. If this is not set, only the owner password will be configured, and anyone can open the PDF file with the provided restrictions enabled. Password Length should be between 6 and 128 characters."
+          },
+          {
+            "name": "owner_password",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Sets the password that allows full access to the PDF (e.g., removing restrictions). If not provided, the `user_password` (if set) will also be used as the owner password. Password Length should be between 6 and 128 characters."
+          },
+          {
+            "name": "restrictions",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "A comma-separated list of restrictions to apply to the PDF. These define what the end-user is *not* allowed to do with the PDF. Available options are:\n\n\n* **print_high** \u2013 Disables high-quality printing.\n* **print_low** \u2013 Disables low-resolution printing.\n* **edit_document_assembly** \u2013 Prevents reordering or inserting pages.\n* **fill_form_fields** \u2013 Disallows filling in PDF form fields.\n* **edit_annotations** \u2013 Disables adding or modifying annotations or comments.\n* **modify_content** \u2013 Prevents modifying existing content in the PDF.\n* **copy_and_extract_content** \u2013 Disables copying text or images from the PDF.\n* **use_accessibility** \u2013 Prevents screen readers or accessibility tools from accessing content. An invalid restriction keyword returns a 400 with error \"Invalid PDF Restriction\"."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to restrict. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF restrict successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "42839406-7e1b-4f64-96bb-d94bb054e8d3",
+                      "inputIds": [
+                        "2c682ade-eccc-4ab5-9c06-d16e415cbecb"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters, file ID, or password",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingParams": {
+                    "summary": "Missing required user_password or restrictions parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/restrict",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:57:14.449Z"
+                    }
+                  },
+                  "MissingFileOrID": {
+                    "summary": "Neither a file nor a file ID was provided",
+                    "value": {
+                      "timestamp": "2026-07-27T10:57:25.953Z",
+                      "path": "/v1.0/pdf/restrict-pdf",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "timestamp": "2026-07-27T10:57:24.835Z",
+                      "path": "/v1.0/pdf/restrict",
+                      "status": 400,
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID"
+                    }
+                  },
+                  "WeakPassword": {
+                    "summary": "Password does not meet strength requirements",
+                    "value": {
+                      "timestamp": "2026-07-27T10:57:15.634Z",
+                      "path": "/v1.0/pdf/restrict-pdf",
+                      "status": 400,
+                      "error": "Weak Password Provided",
+                      "message": "Please provide a strong password. Refer to the documentation for password requirements."
+                    }
+                  },
+                  "InvalidRestriction": {
+                    "summary": "Unrecognized restriction keyword",
+                    "value": {
+                      "timestamp": "2026-07-27T10:57:16.268Z",
+                      "path": "/v1.0/pdf/restrict-pdf",
+                      "status": 400,
+                      "error": "Invalid PDF Restriction",
+                      "message": "Please provide valid PDF restrictions. Refer to the documentation for valid PDF restrictions."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 File type not supported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "UnsupportedFileType": {
+                    "summary": "Uploaded file is not a supported type",
+                    "value": {
+                      "timestamp": "2026-07-27T10:57:25.374Z",
+                      "path": "/v1.0/pdf/restrict-pdf",
+                      "status": 415,
+                      "error": "Unsupported File Type",
+                      "message": "The provided file type is not supported. Refer to the documentation for valid file types."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "restrictPdf"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "PDFResponse": {
+        "type": "object",
+        "description": "Response containing the task ID and input file IDs for a PDF processing task.",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "Task ID of the requested task, used to check the task status."
+          },
+          "inputIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "File IDs for the input files provided for the task. Not returned when destroy parameter is true."
+          }
+        }
+      },
+      "PdfFileUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the PDF file to process.",
+        "required": [],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Raw PDF file bytes sent as a multipart/form-data field named 'file'. Omit this field entirely and pass file_id in the query string instead to use an already-uploaded file."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

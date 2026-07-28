@@ -1,0 +1,533 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Domain WHOIS Lookup API - Well-Structured Registration & Ownership Data",
+    "version": "1.0.0",
+    "description": "Retrieve real-time WHOIS registration and ownership data for a domain name directly from its authoritative registrar and registry. Returns registrar details (name, IANA ID, WHOIS/RDAP server, accreditation status), registrant/administrative/technical/billing/reseller contact information, name servers, EPP domain status codes, and both registrar-level and registry-level raw WHOIS text. Pass `domainName` as a bare domain (e.g. `example.com`); a `https://` or `http://` prefix is also accepted. Privacy-protected domains return redirect instructions instead of direct contact emails, and an unregistered domain returns `domain_registered: no` with most fields omitted instead of an error. Domain extensions this API does not support live WHOIS for return a `403` error, and a missing or malformed `domainName` returns a `400` error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v2.0",
+      "description": "Domain WHOIS Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/domain/whois/live": {
+      "get": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Retrieve real-time WHOIS registration and ownership data for a domain name",
+        "description": "Returns the current WHOIS record for the specified domain, including registrar details, registrant/administrative/technical/billing/reseller contacts, name servers, status codes, and raw WHOIS text.",
+        "operationId": "lookupDomainWhois",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "domainName",
+            "in": "query",
+            "required": true,
+            "description": "Domain name to retrieve WHOIS data for (e.g. example.com).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful WHOIS lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainWhoisLookupResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "status": true,
+                      "domain_name": "google.com",
+                      "query_time": "2026-07-23 08:22:19",
+                      "whois_server": "whois.verisign-grs.com",
+                      "domain_registered": "yes",
+                      "create_date": "1997-09-15",
+                      "update_date": "2024-08-02",
+                      "expiry_date": "2028-09-13",
+                      "domain_registrar": {
+                        "iana_id": "292",
+                        "status": "accredited",
+                        "registrar_name": "MarkMonitor, Inc",
+                        "normalized_name": "markmonitor",
+                        "whois_server": "whois.markmonitor.com",
+                        "rdap_server": "https://rdap.markmonitor.com/rdap/",
+                        "website_url": "http://www.markmonitor.com",
+                        "email_address": "abusecomplaints@markmonitor.com",
+                        "phone_number": "+12086851750"
+                      },
+                      "registrant_contact": {
+                        "company": "Google LLC",
+                        "country_name": "United States",
+                        "country_code": "US",
+                        "email_address": "Select Request Email Form at https://domains.markmonitor.com/whois/google.com"
+                      },
+                      "technical_contact": {
+                        "email_address": "Select Request Email Form at https://domains.markmonitor.com/whois/google.com"
+                      },
+                      "name_servers": [
+                        "ns1.google.com",
+                        "ns2.google.com",
+                        "ns3.google.com",
+                        "ns4.google.com"
+                      ],
+                      "domain_status": [
+                        "clientupdateprohibited",
+                        "clienttransferprohibited",
+                        "clientdeleteprohibited",
+                        "serverdeleteprohibited",
+                        "serverupdateprohibited",
+                        "servertransferprohibited"
+                      ],
+                      "whois_raw_domain": "\nDomain Name: google.com\nRegistry Domain ID: 2138514_DOMAIN_COM-VRSN\nRegistrar WHOIS Server: whois.markmonitor.com\nRegistrar URL: http://www.markmonitor.com\nUpdated Date: 2024-08-02T02:17:33+0000\nCreation Date: 1997-09-15T07:00:00+0000\nRegistrar Registration Expiration Date: 2028-09-13T07:00:00+0000\nRegistrar: MarkMonitor, Inc.\nRegistrar IANA ID: 292\nRegistrar Abuse Contact: https://corp.markmonitor.com/domain/ui/abuse-report\nRegistrar Abuse Contact Phone: +1.2086851750\nDomain Status: clientUpdateProhibited (https://www.icann.org/epp#clientUpdateProhibited)\nDomain Status: clientTransferProhibited (https://www.icann.org/epp#clientTransferProhibited)\nDomain Status: clientDeleteProhibited (https://www.icann.org/epp#clientDeleteProhibited)\nDomain Status: serverUpdateProhibited (https://www.icann.org/epp#serverUpdateProhibited)\nDomain Status: serverTransferProhibited (https://www.icann.org/epp#serverTransferProhibited)\nDomain Status: serverDeleteProhibited (https://www.icann.org/epp#serverDeleteProhibited)\nRegistrant Organization: Google LLC\nRegistrant Country: US\nRegistrant Email: Select Request Email Form at https://domains.markmonitor.com/whois/google.com\nTech Email: Select Request Email Form at https://domains.markmonitor.com/whois/google.com\nName Server: ns1.google.com\nName Server: ns4.google.com\nName Server: ns3.google.com\nName Server: ns2.google.com\nDNSSEC: unsigned\nURL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/\n>>> Last update of WHOIS database: 2026-07-23T08:17:26+0000 <<<\n\nFor more information on WHOIS status codes, please visit:\n  https://www.icann.org/resources/pages/epp-status-codes\n\nIf you wish to contact this domain’s Registrant or Technical\ncontact, and such email address is not visible above, you may do so via our web\nform, pursuant to ICANN’s Temporary Specification. To verify that you are not a\nrobot, please enter your email address to receive a link to a page that\nfacilitates email communication with the relevant contact(s).\n\nWeb-based WHOIS:\n  https://domains.markmonitor.com/whois/contact/google.com\n\nIf you have a legitimate interest in viewing the non-public WHOIS details, send\nyour request and the reasons for your request to whoisrequest@markmonitor.com\nand specify the domain name in the subject line. We will review that request and\nmay ask for supporting documentation and explanation.\n\nThe data in MarkMonitor’s WHOIS database is provided for information purposes,\nand to assist persons in obtaining information about or related to a domain\nname’s registration record. While MarkMonitor believes the data to be accurate,\nthe data is provided \"as is\" with no guarantee or warranties regarding its\naccuracy.\n\nBy submitting a WHOIS query, you agree that you will use this data only for\nlawful purposes and that, under no circumstances will you use this data to:\n  (1) allow, enable, or otherwise support the transmission by email, telephone,\nor facsimile of mass, unsolicited, commercial advertising, or spam; or\n  (2) enable high volume, automated, or electronic processes that send queries,\ndata, or email to MarkMonitor (or its systems) or the domain name contacts (or\nits systems).\n\nMarkMonitor reserves the right to modify these terms at any time.\n\nBy submitting this query, you agree to abide by this policy.\n\nMarkMonitor Domain Management(TM)\nProtecting companies and consumers in a digital world.\n\nVisit MarkMonitor at https://www.markmonitor.com\nContact us at +1.8007459229\nIn Europe, at +44.02032062220\n--",
+                      "registry_data": {
+                        "domain_name": "GOOGLE.COM",
+                        "query_time": "2026-07-23 08:22:18",
+                        "whois_server": "whois.verisign-grs.com",
+                        "domain_registered": "yes",
+                        "create_date": "1997-09-15",
+                        "update_date": "2019-09-09",
+                        "expiry_date": "2028-09-14",
+                        "domain_registrar": {
+                          "iana_id": "292",
+                          "registrar_name": "MarkMonitor Inc",
+                          "whois_server": "whois.markmonitor.com",
+                          "website_url": "http://www.markmonitor.com"
+                        },
+                        "name_servers": [
+                          "ns1.google.com",
+                          "ns2.google.com",
+                          "ns3.google.com",
+                          "ns4.google.com"
+                        ],
+                        "domain_status": [
+                          "clientupdateprohibited",
+                          "clientdeleteprohibited",
+                          "clienttransferprohibited",
+                          "serverdeleteprohibited",
+                          "serverupdateprohibited",
+                          "servertransferprohibited"
+                        ],
+                        "whois_raw_registery": "\nDomain Name: GOOGLE.COM\n   Registry Domain ID: 2138514_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2019-09-09T15:39:04Z\n   Creation Date: 1997-09-15T04:00:00Z\n   Registry Expiry Date: 2028-09-14T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2086851750\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1.GOOGLE.COM\n   Name Server: NS2.GOOGLE.COM\n   Name Server: NS3.GOOGLE.COM\n   Name Server: NS4.GOOGLE.COM\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2026-07-23T08:22:08Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars."
+                      }
+                    }
+                  },
+                  "unregisteredDomain": {
+                    "summary": "Unregistered domain",
+                    "value": {
+                      "status": true,
+                      "domain_name": "example.xn--tckwe",
+                      "query_time": "2026-07-23 08:03:00",
+                      "whois_server": "https://tld-rdap.verisign.com/xn--tckwe/v1/",
+                      "domain_registered": "no"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial Content — The response contains partial data because an error occurred while processing the request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "partialContent": {
+                    "summary": "Partial WHOIS data returned",
+                    "value": {
+                      "timestamp": "2025-08-14T09:25:32.271Z",
+                      "status": 206,
+                      "error": "Partial Content",
+                      "message": "The response contains partial data due to an error while processing the request.",
+                      "path": "/v2.0/domain/whois/live"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or invalid domainName parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingDomain": {
+                    "summary": "Missing domainName parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v2.0/domain/whois/live",
+                      "status": 400,
+                      "timestamp": "2026-07-23T08:04:19.197Z"
+                    }
+                  },
+                  "invalidDomain": {
+                    "summary": "Malformed domain name",
+                    "value": {
+                      "timestamp": "2026-07-23T08:04:18.733Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value [For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v2.0/whois/live"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — Domain extension not supported for live WHOIS",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "domainExtensionNotSupported": {
+                    "summary": "Unsupported domain extension",
+                    "value": {
+                      "timestamp": "2026-07-23T08:11:12.380Z",
+                      "status": 403,
+                      "error": "Not Supported Domain extension",
+                      "message": "We are not providing the whois of this domain extension (local)",
+                      "path": "/v2.0/whois/live"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "DomainWhoisLookupResponse": {
+        "type": "object",
+        "description": "Current WHOIS registration record for the requested domain.",
+        "required": [
+          "status",
+          "domain_name",
+          "query_time",
+          "whois_server",
+          "domain_registered"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "true if the request was successfully processed."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name that was queried."
+          },
+          "query_time": {
+            "type": "string",
+            "description": "Timestamp when the WHOIS query was executed."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS or RDAP server that provided this record."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status; 'restricted' means the registry withholds registration details."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain was originally registered, when the domain is registered."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration was last updated, when the domain is registered."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration is set to expire, when the domain is registered."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record for the domain."
+          },
+          "reseller_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Reseller contact details, when the domain was registered through a reseller."
+          },
+          "registrant_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Domain registrant (owner) contact details."
+          },
+          "administrative_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Administrative contact details."
+          },
+          "technical_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Technical contact details."
+          },
+          "billing_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Billing contact details."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers currently recorded for the domain.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes currently recorded for the domain.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_domain": {
+            "type": "string",
+            "description": "Raw WHOIS text as returned by the registrar's WHOIS server."
+          },
+          "registry_data": {
+            "$ref": "#/components/schemas/DomainWhoisRegistryData"
+          }
+        }
+      },
+      "DomainRegistrar": {
+        "type": "object",
+        "description": "Registrar of record for a domain, as published by either the registrar or the registry.",
+        "properties": {
+          "iana_id": {
+            "type": "string",
+            "description": "IANA registrar ID."
+          },
+          "status": {
+            "type": "string",
+            "description": "Registrar's ICANN accreditation status (e.g. accredited), when published at the registrar level."
+          },
+          "registrar_name": {
+            "type": "string",
+            "description": "Registered name of the registrar."
+          },
+          "normalized_name": {
+            "type": "string",
+            "description": "Lowercased, normalized form of the registrar name, when published at the registrar level."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS server operated by the registrar."
+          },
+          "rdap_server": {
+            "type": "string",
+            "description": "RDAP server URL operated by the registrar, when published at the registrar level."
+          },
+          "website_url": {
+            "type": "string",
+            "description": "Registrar's website URL."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Registrar abuse or contact email address."
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Registrar contact phone number."
+          }
+        }
+      },
+      "WhoisContactDetail": {
+        "type": "object",
+        "description": "A contact record (registrant, administrative, technical, billing, or reseller) published in the domain's WHOIS record.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Contact's full name."
+          },
+          "company": {
+            "type": "string",
+            "description": "Contact's organization or company name."
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province."
+          },
+          "zip_code": {
+            "type": "string",
+            "description": "Postal/ZIP code."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full country name."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Contact email address, or a privacy-service redirect instruction."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Contact phone number."
+          },
+          "fax": {
+            "type": "string",
+            "description": "Contact fax number."
+          },
+          "mailing_address": {
+            "type": "string",
+            "description": "Full combined mailing address, when published as a single string."
+          }
+        }
+      },
+      "DomainWhoisRegistryData": {
+        "type": "object",
+        "description": "Registry-level (as opposed to registrar-level) WHOIS data, sourced directly from the TLD registry.",
+        "properties": {
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name as recorded by the registry."
+          },
+          "query_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the registry-level record was queried."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "Registry WHOIS server that returned this data."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status as recorded by the registry."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain creation date as recorded by the registry."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain last-updated date as recorded by the registry."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain expiry date as recorded by the registry."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_registery": {
+            "type": "string",
+            "description": "Raw WHOIS text as returned directly by the registry server."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record as recorded directly by the registry."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

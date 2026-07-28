@@ -1,0 +1,1162 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bulk IP Geolocation Lookup API - Instantly Geolocate Thousands of IP Addresses",
+    "version": "1.0.0",
+    "description": "Retrieve the same geolocation and network intelligence as the single-IP Geolocation API for up to 50,000 IP addresses or hostnames in one request. The response is an array in request order; each entry is either a full location result (location, network, ASN, company, currency, and time zone data) or, if that specific IP is invalid, bogon, reserved, or unresolvable, an error object --- a bad IP in the batch does not fail the whole request. The same optional `include=security,hostname,liveHostname,user_agent,abuse` modules from the single-IP API (or `include=*`) apply to every item in the batch.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v2.0",
+      "description": "Bulk IP Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/geolocation/lookup": {
+      "post": {
+        "tags": ["IP Geolocation APIs"],
+        "summary": "Retrieve geolocation and threat intelligence data for multiple IP addresses in a single request",
+        "description": "Get detailed IP geolocation data for multiple IP addresses including country, city, timezone, currency, and optional threat intelligence information. Supports up to 50,000 IP addresses per request.",
+        "operationId": "bulkIpLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Response language for location fields. Default: en.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "de",
+                "ru",
+                "ja",
+                "fr",
+                "cn",
+                "es",
+                "cs",
+                "it",
+                "ko",
+                "fa",
+                "pt"
+              ],
+              "default": "en"
+            }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of fields to include in the response. For example, `location` includes all location fields, `location.city` is a specific field.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "excludes",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of fields to exclude from response.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "include",
+            "in": "query",
+            "required": false,
+            "description": "Comma-separated list of additional data modules to include. Possible values: security (threat intelligence), hostname (IP-Hostname lookup), liveHostname (live hostname lookup), user_agent (parse User-Agent header), abuse (abuse contact info), * (all modules).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkIpLookupRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Typical bulk lookup request",
+                  "value": {
+                    "ips": ["8.8.8.8", "1.1.1.1"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful geolocation response. Each item corresponds to one requested IP, in the same order; an IP that fails validation (invalid, bogon, reserved, or not found) yields an error item instead of a location result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkIpLookupResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": [
+                      {
+                        "ip": "8.8.8.8",
+                        "location": {
+                          "continent_code": "NA",
+                          "continent_name": "North America",
+                          "country_code2": "US",
+                          "country_code3": "USA",
+                          "country_name": "United States",
+                          "country_name_official": "United States of America",
+                          "country_capital": "Washington, D.C.",
+                          "state_prov": "California",
+                          "state_code": "US-CA",
+                          "district": "Santa Clara",
+                          "city": "Mountain View",
+                          "zipcode": "94043-1351",
+                          "latitude": "37.42240",
+                          "longitude": "-122.08421",
+                          "is_eu": false,
+                          "country_flag": "https://ipgeolocation.io/static/flags/us_64.png",
+                          "geoname_id": "6301403",
+                          "country_emoji": "🇺🇸"
+                        },
+                        "country_metadata": {
+                          "calling_code": "+1",
+                          "tld": ".us",
+                          "languages": ["en-US", "es-US", "haw", "fr"]
+                        },
+                        "network": {
+                          "connection_type": "",
+                          "route": "8.8.8.0/24",
+                          "is_anycast": true
+                        },
+                        "currency": {
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$"
+                        },
+                        "asn": {
+                          "as_number": "AS15169",
+                          "organization": "Google LLC",
+                          "country": "US",
+                          "type": "BUSINESS",
+                          "domain": "google.com",
+                          "date_allocated": "2000-03-30",
+                          "rir": "ARIN"
+                        },
+                        "company": {
+                          "name": "Google LLC",
+                          "type": "HOSTING",
+                          "domain": "google.com"
+                        },
+                        "time_zone": {
+                          "name": "America/Los_Angeles",
+                          "offset": -8,
+                          "offset_with_dst": -7,
+                          "current_time": "2026-07-08 03:21:52.843-0700",
+                          "current_time_unix": 1783506112.843,
+                          "current_tz_abbreviation": "PDT",
+                          "current_tz_full_name": "Pacific Daylight Time",
+                          "standard_tz_abbreviation": "PST",
+                          "standard_tz_full_name": "Pacific Standard Time",
+                          "is_dst": true,
+                          "dst_savings": 1,
+                          "dst_exists": true,
+                          "dst_tz_abbreviation": "PDT",
+                          "dst_tz_full_name": "Pacific Daylight Time",
+                          "dst_start": {
+                            "utc_time": "2026-03-08 TIME 10:00",
+                            "duration": "+1.00H",
+                            "gap": true,
+                            "date_time_after": "2026-03-08 TIME 03:00",
+                            "date_time_before": "2026-03-08 TIME 02:00",
+                            "overlap": false
+                          },
+                          "dst_end": {
+                            "utc_time": "2026-11-01 TIME 09:00",
+                            "duration": "-1.00H",
+                            "gap": false,
+                            "date_time_after": "2026-11-01 TIME 01:00",
+                            "date_time_before": "2026-11-01 TIME 02:00",
+                            "overlap": true
+                          }
+                        }
+                      },
+                      {
+                        "ip": "1.1.1.1",
+                        "location": {
+                          "continent_code": "OC",
+                          "continent_name": "Oceania",
+                          "country_code2": "AU",
+                          "country_code3": "AUS",
+                          "country_name": "Australia",
+                          "country_name_official": "Commonwealth of Australia",
+                          "country_capital": "Canberra",
+                          "state_prov": "Queensland",
+                          "state_code": "AU-QLD",
+                          "district": "Brisbane",
+                          "city": "South Brisbane",
+                          "zipcode": "4101",
+                          "latitude": "-27.47301",
+                          "longitude": "153.01425",
+                          "is_eu": false,
+                          "country_flag": "https://ipgeolocation.io/static/flags/au_64.png",
+                          "geoname_id": "10113228",
+                          "country_emoji": "🇦🇺"
+                        },
+                        "country_metadata": {
+                          "calling_code": "+61",
+                          "tld": ".au",
+                          "languages": ["en-AU"]
+                        },
+                        "network": {
+                          "connection_type": "",
+                          "route": "1.1.1.0/24",
+                          "is_anycast": true
+                        },
+                        "currency": {
+                          "code": "AUD",
+                          "name": "Australian Dollar",
+                          "symbol": "A$"
+                        },
+                        "asn": {
+                          "as_number": "AS13335",
+                          "organization": "Cloudflare, Inc.",
+                          "country": "US",
+                          "type": "BUSINESS",
+                          "domain": "cloudflare.com",
+                          "date_allocated": "2010-07-14",
+                          "rir": "ARIN"
+                        },
+                        "company": {
+                          "name": "APNIC Research and Development",
+                          "type": "",
+                          "domain": ""
+                        },
+                        "time_zone": {
+                          "name": "Australia/Brisbane",
+                          "offset": 10,
+                          "offset_with_dst": 10,
+                          "current_time": "2026-07-08 20:21:52.843+1000",
+                          "current_time_unix": 1783506112.843,
+                          "current_tz_abbreviation": "AEST",
+                          "current_tz_full_name": "Australian Eastern Standard Time",
+                          "standard_tz_abbreviation": "AEST",
+                          "standard_tz_full_name": "Australian Eastern Standard Time",
+                          "is_dst": false,
+                          "dst_savings": 0,
+                          "dst_exists": false,
+                          "dst_tz_abbreviation": "",
+                          "dst_tz_full_name": "",
+                          "dst_start": {},
+                          "dst_end": {}
+                        }
+                      }
+                    ]
+                  },
+                  "partialFailure": {
+                    "summary": "Response with an invalid IP mixed in — that item returns an error object instead of location data",
+                    "value": [
+                      {
+                        "message": "Provided name, service or IP address 'not-an-ip' is not valid."
+                      },
+                      {
+                        "ip": "8.8.8.8",
+                        "location": {
+                          "continent_code": "NA",
+                          "continent_name": "North America",
+                          "country_code2": "US",
+                          "country_code3": "USA",
+                          "country_name": "United States",
+                          "country_name_official": "United States of America",
+                          "country_capital": "Washington, D.C.",
+                          "state_prov": "California",
+                          "state_code": "US-CA",
+                          "district": "Santa Clara",
+                          "city": "Mountain View",
+                          "zipcode": "94043-1351",
+                          "latitude": "37.42240",
+                          "longitude": "-122.08421",
+                          "is_eu": false,
+                          "country_flag": "https://ipgeolocation.io/static/flags/us_64.png",
+                          "geoname_id": "6301403",
+                          "country_emoji": "🇺🇸"
+                        },
+                        "country_metadata": {
+                          "calling_code": "+1",
+                          "tld": ".us",
+                          "languages": ["en-US", "es-US", "haw", "fr"]
+                        },
+                        "network": {
+                          "connection_type": "",
+                          "route": "8.8.8.0/24",
+                          "is_anycast": true
+                        },
+                        "currency": {
+                          "code": "USD",
+                          "name": "US Dollar",
+                          "symbol": "$"
+                        },
+                        "asn": {
+                          "as_number": "AS15169",
+                          "organization": "Google LLC",
+                          "country": "US",
+                          "type": "BUSINESS",
+                          "domain": "google.com",
+                          "date_allocated": "2000-03-30",
+                          "rir": "ARIN"
+                        },
+                        "company": {
+                          "name": "Google LLC",
+                          "type": "HOSTING",
+                          "domain": "google.com"
+                        },
+                        "time_zone": {
+                          "name": "America/Los_Angeles",
+                          "offset": -8,
+                          "offset_with_dst": -7,
+                          "current_time": "2026-07-22 06:08:52.526-0700",
+                          "current_time_unix": 1784725732.526,
+                          "current_tz_abbreviation": "PDT",
+                          "current_tz_full_name": "Pacific Daylight Time",
+                          "standard_tz_abbreviation": "PST",
+                          "standard_tz_full_name": "Pacific Standard Time",
+                          "is_dst": true,
+                          "dst_savings": 1,
+                          "dst_exists": true,
+                          "dst_tz_abbreviation": "PDT",
+                          "dst_tz_full_name": "Pacific Daylight Time",
+                          "dst_start": {
+                            "utc_time": "2026-03-08 TIME 10:00",
+                            "duration": "+1.00H",
+                            "gap": true,
+                            "date_time_after": "2026-03-08 TIME 03:00",
+                            "date_time_before": "2026-03-08 TIME 02:00",
+                            "overlap": false
+                          },
+                          "dst_end": {
+                            "utc_time": "2026-11-01 TIME 09:00",
+                            "duration": "-1.00H",
+                            "gap": false,
+                            "date_time_after": "2026-11-01 TIME 01:00",
+                            "date_time_before": "2026-11-01 TIME 02:00",
+                            "overlap": true
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "bogonOrNotFound": {
+                    "summary": "Bogon, reserved, or not-in-database IP — returns an error object for that item",
+                    "value": [
+                      {
+                        "message": "'127.0.0.1' is a bogon IP address."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid or missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidRequestBody": {
+                    "summary": "Missing, empty, or malformed `ips` in the request body",
+                    "value": {
+                      "error": "Invalid request body Exception",
+                      "message": "Please provide data in required format in request body",
+                      "path": "/v2.0/geolocation/lookup",
+                      "status": 400,
+                      "timestamp": "2026-07-22T13:08:51.422Z"
+                    }
+                  },
+                  "missingApiKey": {
+                    "summary": "No API key provided",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "Please provide apiKey",
+                      "path": "/v2.0/geolocation/lookup",
+                      "status": 400,
+                      "timestamp": "2026-07-22T13:09:02.595Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large — Request body exceeds the maximum allowed size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "payloadTooLarge": {
+                    "summary": "Request body exceeds the maximum size limit",
+                    "value": {
+                      "error": "Payload too large Exception",
+                      "message": "Maximum request body size limit exceeded",
+                      "path": "/v2.0/geolocation/lookup",
+                      "status": 413,
+                      "timestamp": "2026-07-22T13:09:13.142Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "BulkIpLookupRequest": {
+        "type": "object",
+        "required": ["ips"],
+        "description": "Request body for bulk IP geolocation lookup.",
+        "properties": {
+          "ips": {
+            "type": "array",
+            "description": "List of IP addresses or hostnames to lookup.",
+            "maxItems": 50000,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "BulkIpLookupItemError": {
+        "type": "object",
+        "description": "Per-item error, returned in place of a location result when an individual IP is invalid, bogon/reserved, or not found in the database.",
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Human-readable reason this IP could not be resolved."
+          }
+        }
+      },
+      "BulkIpLookupResultItem": {
+        "type": "object",
+        "description": "Geolocation and threat intelligence result for one successfully resolved IP address.",
+        "required": ["ip"],
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "The IP address used for the lookup (IPv4 or IPv6)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "The input domain, returned only for domain-based lookups."
+          },
+          "hostname": {
+            "type": "string",
+            "description": "Reverse DNS hostname (PTR) for the input IP; returns the input IP if not resolvable."
+          },
+          "location": {
+            "$ref": "#/components/schemas/Location"
+          },
+          "country_metadata": {
+            "$ref": "#/components/schemas/CountryMetadata"
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "asn": {
+            "$ref": "#/components/schemas/Asn"
+          },
+          "company": {
+            "$ref": "#/components/schemas/Company"
+          },
+          "currency": {
+            "$ref": "#/components/schemas/Currency"
+          },
+          "security": {
+            "$ref": "#/components/schemas/Security"
+          },
+          "abuse": {
+            "$ref": "#/components/schemas/Abuse"
+          },
+          "time_zone": {
+            "$ref": "#/components/schemas/TimeZone"
+          },
+          "user_agent": {
+            "$ref": "#/components/schemas/UserAgent"
+          }
+        }
+      },
+      "BulkIpLookupResponse": {
+        "type": "array",
+        "description": "Array of per-IP results, one entry per requested IP, in the same order as the request. Each entry is either a location result or, if that IP could not be resolved, an error object.",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/components/schemas/BulkIpLookupResultItem"
+            },
+            {
+              "$ref": "#/components/schemas/BulkIpLookupItemError"
+            }
+          ]
+        }
+      },
+      "Location": {
+        "type": "object",
+        "description": "Geographic location information for the IP.",
+        "required": [
+          "continent_code",
+          "continent_name",
+          "country_code2",
+          "country_code3",
+          "country_name",
+          "country_name_official",
+          "country_capital",
+          "latitude",
+          "longitude",
+          "is_eu",
+          "country_flag"
+        ],
+        "properties": {
+          "continent_code": {
+            "type": "string",
+            "description": "2-letter code of the continent."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Name of the continent."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "Country code (ISO 3166-1 alpha-2) of the country."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "Country code (ISO 3166-1 alpha-3) of the country."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Name of the country."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official name (ISO 3166) of the country."
+          },
+          "country_capital": {
+            "type": "string",
+            "description": "Name of the country's capital."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "Name of the state/province/region."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Code of the state/province/region."
+          },
+          "district": {
+            "type": "string",
+            "description": "Name of the district or county."
+          },
+          "city": {
+            "type": "string",
+            "description": "Name of the city."
+          },
+          "locality": {
+            "type": "string",
+            "description": "A more specific area in city or it can be same as city."
+          },
+          "accuracy_radius": {
+            "type": "string",
+            "description": "Circular radius in Km, where the IP address location can be found."
+          },
+          "confidence": {
+            "type": "string",
+            "description": "Confidence level of the location match (e.g., low, medium, high)."
+          },
+          "dma_code": {
+            "type": ["string", "null"],
+            "description": "Designated Market Area (DMA) code used in the United States for media marketing."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "ZIP/Postal code of the place."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Latitude of the place."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Longitude of the place."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Is the country belong to European Union?"
+          },
+          "country_flag": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to get the country flag."
+          },
+          "geoname_id": {
+            "type": "string",
+            "description": "Geoname ID of the place from geonames.org."
+          },
+          "country_emoji": {
+            "type": "string",
+            "description": "Emoji of the Country flag."
+          }
+        }
+      },
+      "CountryMetadata": {
+        "type": "object",
+        "description": "Country-specific metadata.",
+        "required": ["calling_code", "tld", "languages"],
+        "properties": {
+          "calling_code": {
+            "type": "string",
+            "description": "Calling code/Dialing code of the country."
+          },
+          "tld": {
+            "type": "string",
+            "description": "Top Level Domain Name (TLD) of the country, which is also called ccTLD."
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of the languages' codes, spoken in the country."
+          }
+        }
+      },
+      "Network": {
+        "type": "object",
+        "description": "Network information for the IP.",
+        "properties": {
+          "connection_type": {
+            "type": "string",
+            "description": "Network access type classification (e.g., DSL, Cable, Mobile, 5G) when available."
+          },
+          "route": {
+            "type": "string",
+            "description": "Network prefix in CIDR notation that contains the IP."
+          },
+          "is_anycast": {
+            "type": "boolean",
+            "description": "true if the IP is anycast (same IP announced from multiple locations)."
+          }
+        }
+      },
+      "Asn": {
+        "type": "object",
+        "description": "Autonomous System details for the IP.",
+        "properties": {
+          "as_number": {
+            "type": "string",
+            "description": "ASN identifier in AS<number> format associated with the IP's network."
+          },
+          "organization": {
+            "type": "string",
+            "description": "ASN operator name."
+          },
+          "country": {
+            "type": "string",
+            "description": "ASN registration country as ISO 3166-1 alpha-2."
+          },
+          "type": {
+            "type": "string",
+            "description": "ASN category (ISP, HOSTING, BUSINESS, etc.)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "ASN operator domain name."
+          },
+          "date_allocated": {
+            "type": "string",
+            "description": "ASN allocation date in YYYY-MM-DD format."
+          },
+          "rir": {
+            "type": "string",
+            "description": "Regional Internet Registry that allocated the ASN."
+          }
+        }
+      },
+      "Company": {
+        "type": "object",
+        "description": "Company or ISP information mapped to the IP address.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Company name mapped to the IP."
+          },
+          "type": {
+            "type": "string",
+            "description": "Company category (ISP, HOSTING, BUSINESS, etc.)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "Company domain name."
+          }
+        }
+      },
+      "Currency": {
+        "type": "object",
+        "description": "Currency information for the IP's country.",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Currency code (ISO 4217)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Currency name (ISO 4217)."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Currency symbol."
+          }
+        }
+      },
+      "Security": {
+        "type": "object",
+        "description": "Threat intelligence and security information for the IP.",
+        "required": [
+          "threat_score",
+          "is_tor",
+          "is_proxy",
+          "proxy_confidence_score",
+          "is_residential_proxy",
+          "is_vpn",
+          "vpn_confidence_score",
+          "is_relay",
+          "is_anonymous",
+          "is_known_attacker",
+          "is_bot",
+          "is_spam",
+          "is_cloud_provider"
+        ],
+        "properties": {
+          "threat_score": {
+            "type": "number",
+            "description": "Aggregate risk score from 0 to 100."
+          },
+          "is_tor": {
+            "type": "boolean",
+            "description": "true if the IP matches a Tor exit node."
+          },
+          "is_proxy": {
+            "type": "boolean",
+            "description": "true if the IP is associated with a proxy service."
+          },
+          "proxy_provider_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Detected proxy provider names."
+          },
+          "proxy_confidence_score": {
+            "type": "number",
+            "description": "Proxy detection confidence from 0 to 100."
+          },
+          "proxy_last_seen": {
+            "type": "string",
+            "description": "Last observed proxy activity date in YYYY-MM-DD."
+          },
+          "is_residential_proxy": {
+            "type": "boolean",
+            "description": "true if the IP is linked to a residential proxy network."
+          },
+          "is_vpn": {
+            "type": "boolean",
+            "description": "true if the IP is associated with a VPN service."
+          },
+          "vpn_provider_names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Detected VPN provider names."
+          },
+          "vpn_confidence_score": {
+            "type": "number",
+            "description": "VPN detection confidence from 0 to 100."
+          },
+          "vpn_last_seen": {
+            "type": "string",
+            "description": "Last observed VPN activity date in YYYY-MM-DD."
+          },
+          "is_relay": {
+            "type": "boolean",
+            "description": "true if the IP is associated with a relay network."
+          },
+          "relay_provider_name": {
+            "type": "string",
+            "description": "Relay provider name."
+          },
+          "is_anonymous": {
+            "type": "boolean",
+            "description": "true if any anonymity signal is present."
+          },
+          "is_known_attacker": {
+            "type": "boolean",
+            "description": "true if the IP is flagged for known attacker behavior."
+          },
+          "is_bot": {
+            "type": "boolean",
+            "description": "true if the IP is associated with bot activity."
+          },
+          "is_spam": {
+            "type": "boolean",
+            "description": "true if the IP is associated with spam activity."
+          },
+          "is_cloud_provider": {
+            "type": "boolean",
+            "description": "true if the IP belongs to a cloud provider range."
+          },
+          "cloud_provider_name": {
+            "type": "string",
+            "description": "Cloud provider name."
+          }
+        }
+      },
+      "Abuse": {
+        "type": "object",
+        "description": "Abuse contact information for the IP.",
+        "properties": {
+          "route": {
+            "type": "string",
+            "description": "Abuse-handling IP range in CIDR notation."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code of the abuse contact."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the abuse contact."
+          },
+          "organization": {
+            "type": "string",
+            "description": "Organization name for the abuse contact."
+          },
+          "kind": {
+            "type": "string",
+            "description": "Contact type: group or individual."
+          },
+          "address": {
+            "type": "string",
+            "description": "Registered address of the organization owning the IP."
+          },
+          "emails": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Abuse contact email addresses."
+          },
+          "phone_numbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Abuse contact phone numbers."
+          }
+        }
+      },
+      "DstTransition": {
+        "type": "object",
+        "description": "DST transition details (used for both the DST start and DST end transitions).",
+        "properties": {
+          "utc_time": {
+            "type": "string",
+            "description": "DST transition moment in UTC."
+          },
+          "duration": {
+            "type": "string",
+            "description": "Clock change at the DST transition, in hours."
+          },
+          "gap": {
+            "type": "boolean",
+            "description": "true if local time jumps forward (some times do not exist)."
+          },
+          "date_time_after": {
+            "type": "string",
+            "description": "Local date/time immediately after the DST transition."
+          },
+          "date_time_before": {
+            "type": "string",
+            "description": "Local date/time immediately before the DST transition."
+          },
+          "overlap": {
+            "type": "boolean",
+            "description": "true if local times repeat around the DST transition."
+          }
+        }
+      },
+      "TimeZone": {
+        "type": "object",
+        "description": "Time zone information for the IP's location.",
+        "required": [
+          "name",
+          "offset",
+          "offset_with_dst",
+          "current_time",
+          "current_time_unix",
+          "is_dst",
+          "dst_savings",
+          "dst_exists"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Time zone in IANA TZDB format."
+          },
+          "offset": {
+            "type": "number",
+            "format": "float",
+            "description": "Standard time UTC offset in hours."
+          },
+          "offset_with_dst": {
+            "type": "number",
+            "format": "float",
+            "description": "Current effective UTC offset in hours, including DST."
+          },
+          "current_time": {
+            "type": "string",
+            "description": "Local date/time in YYYY-MM-DD HH:mm:ss.SSS±ZZZZ format."
+          },
+          "current_time_unix": {
+            "type": "number",
+            "format": "float",
+            "description": "Local time as Unix epoch seconds."
+          },
+          "current_tz_abbreviation": {
+            "type": "string",
+            "description": "Current time zone abbreviation."
+          },
+          "current_tz_full_name": {
+            "type": "string",
+            "description": "Current time zone full name."
+          },
+          "standard_tz_abbreviation": {
+            "type": "string",
+            "description": "Standard (non-DST) abbreviation."
+          },
+          "standard_tz_full_name": {
+            "type": "string",
+            "description": "Standard (non-DST) full name."
+          },
+          "is_dst": {
+            "type": "boolean",
+            "description": "true if DST is active."
+          },
+          "dst_savings": {
+            "type": "number",
+            "format": "float",
+            "description": "DST shift amount in hours."
+          },
+          "dst_exists": {
+            "type": "boolean",
+            "description": "true if the time zone observes DST."
+          },
+          "dst_tz_abbreviation": {
+            "type": "string",
+            "description": "DST abbreviation when DST is active."
+          },
+          "dst_tz_full_name": {
+            "type": "string",
+            "description": "DST full name when DST is active."
+          },
+          "dst_start": {
+            "$ref": "#/components/schemas/DstTransition"
+          },
+          "dst_end": {
+            "$ref": "#/components/schemas/DstTransition"
+          }
+        }
+      },
+      "Device": {
+        "type": "object",
+        "description": "Device details.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Detected device label."
+          },
+          "type": {
+            "type": "string",
+            "description": "Device category (Desktop, Mobile, Tablet, Bot)."
+          },
+          "brand": {
+            "type": "string",
+            "description": "Device vendor/brand."
+          },
+          "cpu": {
+            "type": "string",
+            "description": "CPU / architecture string."
+          }
+        }
+      },
+      "Engine": {
+        "type": "object",
+        "description": "Rendering engine details.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Rendering engine name."
+          },
+          "type": {
+            "type": "string",
+            "description": "Engine category."
+          },
+          "version": {
+            "type": "string",
+            "description": "Full engine version string."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major engine version."
+          }
+        }
+      },
+      "OperatingSystem": {
+        "type": "object",
+        "description": "Operating system details.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Operating system name."
+          },
+          "type": {
+            "type": "string",
+            "description": "OS category (Desktop, Mobile, Server)."
+          },
+          "version": {
+            "type": "string",
+            "description": "OS version string."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major OS version."
+          },
+          "build": {
+            "type": "string",
+            "description": "OS build identifier."
+          }
+        }
+      },
+      "UserAgent": {
+        "type": "object",
+        "description": "Parsed User-Agent details from the request.",
+        "properties": {
+          "user_agent_string": {
+            "type": "string",
+            "description": "Raw User-Agent string used for parsing."
+          },
+          "name": {
+            "type": "string",
+            "description": "Detected user agent product name."
+          },
+          "type": {
+            "type": "string",
+            "description": "User agent category (e.g., Browser, Mobile App, Bot)."
+          },
+          "version": {
+            "type": "string",
+            "description": "Full product version string."
+          },
+          "version_major": {
+            "type": "string",
+            "description": "Major version extracted from version."
+          },
+          "device": {
+            "$ref": "#/components/schemas/Device"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/Engine"
+          },
+          "operating_system": {
+            "$ref": "#/components/schemas/OperatingSystem"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

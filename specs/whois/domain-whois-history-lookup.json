@@ -1,0 +1,500 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "WHOIS History API: Historical WHOIS Records Since 1986",
+    "version": "1.0.0",
+    "description": "Retrieve the full chronological history of WHOIS registration records for a domain name, going back to 1986 where available. Each record in the returned array is a snapshot capturing the registrar, registrant/admin/technical/billing contacts, name servers, domain status codes, and both the original and registry-level raw WHOIS text as they existed at that point in time. Pass `domainName` as a bare domain (e.g. `example.com`); a `https://` or `http://` prefix is also accepted. Early historical snapshots may include only a subset of fields (e.g. dates without registrar or name server data) since registries did not always publish complete records; a domain with no historical WHOIS data returns a `404` error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "WHOIS History API Server"
+    }
+  ],
+  "paths": {
+    "/domain/whois/history": {
+      "get": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Retrieve the complete historical WHOIS record timeline for a domain name",
+        "description": "Returns every recorded WHOIS snapshot for the specified domain in chronological order, including registrar, contact, name server, and status changes over time.",
+        "operationId": "whoisHistoryLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "domainName",
+            "in": "query",
+            "required": true,
+            "description": "Domain name to retrieve historical WHOIS records for (e.g. example.com).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful historical WHOIS response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainWhoisHistoryLookupResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "status": true,
+                      "whois": "historical",
+                      "total_records": "18",
+                      "whois_domains_historical": [
+                        {
+                          "num": 1,
+                          "status": true,
+                          "domain_name": "example.com",
+                          "query_time": "2022-04-28 12:56:13",
+                          "create_date": "1992-01-01",
+                          "update_date": "2021-08-14",
+                          "expiry_date": "2022-08-13"
+                        },
+                        {
+                          "num": 18,
+                          "status": true,
+                          "domain_name": "example.com",
+                          "query_time": "2026-07-23 07:47:26",
+                          "whois_server": "whois.verisign-grs.com",
+                          "domain_registered": "yes",
+                          "create_date": "1992-01-01",
+                          "update_date": "2026-01-16",
+                          "expiry_date": "2026-08-13",
+                          "name_servers": [
+                            "elliott.ns.cloudflare.com",
+                            "hera.ns.cloudflare.com"
+                          ],
+                          "whois_raw_domain": "\n% IANA WHOIS server\n% for more information on IANA, visit http://www.iana.org\n% This query returned 1 object\n\ndomain:       EXAMPLE.COM\n\norganisation: Internet Assigned Numbers Authority\n\ncreated:      1992-01-01\nsource:       IANA",
+                          "registry_data": {
+                            "domain_name": "EXAMPLE.COM",
+                            "query_time": "2026-07-23 07:47:25",
+                            "whois_server": "whois.verisign-grs.com",
+                            "domain_registered": "yes",
+                            "create_date": "1995-08-14",
+                            "update_date": "2026-01-16",
+                            "expiry_date": "2026-08-13",
+                            "domain_registrar": {
+                              "iana_id": "376",
+                              "registrar_name": "RESERVED-Internet Assigned Numbers Authority",
+                              "whois_server": "whois.iana.org",
+                              "website_url": "http://res-dom.iana.org"
+                            },
+                            "name_servers": [
+                              "elliott.ns.cloudflare.com",
+                              "hera.ns.cloudflare.com"
+                            ],
+                            "domain_status": [
+                              "clientupdateprohibited",
+                              "clientdeleteprohibited",
+                              "clienttransferprohibited"
+                            ],
+                            "whois_raw_registery": "\nDomain Name: EXAMPLE.COM\n   Registry Domain ID: 2336799_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.iana.org\n   Registrar URL: http://res-dom.iana.org\n   Updated Date: 2026-01-16T18:26:50Z\n   Creation Date: 1995-08-14T04:00:00Z\n   Registry Expiry Date: 2026-08-13T04:00:00Z\n   Registrar: RESERVED-Internet Assigned Numbers Authority\n   Registrar IANA ID: 376\n   Registrar Abuse Contact Email:\n   Registrar Abuse Contact Phone:\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Name Server: ELLIOTT.NS.CLOUDFLARE.COM\n   Name Server: HERA.NS.CLOUDFLARE.COM\n   DNSSEC: signedDelegation\n   DNSSEC DS Data: 2371 13 2 C988EC423E3880EB8DD8A46FE06CA230EE23F35B578D64E78B29C3E1C83D245A\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2026-07-23T08:16:23Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid domainName parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidDomain": {
+                    "summary": "Malformed domain name",
+                    "value": {
+                      "timestamp": "2026-07-23T07:47:39.105Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value [For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v1.0/whois"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — No historical WHOIS records for the domain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "recordNotFound": {
+                    "summary": "No historical records available",
+                    "value": {
+                      "timestamp": "2026-07-23T07:47:40.893Z",
+                      "status": 404,
+                      "error": "Record Not Found",
+                      "message": "Record not found",
+                      "path": "/v1.0/whois"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "DomainWhoisHistoryLookupResponse": {
+        "type": "object",
+        "description": "Chronological collection of historical WHOIS snapshots for the requested domain.",
+        "required": [
+          "status",
+          "whois",
+          "total_records",
+          "whois_domains_historical"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "true if the request was successfully processed."
+          },
+          "whois": {
+            "type": "string",
+            "enum": ["historical"],
+            "description": "Indicates that this response contains historical WHOIS data."
+          },
+          "total_records": {
+            "type": "string",
+            "description": "Total number of historical records found for the queried domain."
+          },
+          "whois_domains_historical": {
+            "type": "array",
+            "description": "Historical WHOIS snapshots for the domain, in chronological order.",
+            "items": {
+              "$ref": "#/components/schemas/DomainWhoisHistoryRecord"
+            }
+          }
+        }
+      },
+      "DomainWhoisHistoryRecord": {
+        "type": "object",
+        "description": "A single historical WHOIS snapshot captured at a point in time. Early snapshots may omit fields the registry did not publish at that time.",
+        "required": [
+          "num",
+          "status",
+          "domain_name",
+          "query_time",
+          "create_date",
+          "update_date",
+          "expiry_date"
+        ],
+        "properties": {
+          "num": {
+            "type": "integer",
+            "description": "1-based sequence number of this record within the historical timeline."
+          },
+          "status": {
+            "type": "boolean",
+            "enum": [true],
+            "description": "Always true for a returned historical record."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name this snapshot was recorded for."
+          },
+          "query_time": {
+            "type": "string",
+            "description": "Timestamp when this historical snapshot was captured."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS server that provided this snapshot's domain-level data, when recorded."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status at the time of this snapshot, when recorded."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain was originally registered, as known at the time of this snapshot."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration was last updated, as of this snapshot."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration was set to expire, as of this snapshot."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record for the domain as of this snapshot."
+          },
+          "reseller_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Reseller contact details, when the domain was registered through a reseller, as published in this snapshot."
+          },
+          "registrant_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Domain registrant (owner) contact details as published in this snapshot."
+          },
+          "administrative_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Administrative contact details as published in this snapshot."
+          },
+          "technical_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Technical contact details as published in this snapshot."
+          },
+          "billing_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Billing contact details as published in this snapshot."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers recorded for the domain as of this snapshot.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes recorded as of this snapshot.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_domain": {
+            "type": "string",
+            "description": "Raw WHOIS text for the domain as of this snapshot."
+          },
+          "registry_data": {
+            "$ref": "#/components/schemas/DomainWhoisHistoryRegistryData"
+          }
+        }
+      },
+      "DomainRegistrar": {
+        "type": "object",
+        "description": "Registrar of record at the time of the snapshot.",
+        "properties": {
+          "iana_id": {
+            "type": "string",
+            "description": "IANA registrar ID."
+          },
+          "registrar_name": {
+            "type": "string",
+            "description": "Registered name of the registrar."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS server operated by the registrar."
+          },
+          "website_url": {
+            "type": "string",
+            "description": "Registrar's website URL."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Registrar abuse or contact email address."
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Registrar contact phone number."
+          }
+        }
+      },
+      "WhoisContactDetail": {
+        "type": "object",
+        "description": "A contact record (registrant, administrative, technical, billing, or reseller) as published in this snapshot.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Contact's full name."
+          },
+          "company": {
+            "type": "string",
+            "description": "Contact's organization or company name."
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province."
+          },
+          "zip_code": {
+            "type": "string",
+            "description": "Postal/ZIP code."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full country name."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Contact email address, or a privacy-service redirect instruction."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Contact phone number."
+          },
+          "fax": {
+            "type": "string",
+            "description": "Contact fax number."
+          },
+          "mailing_address": {
+            "type": "string",
+            "description": "Full combined mailing address, when published as a single string."
+          }
+        }
+      },
+      "DomainWhoisHistoryRegistryData": {
+        "type": "object",
+        "description": "Registry-level (as opposed to registrar-level) WHOIS data for this snapshot, sourced directly from the TLD registry.",
+        "properties": {
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name as recorded by the registry."
+          },
+          "query_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the registry-level record was queried."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "Registry WHOIS server that returned this data."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status as recorded by the registry."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain creation date as recorded by the registry."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain last-updated date as recorded by the registry."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain expiry date as recorded by the registry."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_registery": {
+            "type": "string",
+            "description": "Raw WHOIS text as returned directly by the registry server."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record as recorded directly by the registry."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

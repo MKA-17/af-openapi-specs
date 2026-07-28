@@ -1,0 +1,414 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Reverse DNS Lookup API - Find Every Hostname Behind an IP, MX, NS, or CNAME",
+    "version": "1.0.0",
+    "description": "The Reverse DNS Lookup API finds every hostname associated with a given IP address, CIDR block, nameserver, mail host, or other DNS selector. The type parameter switches between A, AAAA, MX, NS, SOA, SPF, TXT, and CNAME lookups to control how the value parameter is interpreted. Wildcard regex matching on the value parameter is supported for flexible pattern searches such as m*.google.com. An exact-match filter is available when you need only exact hits rather than all partial matches. Results are paginated with 100 records per page and include dated DNS snapshots for each matched domain.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Reverse DNS Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/domain/dns/reverse": {
+      "get": {
+        "tags": ["DNS APIs"],
+        "summary": "Retrieve all hostnames associated with any A, AAAA, MX, NS, SOA, SPF, TXT, or CNAME DNS record",
+        "description": "Perform a reverse DNS lookup by providing an IP or CIDR for A/AAAA lookups, or a hostname selector for MX, NS, SOA, SPF, TXT, and CNAME queries. Returns paginated results with dated DNS snapshots for each matched domain.",
+        "operationId": "reverseDnsLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "description": "The type of reverse DNS lookup to perform. Determines how the value parameter is interpreted:\n- A: IPv4 CIDR block\n- AAAA: IPv6 CIDR block\n- MX: Mail provider domain\n- NS: Name server provider hostname\n- SOA: SOA record admin domain\n- SPF/TXT: Target verification strings\n- CNAME: Target hostname",
+            "schema": {
+              "type": "string",
+              "enum": ["A", "AAAA", "MX", "NS", "SOA", "SPF", "TXT", "CNAME"]
+            }
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "required": true,
+            "description": "Provide an IP or CIDR for A/AAAA lookups, or a hostname/selector for MX, NS, SOA, SPF, TXT, and CNAME queries. Wildcard regex patterns are also supported (e.g., mail.google.com, m*.google.com, _spf.g*.com, s*.g*.com).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exact",
+            "in": "query",
+            "required": false,
+            "description": "When true, returns only records that exactly match the input (NS, MX, CNAME, SOA, SPF, TXT). When false, returns all matches (default when omitted).",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number to paginate through results (defaults to 1).",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseDnsResponse"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "Reverse DNS lookup for IP 8.8.8.8",
+                    "value": {
+                      "totalRecords": 89950,
+                      "totalPages": 900,
+                      "currentPage": 1,
+                      "reverseDnsRecords": [
+                        {
+                          "queryTime": "2024-05-30",
+                          "domainName": "www.maguire.romamenu.cotest.avalon-invest.pro",
+                          "dnsTypes": {
+                            "A": 1
+                          },
+                          "dnsRecords": [
+                            {
+                              "name": "www.maguire.romamenu.cotest.avalon-invest.pro",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 300,
+                              "rawText": "www.maguire.romamenu.cotest.avalon-invest.pro.\t300\tIN\tA\t8.8.8.8",
+                              "rRsetType": 1,
+                              "address": "8.8.8.8"
+                            }
+                          ]
+                        },
+                        {
+                          "queryTime": "2026-06-13",
+                          "domainName": "qa-allure.salt-dev.ws",
+                          "dnsTypes": {
+                            "A": 1
+                          },
+                          "dnsRecords": [
+                            {
+                              "name": "qa-allure.salt-dev.ws",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 300,
+                              "rawText": "qa-allure.salt-dev.ws.\t300\tIN\tA\t8.8.8.8",
+                              "rRsetType": 1,
+                              "address": "8.8.8.8"
+                            }
+                          ]
+                        },
+                        {
+                          "queryTime": "2026-03-21",
+                          "domainName": "www.hailibu.cn",
+                          "dnsTypes": {
+                            "A": 1
+                          },
+                          "dnsRecords": [
+                            {
+                              "name": "www.hailibu.cn",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 1,
+                              "rawText": "www.hailibu.cn.\t\t1\tIN\tA\t8.8.8.8",
+                              "rRsetType": 1,
+                              "address": "8.8.8.8"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid DNS type or missing required parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidType": {
+                    "summary": "Invalid DNS type",
+                    "value": {
+                      "timestamp": "2026-07-23T09:51:58.340Z",
+                      "path": "/v2.1/dns/reverse",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Invalid dns Record Type. Kindly use the supported record types."
+                    }
+                  },
+                  "missingValue": {
+                    "summary": "Missing required value parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/domain/dns/reverse",
+                      "status": 400,
+                      "timestamp": "2026-07-23T09:51:58.951Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No reverse DNS records found for the given input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "No records found",
+                    "value": {
+                      "timestamp": "2026-07-23T09:52:07.079Z",
+                      "path": "/v2.1/dns/reverse",
+                      "status": 404,
+                      "error": "Record not Found",
+                      "message": "No Record Found across: zzsuperrandomnonexistentmxprovider99988.com"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key in the X-apiKey header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key as the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["timestamp", "path", "status", "error", "message"],
+        "description": "Standard error response returned by the API when a request fails.",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the error."
+          },
+          "path": {
+            "type": "string",
+            "description": "Request path that triggered the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code."
+          },
+          "error": {
+            "type": "string",
+            "description": "Error type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message."
+          }
+        }
+      },
+      "ReverseDnsResponse": {
+        "type": "object",
+        "required": [
+          "totalRecords",
+          "totalPages",
+          "currentPage",
+          "reverseDnsRecords"
+        ],
+        "description": "Paginated response containing all domain records matching the reverse DNS query.",
+        "properties": {
+          "totalRecords": {
+            "type": "integer",
+            "description": "Total number of domain records matching the reverse DNS query."
+          },
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages available."
+          },
+          "currentPage": {
+            "type": "integer",
+            "description": "Current page number in the paginated result."
+          },
+          "reverseDnsRecords": {
+            "type": "array",
+            "description": "Array of matching domain records, each containing dated DNS snapshots.",
+            "items": {
+              "$ref": "#/components/schemas/ReverseDnsRecord"
+            }
+          }
+        }
+      },
+      "ReverseDnsRecord": {
+        "type": "object",
+        "description": "A single domain record matched by the reverse DNS query, with its DNS snapshot data.",
+        "required": ["queryTime", "domainName", "dnsTypes", "dnsRecords"],
+        "properties": {
+          "queryTime": {
+            "type": "string",
+            "format": "date",
+            "description": "Date when the DNS snapshot was taken (YYYY-MM-DD)."
+          },
+          "domainName": {
+            "type": "string",
+            "description": "Matched domain name."
+          },
+          "domainRegistered": {
+            "type": "boolean",
+            "description": "Indicates whether the domain is registered."
+          },
+          "dnsTypes": {
+            "$ref": "#/components/schemas/DnsTypes"
+          },
+          "dnsRecords": {
+            "type": "array",
+            "description": "Array of DNS records for this domain on this date. Field presence varies by dnsType — see DnsRecord for which fields apply to which type.",
+            "items": {
+              "$ref": "#/components/schemas/DnsRecord"
+            }
+          }
+        }
+      },
+      "DnsTypes": {
+        "type": "object",
+        "description": "Map of each DNS record type present in dnsRecords to its IANA DNS resource record type code (e.g. A: 1, AAAA: 28, CNAME: 5, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99). Indicates which record types were found for this domain, not how many of each — count entries in dnsRecords for that.",
+        "additionalProperties": {
+          "title": "DnsTypeCode",
+          "type": "integer",
+          "description": "IANA DNS resource record type code for this DNS record type (A: 1, AAAA: 28, CNAME: 5, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99)."
+        }
+      },
+      "DnsRecord": {
+        "type": "object",
+        "description": "A single DNS resource record. name, type, dnsType, ttl, rawText, and rRsetType are always present; every other field is populated only for the dnsType(s) noted in its description.",
+        "required": ["name", "type", "dnsType", "ttl", "rawText", "rRsetType"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the queried domain."
+          },
+          "type": {
+            "type": "integer",
+            "description": "DNS type code (1=A, 28=AAAA, 5=CNAME, 15=MX, 2=NS, 6=SOA, 16=TXT, 99=SPF)."
+          },
+          "dnsType": {
+            "type": "string",
+            "enum": ["A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT", "SPF"],
+            "description": "DNS record type as a string."
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Time to live in seconds."
+          },
+          "rawText": {
+            "type": "string",
+            "description": "Raw (un-parsed) DNS record text."
+          },
+          "rRsetType": {
+            "type": "integer",
+            "description": "Resource record set type code."
+          },
+          "address": {
+            "type": "string",
+            "description": "IPv4 or IPv6 address. Present only when dnsType is A or AAAA."
+          },
+          "target": {
+            "type": "string",
+            "description": "Target hostname. Present only when dnsType is CNAME or MX."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Mail server priority. Present only when dnsType is MX."
+          },
+          "singleName": {
+            "type": "string",
+            "description": "Authoritative name server. Present only when dnsType is NS."
+          },
+          "admin": {
+            "type": "string",
+            "description": "Administrative contact email. Present only when dnsType is SOA."
+          },
+          "host": {
+            "type": "string",
+            "description": "Primary name server. Present only when dnsType is SOA."
+          },
+          "expire": {
+            "type": "integer",
+            "description": "Expiry time in seconds. Present only when dnsType is SOA."
+          },
+          "minimum": {
+            "type": "integer",
+            "description": "Minimum TTL in seconds. Present only when dnsType is SOA."
+          },
+          "refresh": {
+            "type": "integer",
+            "description": "Refresh interval in seconds. Present only when dnsType is SOA."
+          },
+          "retry": {
+            "type": "integer",
+            "description": "Retry interval in seconds. Present only when dnsType is SOA."
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Serial number. Present only when dnsType is SOA."
+          },
+          "strings": {
+            "type": "array",
+            "description": "Verification or policy strings. Present only when dnsType is TXT or SPF.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [{ "ApiKeyAuthHeader": [] }, { "ApiKeyAuthQuery": [] }]
+}

@@ -1,0 +1,109 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Regions API - Retrieve World Regions & Subregions",
+    "version": "1.0.0",
+    "description": "Retrieve all geographical regions supported by the GeoDB service. Returns a flat array of exactly 6 region names - Africa, Americas, Asia, Europe, Oceania, and Polar. This endpoint takes no required parameters, ignores unrecognized query parameters rather than erroring, and has no documented error responses. Use the returned region names with the Subregions endpoint to drill down into subregional data.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Regions API Server"
+    }
+  ],
+  "paths": {
+    "/geo/regions": {
+      "get": {
+        "tags": ["GeoDB APIs"],
+        "summary": "Retrieve all geographical regions",
+        "description": "Returns all geographical regions supported by the service, such as Africa, Americas, Asia, Europe, Oceania, and Polar.",
+        "operationId": "getRegions",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegionsResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "regions": [
+                        "Africa",
+                        "Americas",
+                        "Asia",
+                        "Europe",
+                        "Oceania",
+                        "Polar"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "RegionsResponse": {
+        "type": "object",
+        "description": "Response containing the flat list of geographical regions supported by the GeoDB service.",
+        "required": ["regions"],
+        "properties": {
+          "regions": {
+            "type": "array",
+            "description": "An array of region names representing all geographical regions supported by the service.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

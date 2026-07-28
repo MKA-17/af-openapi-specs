@@ -1,0 +1,275 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "VAT Rates by IP API Reference",
+    "version": "1.0.0",
+    "description": "Get VAT rates for a country resolved from an IP address. Returns standard and reduced VAT rates based on the geographic location of the IP.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "VAT Rates by IP API Server"
+    }
+  ],
+  "paths": {
+    "/vat/rates/ip-address": {
+      "get": {
+        "tags": ["Financial APIs"],
+        "summary": "Get VAT rate by IP address",
+        "description": "Fetches VAT rate based on the specified or originating IP address.",
+        "operationId": "getVatRatesByIp",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specify the desired response format. Options: 'json' (default) or 'xml'."
+          },
+          {
+            "name": "ipAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "IPv4 or IPv6 address to look up VAT rate for. If omitted, the originating IP address will be used."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VatIpItemArray"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Country-level VAT rate",
+                    "value": [
+                      {
+                        "country": "GB",
+                        "type": "vat",
+                        "currency": "GBP",
+                        "standard_rate": 0.2,
+                        "reduced_rate": [0, 0.05],
+                        "categories": {
+                          "books": 0.2,
+                          "newspapers": 0.2,
+                          "periodicals": 0.2,
+                          "broadcasting": 0.2
+                        }
+                      }
+                    ]
+                  },
+                  "stateLevel": {
+                    "summary": "IP resolved to a US state with sub-national sales tax",
+                    "value": [
+                      {
+                        "country": "US",
+                        "state": "CA",
+                        "type": "vat",
+                        "currency": "",
+                        "standard_rate": 0.0825
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidIp": {
+                    "summary": "Invalid IP address format",
+                    "value": {
+                      "message": "Invalid IP address format. Please provide a valid IPv4 or IPv6 address."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NotFound": {
+                    "summary": "VAT data not found for IP",
+                    "value": {
+                      "message": "No VAT data found. Please provide a valid ipAddress."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "VatIpItemArray": {
+        "type": "array",
+        "description": "Array of VAT rate objects for the country resolved from the IP address.",
+        "items": {
+          "$ref": "#/components/schemas/VatIpItem"
+        }
+      },
+      "VatIpItem": {
+        "type": "object",
+        "required": ["country", "type", "currency", "standard_rate"],
+        "description": "Each item in the array represents a VAT rate object for the country resolved from the IP.",
+        "properties": {
+          "country": {
+            "type": "string",
+            "description": "Country resolved from the IP address."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or region resolved from the IP address, for countries with sub-national tax rates (e.g. US). Only present when applicable."
+          },
+          "type": {
+            "type": "string",
+            "description": "Tax type for the resolved country (e.g., vat)."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code for the resolved country."
+          },
+          "standard_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Standard VAT rate as a decimal."
+          },
+          "reduced_rate": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VatRateDecimal"
+            },
+            "description": "Reduced VAT rates (EU/UK only)."
+          },
+          "super_reduced_rate": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VatRateDecimal"
+            },
+            "description": "Super-reduced VAT rates (EU/UK only)."
+          },
+          "parking_rate": {
+            "type": "number",
+            "format": "float",
+            "description": "Parking rate (EU/UK only)."
+          },
+          "categories": {
+            "description": "Category-specific VAT rates, where defined (EU/UK only). Keys vary by country.",
+            "$ref": "#/components/schemas/VatCategories"
+          }
+        }
+      },
+      "VatRateDecimal": {
+        "type": "number",
+        "format": "float",
+        "description": "A VAT rate expressed as a decimal (e.g., 0.19 = 19%)."
+      },
+      "VatCategories": {
+        "type": "object",
+        "description": "Category-specific VAT rates, where defined (EU/UK only). Keys vary by country.",
+        "properties": {
+          "books": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for books, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "newspapers": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for newspapers, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "periodicals": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for periodicals, as a decimal (e.g., 0.07 = 7%)."
+          },
+          "broadcasting": {
+            "type": "number",
+            "format": "float",
+            "description": "VAT rate for broadcasting services, as a decimal (e.g., 0.19 = 19%)."
+          }
+        },
+        "required": []
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        },
+        "description": "Standard error envelope returned by the API on failed requests."
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

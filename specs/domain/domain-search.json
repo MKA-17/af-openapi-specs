@@ -1,0 +1,206 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Domain Availability API - Check Domain Names in Real Time and Get Suggestions",
+    "version": "1.0.0",
+    "description": "Check whether a domain is available for registration across all top-level domains (TLDs) and second-level domains (SLDs). Uses DNS-based or WHOIS-based lookups to determine domain availability. Returns a simple response with the domain name and a boolean availability indicator.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Domain Search API Server"
+    }
+  ],
+  "paths": {
+    "/domain/availability": {
+      "get": {
+        "tags": ["Domain APIs"],
+        "summary": "Check whether a domain is available for registration or not.",
+        "description": "The Domain Search API is designed to simplify the process of finding available domain names across all top-level domains (TLDs) and second-level domains (SLDs).",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Domain name whose availability is to be checked."
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["dns", "whois"],
+              "default": "dns"
+            },
+            "description": "Specify the data source for domain availability checks. Use \"dns\" for DNS-based lookups or \"whois\" for WHOIS-based lookups. By default, \"dns\" is used."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainAvailabilityResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Domain available",
+                    "value": {
+                      "domain": "google.com",
+                      "domainAvailability": false
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request – Missing domain, or domain has an unrecognized/unsupported TLD",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingDomain": {
+                    "summary": "Missing required domain parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/domain/availability",
+                      "status": 400,
+                      "timestamp": "2026-07-27T12:18:21.115Z"
+                    }
+                  },
+                  "unsupportedTld": {
+                    "summary": "Domain has an unrecognized or unsupported TLD",
+                    "value": {
+                      "timestamp": "2026-07-27T12:18:47.346748812Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value [For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v1.0/domain/availability"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout – Unable to fetch WHOIS data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Error response",
+                    "value": {
+                      "timestamp": "2025-08-14T10:37:21.871Z",
+                      "status": 408,
+                      "error": "Request Timeout",
+                      "message": "Unable to fetch whois data. Please try again. [For Technical Support email at: support@apifreaks.com]",
+                      "path": "/v1.0/domain/availability"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "checkDomainAvailability"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "DomainAvailabilityResponse": {
+        "type": "object",
+        "required": ["domain", "domainAvailability"],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Name of the queried domain"
+          },
+          "domainAvailability": {
+            "type": "boolean",
+            "description": "True if available, false if not available"
+          }
+        },
+        "description": "Domain availability check response containing the domain name and availability status."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

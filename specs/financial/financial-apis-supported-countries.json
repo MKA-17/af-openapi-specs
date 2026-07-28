@@ -1,0 +1,204 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Financial APIs Supported Countries Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the countries and states supported by the VAT, IBAN, and SWIFT APIs. The response always includes all three categories — VAT_Supported_Countries_And_States, IBAN_Supported_Countries, and SWIFT_Supported_Countries — each with a different shape. VAT entries are keyed by lowercase country name and include an ISO code plus, for a handful of countries (US, Canada, Spain), a nested map of sub-national state/region codes. IBAN and SWIFT entries are flat arrays of {name, countryCode} objects.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Financial APIs Supported Countries API Server"
+    }
+  ],
+  "paths": {
+    "/vat/supported-countries": {
+      "get": {
+        "tags": ["Financial APIs"],
+        "summary": "Get supported countries",
+        "description": "Returns the countries and states supported by the VAT, IBAN, and SWIFT APIs.",
+        "operationId": "getSupportedCountries",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response. Default is JSON."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Accepted by the endpoint but currently has no effect — all three categories (VAT, IBAN, SWIFT) are always returned regardless of this value."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response — always returns all three categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedCountriesResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response (truncated)",
+                    "value": {
+                      "VAT_Supported_Countries_And_States": [
+                        { "germany": { "code": "de" } },
+                        {
+                          "united_states": {
+                            "code": "us",
+                            "states": {
+                              "california": "us:ca",
+                              "new_york": "us:ny",
+                              "texas": "us:tx"
+                            }
+                          }
+                        }
+                      ],
+                      "IBAN_Supported_Countries": [
+                        { "countryCode": "DE", "name": "Germany" },
+                        { "countryCode": "GB", "name": "United Kingdom" }
+                      ],
+                      "SWIFT_Supported_Countries": [
+                        { "name": "Germany", "countryCode": "DE" },
+                        { "name": "United States", "countryCode": "US" }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SupportedCountriesResponse": {
+        "type": "object",
+        "description": "Countries and states supported by the VAT, IBAN, and SWIFT APIs.",
+        "required": [
+          "VAT_Supported_Countries_And_States",
+          "IBAN_Supported_Countries",
+          "SWIFT_Supported_Countries"
+        ],
+        "properties": {
+          "VAT_Supported_Countries_And_States": {
+            "type": "array",
+            "description": "Array of single-key objects, one per supported VAT country. Each key is the lowercase, underscore-separated country name.",
+            "items": {
+              "type": "object",
+              "description": "A single VAT-supported country, keyed by its lowercase name.",
+              "additionalProperties": {
+                "title": "VatCountryEntry",
+                "$ref": "#/components/schemas/VatCountryEntry"
+              }
+            }
+          },
+          "IBAN_Supported_Countries": {
+            "type": "array",
+            "description": "Array of countries supported by the IBAN Validation API.",
+            "items": {
+              "$ref": "#/components/schemas/IbanCountryEntry"
+            }
+          },
+          "SWIFT_Supported_Countries": {
+            "type": "array",
+            "description": "Array of countries supported by the SWIFT/BIC Code Lookup and Finder APIs.",
+            "items": {
+              "$ref": "#/components/schemas/SwiftCountryEntry"
+            }
+          }
+        }
+      },
+      "VatCountryEntry": {
+        "type": "object",
+        "description": "VAT country metadata: an ISO 3166-1 alpha-2 code, plus an optional map of sub-national states/regions for countries with state-level VAT (US, Canada, Spain).",
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code, lowercase."
+          },
+          "states": {
+            "type": "object",
+            "description": "Map of state/region name to its combined country:state code. Only present for countries with sub-national VAT rates.",
+            "additionalProperties": {
+              "title": "StateCode",
+              "type": "string",
+              "description": "Combined country:state identifier (e.g. us:ca)."
+            }
+          }
+        }
+      },
+      "IbanCountryEntry": {
+        "type": "object",
+        "description": "A single country supported by the IBAN Validation API.",
+        "required": ["countryCode", "name"],
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "name": {
+            "type": "string",
+            "description": "Full country name."
+          }
+        }
+      },
+      "SwiftCountryEntry": {
+        "type": "object",
+        "description": "A single country supported by the SWIFT/BIC Code Lookup and Finder APIs.",
+        "required": ["name", "countryCode"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full country name."
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

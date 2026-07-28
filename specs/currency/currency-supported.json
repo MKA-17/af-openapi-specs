@@ -1,0 +1,234 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Currency Supported API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the complete list of all supported currencies with full metadata. Returns a map of currency codes to objects containing currency name, country code, country name, availability status, date range, and icon URL. Covers fiat currencies, cryptocurrencies, and precious metals.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Currency Supported API Server"
+    }
+  ],
+  "paths": {
+    "/currency/supported": {
+      "get": {
+        "tags": ["Currency APIs"],
+        "summary": "Get all supported currencies",
+        "description": "Returns a map of all supported currencies with metadata.",
+        "operationId": "getSupportedCurrencies",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedCurrenciesResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "supportedCurrenciesMap": {
+                        "USD": {
+                          "currencyCode": "USD",
+                          "currencyName": "US Dollar",
+                          "countryCode": "AS",
+                          "countryName": "American Samoa",
+                          "status": "AVAILABLE",
+                          "availableFrom": "2020-01-01",
+                          "availableUntil": "2026-06-18",
+                          "icon": "https://currencyfreaks.com/photos/flags/usd.png"
+                        },
+                        "BTC": {
+                          "currencyCode": "BTC",
+                          "currencyName": "Bitcoin",
+                          "countryCode": "Crypto",
+                          "countryName": "Global",
+                          "status": "AVAILABLE",
+                          "availableFrom": "2014-01-01",
+                          "availableUntil": "2026-06-18",
+                          "icon": "https://currencyfreaks.com/photos/flags/btc.png"
+                        },
+                        "XAU": {
+                          "currencyCode": "XAU",
+                          "currencyName": "Gold Ounce",
+                          "countryCode": "Metal",
+                          "countryName": "Precious Metal",
+                          "status": "AVAILABLE",
+                          "availableFrom": "2020-01-01",
+                          "availableUntil": "2026-06-18",
+                          "icon": "https://currencyfreaks.com/photos/flags/xau.png"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "Unsupported Media Type — format is not json or xml",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "badFormat": {
+                    "summary": "format value not supported",
+                    "value": {
+                      "error": "Unsupported Media Type",
+                      "message": "The media type specified in the request is not supported. For more details, please refer to the API documentation.",
+                      "path": "/v1.0/currency/supported",
+                      "status": 406,
+                      "timestamp": "2026-07-27T12:12:35.587Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SupportedCurrenciesResponse": {
+        "type": "object",
+        "required": ["supportedCurrenciesMap"],
+        "properties": {
+          "supportedCurrenciesMap": {
+            "type": "object",
+            "description": "Map of all supported currencies keyed by currency code. Each key is a currency code and the value contains full currency metadata.",
+            "additionalProperties": {
+              "title": "CurrencySupportedItem",
+              "$ref": "#/components/schemas/CurrencySupportedItem"
+            }
+          }
+        },
+        "description": "Currency supported response containing the map of all supported currencies."
+      },
+      "CurrencySupportedItem": {
+        "type": "object",
+        "description": "Metadata for a single supported currency.",
+        "required": [
+          "currencyCode",
+          "currencyName",
+          "countryCode",
+          "countryName",
+          "status",
+          "availableFrom",
+          "availableUntil",
+          "icon"
+        ],
+        "properties": {
+          "currencyCode": {
+            "type": "string",
+            "description": "Unique currency code (e.g., USD, BTC, XAU)."
+          },
+          "currencyName": {
+            "type": "string",
+            "description": "Full name of the currency."
+          },
+          "countryCode": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code. For crypto: Crypto. For metals: Metal."
+          },
+          "countryName": {
+            "type": "string",
+            "description": "Country name. For crypto: Global. For metals: Precious Metal."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["AVAILABLE", "DEPRECIATED"],
+            "description": "Availability status."
+          },
+          "availableFrom": {
+            "type": "string",
+            "description": "Date the currency became available (YYYY-MM-DD)."
+          },
+          "availableUntil": {
+            "type": "string",
+            "description": "Date the currency is or was available (YYYY-MM-DD)."
+          },
+          "icon": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL of the currency icon/flag image."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "ZIP Code Distance API - Straight-Line Distance Between ZIP & Postal Codes Worldwide",
+    "version": "1.0.0",
+    "description": "Calculate straight-line distances from a base point to up to 100 comparison postal codes in one request. The base point can be specified by a postal code or by exact latitude/longitude coordinates, but a `country` code is required either way. Supports six distance units: kilometers, miles, yards, meters, feet, and inches. Comparison codes with no match are silently omitted from the results array rather than returned as per-item errors — the array can be shorter than the requested compare list.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "ZIP Code Distance API Server"
+    }
+  ],
+  "paths": {
+    "/zipcode/distance": {
+      "post": {
+        "tags": ["ZIP Code APIs"],
+        "summary": "Get distance between postal codes",
+        "operationId": "getZipcodeDistance",
+        "description": "Calculates the distance from a base ZIP/postal code or coordinate pair to up to 100 comparison postal codes.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response. Possible values: json, xml."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Base point (code or coordinates), country, and the list of postal codes to compare against it.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistanceRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Base point by code",
+                  "value": {
+                    "code": "90210",
+                    "country": "US",
+                    "compare": ["10001", "94103"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with distances. Comparison codes with no match are omitted from results rather than represented as error entries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZipcodeDistanceResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Distances to two comparison codes",
+                    "value": {
+                      "result_count": 2,
+                      "results": [
+                        {
+                          "code": "10001",
+                          "distance": 3948.696
+                        },
+                        {
+                          "code": "94103",
+                          "distance": 544.134
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing/invalid body, country, or unit, or over the 100-code limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidBody": {
+                    "summary": "compare field missing or malformed",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:46.922Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 400,
+                      "error": "Request Body Invalid",
+                      "message": "Request body is missing required fields or is not in the expected format. Please refer to the API documentation."
+                    }
+                  },
+                  "MissingCountry": {
+                    "summary": "country is required even when the base point is given as coordinates",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:36.514Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 400,
+                      "error": "Country Code Missing",
+                      "message": "Provide a valid ISO 3166-1 alpha-2 country code."
+                    }
+                  },
+                  "BadCountry": {
+                    "summary": "country is not a valid ISO 3166-1 alpha-2 code",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:48.768Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 400,
+                      "error": "Invalid Country Code Provided",
+                      "message": "Only ISO 3166-1 alpha-2 codes country codes are supported."
+                    }
+                  },
+                  "InvalidUnit": {
+                    "summary": "unit is not one of the supported symbols",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:48.196Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 400,
+                      "error": "Invalid Unit Symbol",
+                      "message": "The provided unit symbol is invalid. Please refer to the documentation for supported units."
+                    }
+                  },
+                  "OverLimit": {
+                    "summary": "More than 100 compare codes submitted",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:47.652Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 400,
+                      "error": "Maximum Postal/Zip Code Limit Exceeded",
+                      "message": "A maximum of 100 postal/zip codes can be processed per request."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — None of the compare codes matched anything",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NotFound": {
+                    "summary": "No compare codes matched",
+                    "value": {
+                      "timestamp": "2026-07-27T11:20:49.310Z",
+                      "path": "/v1.0/zipcode/distance",
+                      "status": 404,
+                      "error": "Postal/Zip Codes Not Found",
+                      "message": "None of the provided postal/zip codes were found in our database."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ZipcodeDistanceResponse": {
+        "type": "object",
+        "description": "Distance calculation results for each comparison code that matched.",
+        "required": ["result_count", "results"],
+        "properties": {
+          "result_count": {
+            "type": "integer",
+            "description": "Number of distance results returned (may be less than the number of requested compare codes)."
+          },
+          "results": {
+            "type": "array",
+            "description": "Array of distance results, one per matched comparison code. Codes with no match are omitted.",
+            "items": {
+              "$ref": "#/components/schemas/ZipcodeDistanceItem"
+            }
+          }
+        }
+      },
+      "ZipcodeDistanceItem": {
+        "type": "object",
+        "description": "Distance from the base point to one matched comparison code.",
+        "required": ["code", "distance"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "The matched comparison ZIP/postal code."
+          },
+          "distance": {
+            "type": "number",
+            "format": "float",
+            "description": "Distance from the base point to this code, in the unit specified by the unit field (default km)."
+          }
+        }
+      },
+      "DistanceRequest": {
+        "type": "object",
+        "description": "Request body specifying the base point, country, and comparison codes for distance calculation.",
+        "required": ["country", "compare"],
+        "properties": {
+          "compare": {
+            "type": "array",
+            "description": "List of ZIP or postal codes to calculate distance from the base point. Maximum 100 codes.",
+            "items": {
+              "$ref": "#/components/schemas/DistanceCompareCode"
+            }
+          },
+          "code": {
+            "type": "string",
+            "description": "Base ZIP or postal code from which distances are calculated. Alternative to lat/long."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code for the base point. Required even when the base point is given as lat/long coordinates."
+          },
+          "lat": {
+            "type": "number",
+            "format": "float",
+            "description": "Base latitude coordinate (-90 to 90). Alternative to code."
+          },
+          "long": {
+            "type": "number",
+            "format": "float",
+            "description": "Base longitude coordinate (-180 to 180). Alternative to code."
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["km", "mi", "yd", "m", "ft", "in"],
+            "default": "km",
+            "description": "Distance unit for the returned values. Default: km."
+          }
+        }
+      },
+      "DistanceCompareCode": {
+        "type": "string",
+        "description": "A ZIP or postal code to compare against the base point."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

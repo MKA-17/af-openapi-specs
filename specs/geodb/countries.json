@@ -1,0 +1,276 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Countries API - Retrieve Global Countries Data",
+    "version": "1.0.0",
+    "description": "Retrieve a complete list of 250 countries and territories with ISO codes (alpha-2, alpha-3, numeric), capital cities, and geographic region/subregion assignments. Optionally filter by region or subregion name to narrow results. Each country object includes the full English name, ISO codes, numeric code, capital city, region, and subregion. Returns all countries by default when no filters are applied. capital, region, and subregion are empty strings (not omitted) for a handful of uninhabited or dependent territories with no assigned value, e.g. Bouvet Island and Heard Island and McDonald Islands have no region/subregion at all, and Antarctica/Tokelau/US Minor Outlying Islands have no capital.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Countries API Server"
+    }
+  ],
+  "paths": {
+    "/geo/countries": {
+      "get": {
+        "tags": ["GeoDB APIs"],
+        "summary": "Retrieve a list of countries with optional region or subregion filtering",
+        "description": "Returns all countries with their ISO codes, capital cities, regions, and subregions. Optional region and subregion parameters narrow results.",
+        "operationId": "getCountries",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter to return countries within a specific region (e.g., Europe, Asia).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subregion",
+            "in": "query",
+            "required": false,
+            "description": "Optional filter to return countries within a specific subregion (e.g., Northern Europe, Southern Asia).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of countries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountriesResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "countries": [
+                        {
+                          "name": "United Kingdom",
+                          "iso_alpha_2": "GB",
+                          "iso_alpha_3": "GBR",
+                          "iso_numeric": 826,
+                          "capital": "London",
+                          "region": "Europe",
+                          "subregion": "Northern Europe"
+                        },
+                        {
+                          "name": "France",
+                          "iso_alpha_2": "FR",
+                          "iso_alpha_3": "FRA",
+                          "iso_numeric": 250,
+                          "capital": "Paris",
+                          "region": "Europe",
+                          "subregion": "Western Europe"
+                        },
+                        {
+                          "name": "Germany",
+                          "iso_alpha_2": "DE",
+                          "iso_alpha_3": "DEU",
+                          "iso_numeric": 276,
+                          "capital": "Berlin",
+                          "region": "Europe",
+                          "subregion": "Western Europe"
+                        }
+                      ]
+                    }
+                  },
+                  "unassignedFields": {
+                    "summary": "Uninhabited/dependent territories — capital, region, and/or subregion come back as empty strings",
+                    "value": {
+                      "countries": [
+                        {
+                          "name": "Bouvet Island",
+                          "iso_alpha_2": "BV",
+                          "iso_alpha_3": "BVT",
+                          "iso_numeric": 74,
+                          "capital": "",
+                          "region": "",
+                          "subregion": ""
+                        },
+                        {
+                          "name": "Antarctica",
+                          "iso_alpha_2": "AQ",
+                          "iso_alpha_3": "ATA",
+                          "iso_numeric": 10,
+                          "capital": "",
+                          "region": "Polar",
+                          "subregion": ""
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid region or subregion name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidRegionName": {
+                    "summary": "Invalid region name",
+                    "value": {
+                      "timestamp": "2026-07-24T10:51:01.695Z",
+                      "path": "/v1/countries",
+                      "status": 400,
+                      "error": "Invalid Region Name provided",
+                      "message": "Please provide a valid region name."
+                    }
+                  },
+                  "InvalidSubregionName": {
+                    "summary": "Invalid subregion name",
+                    "value": {
+                      "timestamp": "2026-07-24T10:51:02.247Z",
+                      "path": "/v1/countries",
+                      "status": 400,
+                      "error": "Invalid Subregion Name provided",
+                      "message": "Please provide a valid subregion name."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CountriesResponse": {
+        "type": "object",
+        "description": "Response containing the list of countries matching the applied region/subregion filters (or all 250 when unfiltered).",
+        "required": ["countries"],
+        "properties": {
+          "countries": {
+            "type": "array",
+            "description": "An array of country objects matching the applied filters.",
+            "items": {
+              "$ref": "#/components/schemas/CountryItem"
+            }
+          }
+        }
+      },
+      "CountryItem": {
+        "type": "object",
+        "description": "A country object containing ISO codes, capital, and region information.",
+        "required": [
+          "name",
+          "iso_alpha_2",
+          "iso_alpha_3",
+          "iso_numeric",
+          "capital",
+          "region",
+          "subregion"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The full English name of the country."
+          },
+          "iso_alpha_2": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 two-letter country code."
+          },
+          "iso_alpha_3": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-3 three-letter country code."
+          },
+          "iso_numeric": {
+            "type": "integer",
+            "description": "The ISO 3166-1 numeric country code."
+          },
+          "capital": {
+            "type": "string",
+            "description": "The capital city of the country. Empty string for uninhabited/dependent territories with no capital."
+          },
+          "region": {
+            "type": "string",
+            "description": "The broad geographical region the country belongs to. Empty string for a small number of territories with no assigned region."
+          },
+          "subregion": {
+            "type": "string",
+            "description": "The more specific subregion the country belongs to. Empty string for a small number of territories with no assigned subregion."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

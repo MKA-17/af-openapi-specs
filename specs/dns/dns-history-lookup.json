@@ -1,0 +1,579 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "DNS History API - Historical DNS Records with Dated Snapshots for Any Hostname",
+    "version": "1.0.0",
+    "description": "Retrieve historical DNS records for any hostname with dated snapshots. Each snapshot includes queryTime, domainName, dnsTypes, and dnsRecords fields showing the full DNS state at that point in time. Supported record types include A, AAAA, MX, NS, SOA, SPF, TXT, and CNAME records. Results are paginated with up to 100 unique records per page. Use the format parameter to receive responses in JSON or XML.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "DNS History API Server"
+    }
+  ],
+  "paths": {
+    "/domain/dns/history": {
+      "get": {
+        "tags": ["DNS APIs"],
+        "summary": "Get all historical A, AAAA, MX, NS, SOA, SPF, TXT, and CNAME DNS records of a hostname",
+        "description": "Retrieve historical DNS records for any hostname. Access unique historical data for A, AAAA, MX, NS, SOA, SPF, TXT, and CNAME records,\nincluding subdomains. Results are paginated with up to 100 unique records per page.\n",
+        "operationId": "dnsHistoryLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "host-name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Hostname or URL whose historical DNS records are required"
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "A",
+                "AAAA",
+                "MX",
+                "NS",
+                "SOA",
+                "SPF",
+                "TXT",
+                "CNAME",
+                "all"
+              ]
+            },
+            "description": "A comma-separated list of DNS record types for lookup.\nPossible values: A, AAAA, MX, NS, SOA, SPF, TXT, CNAME, or all\n"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "description": "Page number for paginated results."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful DNS history lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DNSHistoryLookupResponse"
+                },
+                "examples": {
+                  "default": {
+                    "summary": "DNS history lookup for example.com",
+                    "value": {
+                      "totalRecords": 46,
+                      "totalPages": 1,
+                      "currentPage": 1,
+                      "historicalDnsRecords": [
+                        {
+                          "queryTime": "2025-12-16",
+                          "domainName": "example.com.",
+                          "dnsTypes": {
+                            "SOA": 6,
+                            "AAAA": 28,
+                            "A": 1,
+                            "NS": 2
+                          },
+                          "dnsRecords": [
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 4,
+                              "rawText": "example.com.\t\t4\tIN\tA\t23.192.228.84",
+                              "rRsetType": 1,
+                              "address": "23.192.228.84"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 4,
+                              "rawText": "example.com.\t\t4\tIN\tA\t23.215.0.136",
+                              "rRsetType": 1,
+                              "address": "23.215.0.136"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 278,
+                              "rawText": "example.com.\t\t278\tIN\tA\t23.220.75.245",
+                              "rRsetType": 1,
+                              "address": "23.220.75.245"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 278,
+                              "rawText": "example.com.\t\t278\tIN\tA\t23.220.75.232",
+                              "rRsetType": 1,
+                              "address": "23.220.75.232"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 4,
+                              "rawText": "example.com.\t\t4\tIN\tA\t23.215.0.138",
+                              "rRsetType": 1,
+                              "address": "23.215.0.138"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 4,
+                              "rawText": "example.com.\t\t4\tIN\tA\t23.192.228.80",
+                              "rRsetType": 1,
+                              "address": "23.192.228.80"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 89,
+                              "rawText": "example.com.\t\t89\tIN\tAAAA\t2600:1406:5e00:6:0:0:17ce:bc12",
+                              "rRsetType": 28,
+                              "address": "2600:1406:5e00:6:0:0:17ce:bc12"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 202,
+                              "rawText": "example.com.\t\t202\tIN\tAAAA\t2600:1406:bc00:53:0:0:b81e:94ce",
+                              "rRsetType": 28,
+                              "address": "2600:1406:bc00:53:0:0:b81e:94ce"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 89,
+                              "rawText": "example.com.\t\t89\tIN\tAAAA\t2600:1406:5e00:6:0:0:17ce:bc1b",
+                              "rRsetType": 28,
+                              "address": "2600:1406:5e00:6:0:0:17ce:bc1b"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 202,
+                              "rawText": "example.com.\t\t202\tIN\tAAAA\t2600:1408:ec00:36:0:0:1736:7f31",
+                              "rRsetType": 28,
+                              "address": "2600:1408:ec00:36:0:0:1736:7f31"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 202,
+                              "rawText": "example.com.\t\t202\tIN\tAAAA\t2600:1408:ec00:36:0:0:1736:7f24",
+                              "rRsetType": 28,
+                              "address": "2600:1408:ec00:36:0:0:1736:7f24"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 202,
+                              "rawText": "example.com.\t\t202\tIN\tAAAA\t2600:1406:bc00:53:0:0:b81e:94c8",
+                              "rRsetType": 28,
+                              "address": "2600:1406:bc00:53:0:0:b81e:94c8"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 6,
+                              "dnsType": "SOA",
+                              "ttl": 3600,
+                              "rawText": "example.com.\t\t3600\tIN\tSOA\tns.icann.org. noc.dns.icann.org. 2022091323 7200 3600 1209600 3600",
+                              "rRsetType": 6,
+                              "admin": "noc.dns.icann.org.",
+                              "host": "ns.icann.org.",
+                              "expire": 1209600,
+                              "minimum": 3600,
+                              "refresh": 7200,
+                              "retry": 3600,
+                              "serial": 2022091323
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 2,
+                              "dnsType": "NS",
+                              "ttl": 21600,
+                              "rawText": "example.com.\t\t21600\tIN\tNS\ta.iana-servers.net.",
+                              "rRsetType": 2,
+                              "singleName": "a.iana-servers.net."
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 2,
+                              "dnsType": "NS",
+                              "ttl": 21600,
+                              "rawText": "example.com.\t\t21600\tIN\tNS\tb.iana-servers.net.",
+                              "rRsetType": 2,
+                              "singleName": "b.iana-servers.net."
+                            }
+                          ]
+                        },
+                        {
+                          "queryTime": "2025-12-17",
+                          "domainName": "example.com.",
+                          "dnsTypes": {
+                            "AAAA": 28,
+                            "A": 1,
+                            "NS": 2
+                          },
+                          "dnsRecords": [
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 300,
+                              "rawText": "example.com.\t\t300\tIN\tA\t104.20.34.220",
+                              "rRsetType": 1,
+                              "address": "104.20.34.220"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 1,
+                              "dnsType": "A",
+                              "ttl": 300,
+                              "rawText": "example.com.\t\t300\tIN\tA\t172.66.144.113",
+                              "rRsetType": 1,
+                              "address": "172.66.144.113"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 300,
+                              "rawText": "example.com.\t\t300\tIN\tAAAA\t2606:4700:10:0:0:0:ac42:9071",
+                              "rRsetType": 28,
+                              "address": "2606:4700:10:0:0:0:ac42:9071"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 28,
+                              "dnsType": "AAAA",
+                              "ttl": 300,
+                              "rawText": "example.com.\t\t300\tIN\tAAAA\t2606:4700:10:0:0:0:6814:22dc",
+                              "rRsetType": 28,
+                              "address": "2606:4700:10:0:0:0:6814:22dc"
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 2,
+                              "dnsType": "NS",
+                              "ttl": 128,
+                              "rawText": "example.com.\t\t128\tIN\tNS\ta.iana-servers.net.",
+                              "rRsetType": 2,
+                              "singleName": "a.iana-servers.net."
+                            },
+                            {
+                              "name": "example.com",
+                              "type": 2,
+                              "dnsType": "NS",
+                              "ttl": 128,
+                              "rawText": "example.com.\t\t128\tIN\tNS\tb.iana-servers.net.",
+                              "rRsetType": 2,
+                              "singleName": "b.iana-servers.net."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid DNS type or malformed hostname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidType": {
+                    "summary": "Unsupported DNS record type",
+                    "value": {
+                      "timestamp": "2026-07-23T09:52:28.093Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please provide correct dns records type(s) [For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v2.0/dns/historical"
+                    }
+                  },
+                  "malformedHostname": {
+                    "summary": "Hostname missing a valid TLD",
+                    "value": {
+                      "timestamp": "2026-07-23T09:54:17.353Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value[For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v2.0/dns/historical"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — No DNS history records for the hostname",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "noRecords": {
+                    "summary": "No historical DNS records found",
+                    "value": {
+                      "timestamp": "2026-07-23T09:52:28.643Z",
+                      "status": 404,
+                      "error": "Record not Found",
+                      "message": "No Record Found across: zzsuperrandomnonexistent998877.com",
+                      "path": "/v2.0/dns/historical"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "DNSHistoryLookupResponse": {
+        "type": "object",
+        "description": "Paginated collection of historical DNS snapshots for the requested hostname.",
+        "required": [
+          "totalRecords",
+          "totalPages",
+          "currentPage",
+          "historicalDnsRecords"
+        ],
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "description": "Total number of pages available."
+          },
+          "currentPage": {
+            "type": "integer",
+            "description": "Current page number returned."
+          },
+          "totalRecords": {
+            "type": "integer",
+            "description": "Total number of unique DNS records found."
+          },
+          "historicalDnsRecords": {
+            "type": "array",
+            "description": "Array of dated DNS snapshots.",
+            "items": {
+              "$ref": "#/components/schemas/DnsHistoryRecord"
+            }
+          }
+        }
+      },
+      "DnsHistoryRecord": {
+        "type": "object",
+        "description": "A single dated DNS snapshot for the queried hostname.",
+        "required": ["queryTime", "domainName", "dnsTypes", "dnsRecords"],
+        "properties": {
+          "queryTime": {
+            "type": "string",
+            "description": "Date when the DNS snapshot was taken. (Format: YYYY-MM-DD)"
+          },
+          "domainName": {
+            "type": "string",
+            "description": "Queried domain name with trailing dot."
+          },
+          "dnsTypes": {
+            "$ref": "#/components/schemas/DnsTypes"
+          },
+          "dnsRecords": {
+            "type": "array",
+            "description": "Array of DNS records for this snapshot. Field presence varies by dnsType — see DnsRecord for which fields apply to which type.",
+            "items": {
+              "$ref": "#/components/schemas/DnsRecord"
+            }
+          }
+        }
+      },
+      "DnsTypes": {
+        "type": "object",
+        "description": "Map of each DNS record type present in dnsRecords to its IANA DNS resource record type code (e.g. A: 1, AAAA: 28, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99). Indicates which record types were found in this snapshot, not how many of each — count entries in dnsRecords for that.",
+        "additionalProperties": {
+          "title": "DnsTypeCode",
+          "type": "integer",
+          "description": "IANA DNS resource record type code for this DNS record type (A: 1, AAAA: 28, CNAME: 5, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99)."
+        }
+      },
+      "DnsRecord": {
+        "type": "object",
+        "description": "A single DNS resource record. name, type, dnsType, ttl, rawText, and rRsetType are always present; every other field is populated only for the dnsType(s) noted in its description.",
+        "required": ["name", "type", "dnsType", "ttl", "rawText", "rRsetType"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the queried domain."
+          },
+          "type": {
+            "type": "integer",
+            "description": "DNS type code (1=A, 28=AAAA, 5=CNAME, 15=MX, 2=NS, 6=SOA, 16=TXT, 99=SPF)."
+          },
+          "dnsType": {
+            "type": "string",
+            "enum": ["A", "AAAA", "CNAME", "MX", "NS", "SOA", "TXT", "SPF"],
+            "description": "DNS record type as a string."
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Time to live in seconds."
+          },
+          "rawText": {
+            "type": "string",
+            "description": "Raw (un-parsed) DNS record text."
+          },
+          "rRsetType": {
+            "type": "integer",
+            "description": "Resource record set type code."
+          },
+          "address": {
+            "type": "string",
+            "description": "IPv4 or IPv6 address. Present only when dnsType is A or AAAA."
+          },
+          "target": {
+            "type": "string",
+            "description": "Target hostname. Present only when dnsType is CNAME or MX."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Mail server priority. Present only when dnsType is MX."
+          },
+          "singleName": {
+            "type": "string",
+            "description": "Authoritative name server. Present only when dnsType is NS."
+          },
+          "admin": {
+            "type": "string",
+            "description": "Administrative contact email. Present only when dnsType is SOA."
+          },
+          "host": {
+            "type": "string",
+            "description": "Primary name server. Present only when dnsType is SOA."
+          },
+          "expire": {
+            "type": "integer",
+            "description": "Expiry time in seconds. Present only when dnsType is SOA."
+          },
+          "minimum": {
+            "type": "integer",
+            "description": "Minimum TTL in seconds. Present only when dnsType is SOA."
+          },
+          "refresh": {
+            "type": "integer",
+            "description": "Refresh interval in seconds. Present only when dnsType is SOA."
+          },
+          "retry": {
+            "type": "integer",
+            "description": "Retry interval in seconds. Present only when dnsType is SOA."
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Serial number. Present only when dnsType is SOA."
+          },
+          "strings": {
+            "type": "array",
+            "description": "Verification or policy strings. Present only when dnsType is TXT or SPF.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

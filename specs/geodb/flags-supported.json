@@ -1,0 +1,166 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Supported Flags API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve the list of all country and international organization flags supported by the Flags API. Returns two arrays: `supported_countries` (238 entries) with country names and ISO codes for every available country flag, and `supported_organizations` (22 entries) with case-sensitive identifiers for international organization flags (e.g., United_Nations, NATO, European_Union). Use the returned identifiers with the Flags API's name parameter to retrieve actual flag images — organization identifiers must be passed exactly as listed here, including underscores and capitalization. This endpoint takes no required parameters and has no documented error responses.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Supported Flags API Server"
+    }
+  ],
+  "paths": {
+    "/flags/supported": {
+      "get": {
+        "tags": ["Flags APIs"],
+        "summary": "Retrieve list of all supported flags",
+        "description": "Returns a list of all supported country and international organization flags with their metadata.",
+        "operationId": "getSupportedFlags",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of supported flags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedFlagsResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": {
+                      "supported_countries": [
+                        {
+                          "name": "Luxembourg",
+                          "iso2": "LU",
+                          "iso3": "LUX"
+                        },
+                        {
+                          "name": "Suriname",
+                          "iso2": "SR",
+                          "iso3": "SUR"
+                        },
+                        {
+                          "name": "Tunisia",
+                          "iso2": "TN",
+                          "iso3": "TUN"
+                        },
+                        {
+                          "name": "Colombia",
+                          "iso2": "CO",
+                          "iso3": "COL"
+                        },
+                        {
+                          "name": "Pakistan",
+                          "iso2": "PK",
+                          "iso3": "PAK"
+                        }
+                      ],
+                      "supported_organizations": [
+                        "Commonwealth_of_Independent_States",
+                        "Gulf_Cooperation_Council",
+                        "Arab_League",
+                        "Organization_of_American_States",
+                        "African_Union",
+                        "European_Union",
+                        "United_Nations",
+                        "NATO",
+                        "Association_of_Southeast_Asian_Nations",
+                        "Commonwealth_of_Nations"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SupportedFlagsResponse": {
+        "type": "object",
+        "description": "The full list of country and organization flag identifiers supported by the Flags API.",
+        "required": ["supported_countries", "supported_organizations"],
+        "properties": {
+          "supported_countries": {
+            "type": "array",
+            "description": "List of all supported country flags with their ISO codes and names.",
+            "items": {
+              "$ref": "#/components/schemas/SupportedCountry"
+            }
+          },
+          "supported_organizations": {
+            "type": "array",
+            "description": "List of all supported international organization flag identifiers.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SupportedCountry": {
+        "type": "object",
+        "description": "A supported country with ISO codes.",
+        "required": ["name", "iso2", "iso3"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the country."
+          },
+          "iso2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 code."
+          },
+          "iso3": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 code."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

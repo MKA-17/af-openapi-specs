@@ -1,0 +1,215 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Commodity Symbols API Reference",
+    "version": "1.0.0",
+    "description": "List all supported commodity symbols available in the APIFreaks Commodity API. Returns an array of commodity objects with symbol, name, category, pricing currency, unit of measurement, status, and update interval. Supports metals, energy, agriculture, and livestock categories.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Commodity Symbols API Server"
+    }
+  ],
+  "paths": {
+    "/commodity/symbols": {
+      "get": {
+        "tags": ["Commodity APIs"],
+        "summary": "Get all supported commodity symbols",
+        "description": "Returns the list of supported commodity symbols with metadata.",
+        "operationId": "getCommoditySymbols",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Response format. Accepted values: `json` (default) or `xml`.",
+            "schema": {
+              "type": "string",
+              "enum": ["json"],
+              "default": "json"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommoditySymbolsResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Successful response",
+                    "value": {
+                      "success": true,
+                      "symbols": [
+                        {
+                          "symbol": "XAU",
+                          "name": "Gold",
+                          "category": "Metals",
+                          "status": "active",
+                          "updateInterval": "PER_SECOND",
+                          "currency": {
+                            "code": "USD",
+                            "name": "US Dollar",
+                            "symbol": "$"
+                          },
+                          "unit": {
+                            "symbol": "T.oz",
+                            "name": "Troy Ounce"
+                          }
+                        },
+                        {
+                          "symbol": "NG-FUT",
+                          "name": "Natural Gas Futures",
+                          "category": "Energy",
+                          "status": "active",
+                          "updateInterval": "PER_MINUTE",
+                          "currency": {
+                            "code": "USD",
+                            "name": "US Dollar",
+                            "symbol": "$"
+                          },
+                          "unit": {
+                            "symbol": "MMBtu",
+                            "name": "Million British Thermal Units"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "CommoditySymbolsResponse": {
+        "type": "object",
+        "required": ["success", "symbols"],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indicates whether the API request was successful."
+          },
+          "symbols": {
+            "type": "array",
+            "description": "Array of commodity symbol objects with metadata.",
+            "items": {
+              "$ref": "#/components/schemas/CommoditySymbolItem"
+            }
+          }
+        },
+        "description": "Commodity symbols response containing an array of supported commodity symbol objects."
+      },
+      "CommoditySymbolItem": {
+        "type": "object",
+        "description": "A single commodity symbol with metadata.",
+        "required": [
+          "symbol",
+          "name",
+          "category",
+          "status",
+          "updateInterval",
+          "currency",
+          "unit"
+        ],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Unique identifier/ticker symbol for the commodity (e.g., XAU, NG-FUT)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the commodity (e.g., Gold, Natural Gas Futures)."
+          },
+          "category": {
+            "type": "string",
+            "description": "Category the commodity belongs to (e.g., Metals, Energy)."
+          },
+          "status": {
+            "type": "string",
+            "description": "Current status of the commodity. Value: active."
+          },
+          "updateInterval": {
+            "type": "string",
+            "description": "Rate at which the price is updated. Values: PER_SECOND, PER_MINUTE."
+          },
+          "currency": {
+            "$ref": "#/components/schemas/CommodityCurrency"
+          },
+          "unit": {
+            "$ref": "#/components/schemas/CommodityUnit"
+          }
+        }
+      },
+      "CommodityCurrency": {
+        "type": "object",
+        "description": "Currency information for a commodity.",
+        "required": ["code", "name", "symbol"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "ISO 4217 currency code."
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the currency."
+          },
+          "symbol": {
+            "type": "string",
+            "description": "Symbol of the currency (e.g., $)."
+          }
+        }
+      },
+      "CommodityUnit": {
+        "type": "object",
+        "description": "Unit of measurement for a commodity.",
+        "required": ["symbol", "name"],
+        "properties": {
+          "symbol": {
+            "type": "string",
+            "description": "Abbreviated unit symbol (e.g., T.oz, MMBtu)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Full name of the unit of measurement (e.g., Troy Ounce)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

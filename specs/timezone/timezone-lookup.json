@@ -1,0 +1,910 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Timezone Lookup API - Get Timezone from IP, Coordinates, IATA Code & More",
+    "version": "2.0.0",
+    "description": "Resolve any location identifier to its current timezone, local time, UTC offset, and daylight saving time details. Accepts IP addresses, GPS coordinates, city or address strings, IATA/ICAO airport codes, UN/LOCODEs, and IANA timezone names. Always returns a time_zone object (IANA name, UTC offset with/without DST, current local time in multiple formats, DST transition dates); which other object accompanies it depends entirely on the identifier used. A tz name or lat/long coordinate pair returns time_zone only, with no location breakdown at all. A location address returns a basic location object (country, region, city, coordinates). An ip parameter, or no parameter at all (client-IP fallback), returns a richer location object with continent and country codes, EU membership, and postal code, plus a top-level ip field. An iata_code or icao_code returns an airport_details object instead of location. A lo_code returns a lo_code_details object instead of location.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v2.0",
+      "description": "Timezone Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/geolocation/timezone": {
+      "get": {
+        "tags": ["Timezone APIs"],
+        "summary": "Retrieve current time, date, and timezone information for any location identifier",
+        "description": "Get current time, date, and timezone details by specifying a timezone name, location address, GPS coordinates, IP address, IATA/ICAO airport code, UN/LOCODE, or use the client IP if no parameter is provided.",
+        "operationId": "getTimezone",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "required": false,
+            "description": "IPv4 or IPv6 address to extract timezone information.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tz",
+            "in": "query",
+            "required": false,
+            "description": "Timezone name in IANA format (e.g., Asia/Kolkata) to retrieve information directly.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "Location string (preferably city and country) to extract timezone.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "description": "Latitude for geolocation-based timezone lookup. Only time_zone is returned for this mode; no location object is included.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "required": false,
+            "description": "Longitude for geolocation-based timezone lookup. Only time_zone is returned for this mode; no location object is included.",
+            "schema": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "description": "Response language for location fields. Default: en.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "en",
+                "de",
+                "ru",
+                "ja",
+                "fr",
+                "cn",
+                "es",
+                "cs",
+                "it",
+                "ko",
+                "fa",
+                "pt"
+              ],
+              "default": "en"
+            }
+          },
+          {
+            "name": "iata_code",
+            "in": "query",
+            "required": false,
+            "description": "3-letter IATA airport code (e.g., LHR) to extract timezone.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "icao_code",
+            "in": "query",
+            "required": false,
+            "description": "4-letter ICAO airport code (e.g., KJFK) to extract timezone.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lo_code",
+            "in": "query",
+            "required": false,
+            "description": "5-letter UN/LOCODE city code to extract timezone.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful timezone lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimezoneResponse"
+                },
+                "examples": {
+                  "locationLookup": {
+                    "summary": "Lookup by location address (location param) — basic location fields, DST active",
+                    "value": {
+                      "location": {
+                        "location_string": "London, UK",
+                        "country_name": "United Kingdom",
+                        "state_prov": "England",
+                        "city": "London",
+                        "locality": "",
+                        "latitude": "51.50002",
+                        "longitude": "-0.19244"
+                      },
+                      "time_zone": {
+                        "name": "Europe/London",
+                        "offset": 0,
+                        "offset_with_dst": 1,
+                        "current_time": "2026-07-24 11:27:58.516+0100",
+                        "current_time_unix": 1784888878.516,
+                        "date": "2026-07-24",
+                        "date_time": "2026-07-24 11:27:58",
+                        "date_time_txt": "Friday, July 24, 2026 11:27:58",
+                        "date_time_wti": "Fri, 24 Jul 2026 11:27:58 +0100",
+                        "date_time_ymd": "2026-07-24T11:27:58+0100",
+                        "time_24": "11:27:58",
+                        "time_12": "11:27:58 AM",
+                        "week": 30,
+                        "month": 7,
+                        "year": 2026,
+                        "year_abbr": "26",
+                        "current_tz_abbreviation": "BST",
+                        "current_tz_full_name": "British Summer Time",
+                        "standard_tz_abbreviation": "GMT",
+                        "standard_tz_full_name": "Greenwich Mean Time",
+                        "is_dst": true,
+                        "dst_savings": 1,
+                        "dst_exists": true,
+                        "dst_tz_abbreviation": "BST",
+                        "dst_tz_full_name": "British Summer Time",
+                        "dst_start": {
+                          "utc_time": "2026-03-29 TIME 01:00",
+                          "duration": "+1.00H",
+                          "gap": true,
+                          "date_time_after": "2026-03-29 TIME 02:00",
+                          "date_time_before": "2026-03-29 TIME 01:00",
+                          "overlap": false
+                        },
+                        "dst_end": {
+                          "utc_time": "2026-10-25 TIME 01:00",
+                          "duration": "-1.00H",
+                          "gap": false,
+                          "date_time_after": "2026-10-25 TIME 01:00",
+                          "date_time_before": "2026-10-25 TIME 02:00",
+                          "overlap": true
+                        }
+                      }
+                    }
+                  },
+                  "tzNameLookup": {
+                    "summary": "Lookup by IANA timezone name (tz param) — no location object at all; DST not observed here, so dst_start/dst_end are empty objects",
+                    "value": {
+                      "time_zone": {
+                        "name": "Asia/Kolkata",
+                        "offset": 5.5,
+                        "offset_with_dst": 5.5,
+                        "date": "2026-07-24",
+                        "date_time": "2026-07-24 15:57:57",
+                        "date_time_txt": "Friday, July 24, 2026 15:57:57",
+                        "date_time_wti": "Fri, 24 Jul 2026 15:57:57 +0530",
+                        "date_time_ymd": "2026-07-24T15:57:57+0530",
+                        "current_time": "2026-07-24 15:57:57.984+0530",
+                        "current_time_unix": 1784888877.984,
+                        "time_24": "15:57:57",
+                        "time_12": "03:57:57 PM",
+                        "week": 30,
+                        "month": 7,
+                        "year": 2026,
+                        "year_abbr": "26",
+                        "current_tz_abbreviation": "IST",
+                        "current_tz_full_name": "India Standard Time",
+                        "standard_tz_abbreviation": "IST",
+                        "standard_tz_full_name": "India Standard Time",
+                        "is_dst": false,
+                        "dst_savings": 0,
+                        "dst_exists": false,
+                        "dst_tz_abbreviation": "",
+                        "dst_tz_full_name": "",
+                        "dst_start": {},
+                        "dst_end": {}
+                      }
+                    }
+                  },
+                  "ipLookup": {
+                    "summary": "Lookup by IP address (ip param, or default client IP) — full geo-IP location fields, includes top-level ip, never location_string",
+                    "value": {
+                      "ip": "8.8.8.8",
+                      "location": {
+                        "continent_code": "NA",
+                        "continent_name": "North America",
+                        "country_code2": "US",
+                        "country_code3": "USA",
+                        "country_name": "United States",
+                        "country_name_official": "United States of America",
+                        "is_eu": false,
+                        "state_prov": "California",
+                        "state_code": "US-CA",
+                        "district": "Santa Clara",
+                        "city": "Mountain View",
+                        "zipcode": "94043-1351",
+                        "latitude": "37.42240",
+                        "longitude": "-122.08421"
+                      },
+                      "time_zone": {
+                        "name": "America/Los_Angeles",
+                        "offset": -8,
+                        "offset_with_dst": -7,
+                        "date": "2026-07-24",
+                        "date_time": "2026-07-24 03:27:59",
+                        "date_time_txt": "Friday, July 24, 2026 03:27:59",
+                        "date_time_wti": "Fri, 24 Jul 2026 03:27:59 -0700",
+                        "date_time_ymd": "2026-07-24T03:27:59-0700",
+                        "current_time": "2026-07-24 03:27:59.032-0700",
+                        "current_time_unix": 1784888879.032,
+                        "time_24": "03:27:59",
+                        "time_12": "03:27:59 AM",
+                        "week": 30,
+                        "month": 7,
+                        "year": 2026,
+                        "year_abbr": "26",
+                        "current_tz_abbreviation": "PDT",
+                        "current_tz_full_name": "Pacific Daylight Time",
+                        "standard_tz_abbreviation": "PST",
+                        "standard_tz_full_name": "Pacific Standard Time",
+                        "is_dst": true,
+                        "dst_savings": 1,
+                        "dst_exists": true,
+                        "dst_tz_abbreviation": "PDT",
+                        "dst_tz_full_name": "Pacific Daylight Time",
+                        "dst_start": {
+                          "utc_time": "2026-03-08 TIME 10:00",
+                          "duration": "+1.00H",
+                          "gap": true,
+                          "date_time_after": "2026-03-08 TIME 03:00",
+                          "date_time_before": "2026-03-08 TIME 02:00",
+                          "overlap": false
+                        },
+                        "dst_end": {
+                          "utc_time": "2026-11-01 TIME 09:00",
+                          "duration": "-1.00H",
+                          "gap": false,
+                          "date_time_after": "2026-11-01 TIME 01:00",
+                          "date_time_before": "2026-11-01 TIME 02:00",
+                          "overlap": true
+                        }
+                      }
+                    }
+                  },
+                  "airportLookup": {
+                    "summary": "Lookup by IATA/ICAO airport code — returns airport_details instead of location",
+                    "value": {
+                      "airport_details": {
+                        "type": "large_airport",
+                        "name": "John F Kennedy International Airport",
+                        "latitude": "40.63945",
+                        "longitude": "-73.77932",
+                        "elevation_ft": 13,
+                        "continent_code": "NA",
+                        "country_code": "US",
+                        "state_code": "US-NY",
+                        "city": "New York",
+                        "iata_code": "JFK",
+                        "icao_code": "KJFK",
+                        "faa_code": ""
+                      },
+                      "time_zone": {
+                        "name": "America/New_York",
+                        "offset": -5,
+                        "offset_with_dst": -4,
+                        "date": "2026-07-24",
+                        "date_time": "2026-07-24 06:28:14",
+                        "date_time_txt": "Friday, July 24, 2026 06:28:14",
+                        "date_time_wti": "Fri, 24 Jul 2026 06:28:14 -0400",
+                        "date_time_ymd": "2026-07-24T06:28:14-0400",
+                        "current_time": "2026-07-24 06:28:14.975-0400",
+                        "current_time_unix": 1784888894.975,
+                        "time_24": "06:28:14",
+                        "time_12": "06:28:14 AM",
+                        "week": 30,
+                        "month": 7,
+                        "year": 2026,
+                        "year_abbr": "26",
+                        "current_tz_abbreviation": "EDT",
+                        "current_tz_full_name": "Eastern Daylight Time",
+                        "standard_tz_abbreviation": "EST",
+                        "standard_tz_full_name": "Eastern Standard Time",
+                        "is_dst": true,
+                        "dst_savings": 1,
+                        "dst_exists": true,
+                        "dst_tz_abbreviation": "EDT",
+                        "dst_tz_full_name": "Eastern Daylight Time",
+                        "dst_start": {
+                          "utc_time": "2026-03-08 TIME 07:00",
+                          "duration": "+1.00H",
+                          "gap": true,
+                          "date_time_after": "2026-03-08 TIME 03:00",
+                          "date_time_before": "2026-03-08 TIME 02:00",
+                          "overlap": false
+                        },
+                        "dst_end": {
+                          "utc_time": "2026-11-01 TIME 06:00",
+                          "duration": "-1.00H",
+                          "gap": false,
+                          "date_time_after": "2026-11-01 TIME 01:00",
+                          "date_time_before": "2026-11-01 TIME 02:00",
+                          "overlap": true
+                        }
+                      }
+                    }
+                  },
+                  "loCodeLookup": {
+                    "summary": "Lookup by UN/LOCODE — returns lo_code_details instead of location",
+                    "value": {
+                      "lo_code_details": {
+                        "lo_code": "USNYC",
+                        "city": "New York",
+                        "state_code": "NY",
+                        "country_code": "US",
+                        "country_name": "",
+                        "location_type": "Port, Rail Terminal, Road Terminal, Airport, Postal Exchange",
+                        "latitude": "40.70000",
+                        "longitude": "-74.00000"
+                      },
+                      "time_zone": {
+                        "name": "America/New_York",
+                        "offset": -5,
+                        "offset_with_dst": -4,
+                        "date": "2026-07-24",
+                        "date_time": "2026-07-24 06:28:15",
+                        "date_time_txt": "Friday, July 24, 2026 06:28:15",
+                        "date_time_wti": "Fri, 24 Jul 2026 06:28:15 -0400",
+                        "date_time_ymd": "2026-07-24T06:28:15-0400",
+                        "current_time": "2026-07-24 06:28:15.999-0400",
+                        "current_time_unix": 1784888895.999,
+                        "time_24": "06:28:15",
+                        "time_12": "06:28:15 AM",
+                        "week": 30,
+                        "month": 7,
+                        "year": 2026,
+                        "year_abbr": "26",
+                        "current_tz_abbreviation": "EDT",
+                        "current_tz_full_name": "Eastern Daylight Time",
+                        "standard_tz_abbreviation": "EST",
+                        "standard_tz_full_name": "Eastern Standard Time",
+                        "is_dst": true,
+                        "dst_savings": 1,
+                        "dst_exists": true,
+                        "dst_tz_abbreviation": "EDT",
+                        "dst_tz_full_name": "Eastern Daylight Time",
+                        "dst_start": {
+                          "utc_time": "2026-03-08 TIME 07:00",
+                          "duration": "+1.00H",
+                          "gap": true,
+                          "date_time_after": "2026-03-08 TIME 03:00",
+                          "date_time_before": "2026-03-08 TIME 02:00",
+                          "overlap": false
+                        },
+                        "dst_end": {
+                          "utc_time": "2026-11-01 TIME 06:00",
+                          "duration": "-1.00H",
+                          "gap": false,
+                          "date_time_after": "2026-11-01 TIME 01:00",
+                          "date_time_before": "2026-11-01 TIME 02:00",
+                          "overlap": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid coordinates, timezone name, IP address, or airport code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidCoordinates": {
+                    "summary": "Invalid coordinates range",
+                    "value": {
+                      "message": "'latitude' (999) or 'longitude' (0) is not valid. 'latitude' must be between -90.0 and +90.0 and 'longitude' must be between -180.0 and +180.0."
+                    }
+                  },
+                  "InvalidTimezone": {
+                    "summary": "Invalid timezone name",
+                    "value": {
+                      "message": "Check whether your input values are correct; time_zone_name = Invalid/Timezone"
+                    }
+                  },
+                  "InvalidIP": {
+                    "summary": "Invalid IP address",
+                    "value": {
+                      "message": "'999.999.999.999' is not an IP string literal."
+                    }
+                  },
+                  "InvalidIata": {
+                    "summary": "Invalid IATA code",
+                    "value": {
+                      "message": "Invalid IATA code: INVALID. IATA code must be in the format of AAA."
+                    }
+                  },
+                  "InvalidIcao": {
+                    "summary": "Invalid ICAO code",
+                    "value": {
+                      "message": "Invalid ICAO code: INVALID. ICAO code must be in the format of AAAA."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Location address not found, or LO code has no matching data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "LocationNotFound": {
+                    "summary": "Location not found",
+                    "value": {
+                      "message": "We couldn't find the location (ZZZNOTEXIST). Try a city or state level location address only."
+                    }
+                  },
+                  "InvalidLoCode": {
+                    "summary": "UN/LOCODE not found",
+                    "value": {
+                      "message": "'Data not found for the provided LO code: XXXXX Please contact at support@ipgeolocation.io if provided LO code exists.'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "TimezoneResponse": {
+        "type": "object",
+        "required": ["time_zone"],
+        "properties": {
+          "ip": {
+            "type": "string",
+            "description": "The IP address used for the timezone lookup. Present when queried using the ip parameter, or with no location-identifying parameter at all (client-IP fallback). Absent for every other lookup mode."
+          },
+          "time_zone": {
+            "$ref": "#/components/schemas/TimeZone"
+          },
+          "location": {
+            "$ref": "#/components/schemas/TimezoneLocation"
+          },
+          "airport_details": {
+            "$ref": "#/components/schemas/AirportDetail"
+          },
+          "lo_code_details": {
+            "$ref": "#/components/schemas/LoCodeDetail"
+          }
+        },
+        "description": "Timezone lookup result. time_zone is always present. Exactly which other object accompanies it depends on the lookup mode: tz name and lat/long coordinates return time_zone only (no location, no ip); location address returns a basic location object; ip param or client-IP fallback returns a rich location object plus top-level ip; iata_code/icao_code returns airport_details instead of location; lo_code returns lo_code_details instead of location."
+      },
+      "TimeZone": {
+        "type": "object",
+        "description": "Timezone and date/time information for the location.",
+        "required": [
+          "name",
+          "offset",
+          "offset_with_dst",
+          "current_time",
+          "current_time_unix",
+          "date",
+          "date_time",
+          "date_time_txt",
+          "date_time_wti",
+          "date_time_ymd",
+          "time_24",
+          "time_12",
+          "week",
+          "month",
+          "year",
+          "year_abbr",
+          "current_tz_abbreviation",
+          "current_tz_full_name",
+          "standard_tz_abbreviation",
+          "standard_tz_full_name",
+          "is_dst",
+          "dst_savings",
+          "dst_exists"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The IANA timezone name/identifier for the location."
+          },
+          "offset": {
+            "type": "number",
+            "format": "float",
+            "description": "The Standard time zone offset from UTC in hours."
+          },
+          "offset_with_dst": {
+            "type": "number",
+            "format": "float",
+            "description": "The time zone offset from UTC in hours, accounting for DST."
+          },
+          "current_time": {
+            "type": "string",
+            "description": "The current date and time with timezone offset in YYYY-MM-DD HH:mm:ss.SSS\u00b1ZZZZ format."
+          },
+          "current_time_unix": {
+            "type": "number",
+            "format": "float",
+            "description": "The Unix timestamp representing the date and time in seconds."
+          },
+          "date": {
+            "type": "string",
+            "description": "The current date in YYYY-MM-DD format."
+          },
+          "date_time": {
+            "type": "string",
+            "description": "The current date and time in YYYY-MM-DD HH:mm:ss format."
+          },
+          "date_time_txt": {
+            "type": "string",
+            "description": "The current date and time in descriptive format EEEE, MMMM dd, yyyy HH:mm:ss."
+          },
+          "date_time_wti": {
+            "type": "string",
+            "description": "The date and time with time zone information in EEE, dd MMM yyyy HH:mm:ss Z format."
+          },
+          "date_time_ymd": {
+            "type": "string",
+            "description": "The date and time with timezone offset in ISO 8601 format YYYY-MM-DDTHH:mm:ss\u00b1HHMM."
+          },
+          "time_24": {
+            "type": "string",
+            "description": "The current time in 24-hour format HH:mm:ss."
+          },
+          "time_12": {
+            "type": "string",
+            "description": "The current time in 12-hour format with AM/PM notation."
+          },
+          "week": {
+            "type": "integer",
+            "description": "The week number of the year (1-52)."
+          },
+          "month": {
+            "type": "integer",
+            "description": "The current month as a number (1-12)."
+          },
+          "year": {
+            "type": "integer",
+            "description": "The four-digit current year."
+          },
+          "year_abbr": {
+            "type": "string",
+            "description": "The two-digit abbreviation for the year."
+          },
+          "current_tz_abbreviation": {
+            "type": "string",
+            "description": "Abbreviation of the time zone currently in effect (standard or DST)."
+          },
+          "current_tz_full_name": {
+            "type": "string",
+            "description": "Full name of the time zone currently in effect."
+          },
+          "standard_tz_abbreviation": {
+            "type": "string",
+            "description": "Abbreviation of the standard (non-DST) time zone."
+          },
+          "standard_tz_full_name": {
+            "type": "string",
+            "description": "Full name of the standard (non-DST) time zone."
+          },
+          "is_dst": {
+            "type": "boolean",
+            "description": "Is the time zone in daylight savings?"
+          },
+          "dst_tz_abbreviation": {
+            "type": "string",
+            "description": "Abbreviation of the DST time zone. Always present as a key; holds an empty string when dst_exists is false."
+          },
+          "dst_tz_full_name": {
+            "type": "string",
+            "description": "Full name of the DST time zone. Always present as a key; holds an empty string when dst_exists is false."
+          },
+          "dst_savings": {
+            "type": "number",
+            "format": "float",
+            "description": "The amount of time added for daylight saving in hours."
+          },
+          "dst_exists": {
+            "type": "boolean",
+            "description": "Indicates whether DST is observed in the region."
+          },
+          "dst_start": {
+            "$ref": "#/components/schemas/DstTransition"
+          },
+          "dst_end": {
+            "$ref": "#/components/schemas/DstTransition"
+          }
+        }
+      },
+      "DstTransition": {
+        "type": "object",
+        "description": "DST transition details (used for both the DST start and DST end transitions). Always present as a key on the parent TimeZone object; returned as an empty object {} when dst_exists is false, so none of its properties are required.",
+        "properties": {
+          "utc_time": {
+            "type": "string",
+            "description": "DST transition moment in UTC."
+          },
+          "duration": {
+            "type": "string",
+            "description": "Clock change at the DST transition, in hours."
+          },
+          "gap": {
+            "type": "boolean",
+            "description": "true if local time jumps forward (some times do not exist)."
+          },
+          "date_time_after": {
+            "type": "string",
+            "description": "Local date/time immediately after the DST transition."
+          },
+          "date_time_before": {
+            "type": "string",
+            "description": "Local date/time immediately before the DST transition."
+          },
+          "overlap": {
+            "type": "boolean",
+            "description": "true if local times repeat around the DST transition."
+          }
+        }
+      },
+      "TimezoneLocation": {
+        "type": "object",
+        "description": "Geographic location information. Only present for location (address) and ip (or client-IP fallback) lookups; absent for tz, lat/long, iata_code/icao_code, and lo_code lookups. Field set varies by mode: location returns location_string plus a basic field set (country_name, state_prov, city, locality, latitude, longitude); ip/default returns a richer geo-IP field set (continent_code, continent_name, country_code2, country_code3, country_name_official, is_eu, state_code, district, zipcode) plus the common fields, but never location_string or locality.",
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "The provided location parameter as location. Present only for location (address) lookups; absent for ip lookups."
+          },
+          "continent_code": {
+            "type": "string",
+            "description": "The two-letter code of the continent (e.g., NA). Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "The full name of the continent (e.g., North America). Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 two-letter country code (e.g., US). Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-3 three-letter country code (e.g., USA). Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "The common name of the country (e.g., United States). Present for both location and ip lookups."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "The official full name of the country (e.g., United States of America). Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Whether the country belongs to the European Union. Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "Name of the state/province/region. Present for both location and ip lookups."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Code of the state/province/region. Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "district": {
+            "type": "string",
+            "description": "Name of the district or county. Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "city": {
+            "type": "string",
+            "description": "Name of the city. Present for both location and ip lookups."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Smaller area, part or region of a city. Only present for location (address) lookups (may be an empty string); absent for ip lookups."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "ZIP/Postal code of the place. Geo-IP field only: present for ip param or default client-IP lookups; absent for location lookups."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "The geographic latitude of the location. Present for both location and ip lookups."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "The geographic longitude of the location. Present for both location and ip lookups."
+          }
+        }
+      },
+      "AirportDetail": {
+        "type": "object",
+        "description": "Airport information, present when queried by IATA or ICAO code.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Classification of the airport based on size and traffic."
+          },
+          "name": {
+            "type": "string",
+            "description": "The full name of the airport."
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The latitude coordinate of the airport."
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The longitude coordinate of the airport."
+          },
+          "elevation_ft": {
+            "type": "integer",
+            "description": "The elevation of the airport above sea level, measured in feet."
+          },
+          "continent_code": {
+            "type": "string",
+            "description": "The two-letter code of the continent."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 code for the country where the airport is located."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Code of the state/province/region where the airport is located."
+          },
+          "city": {
+            "type": "string",
+            "description": "The city or administrative region that the airport serves."
+          },
+          "iata_code": {
+            "type": "string",
+            "description": "The three-letter IATA airport code (e.g., LHR)."
+          },
+          "icao_code": {
+            "type": "string",
+            "description": "The four-letter ICAO airport code (e.g., EGLL)."
+          },
+          "faa_code": {
+            "type": "string",
+            "description": "The FAA location identifier, used primarily in the United States."
+          }
+        }
+      },
+      "LoCodeDetail": {
+        "type": "object",
+        "description": "UN/LOCODE location details, present when queried by LO code.",
+        "properties": {
+          "lo_code": {
+            "type": "string",
+            "description": "A unique identifier for the location, often used in logistics and shipping (e.g., USNYC)."
+          },
+          "city": {
+            "type": "string",
+            "description": "The name of the city or location associated with the LO code."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "The code for the state, province or region."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "The ISO 3166-1 alpha-2 country code (e.g., US)."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "The name of the country in an administrative context."
+          },
+          "location_type": {
+            "type": "string",
+            "description": "The type of location as comma-separated list of facilities (e.g., Port, Rail Terminal, Road Terminal, Airport)."
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The latitude coordinate of the location."
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "description": "The longitude coordinate of the location."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

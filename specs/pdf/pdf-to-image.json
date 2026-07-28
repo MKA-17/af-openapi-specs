@@ -1,0 +1,1219 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF to Image APIs - Convert PDF to JPG, PNG, TIFF, BMP & GIF",
+    "version": "1.0.0",
+    "description": "Convert PDF pages to image format. Supports PNG, JPEG, and WebP output formats. Returns a task ID for tracking the conversion progress.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF to Image API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/png": {
+      "post": {
+        "tags": [
+          "PDF To Image APIs"
+        ],
+        "summary": "Convert PDF to PNG",
+        "description": "This API converts a given PDF file into a sequence of PNG images.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output unrestricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies the pages or ranges at which to split the PDF. Accepts individual page numbers (e.g., '1') and/or page ranges (e.g., '4-2', 'last'). Ranges can be ascending or descending. Use commas to separate entries and hyphens for ranges. Alternatively, provide only one of the following keywords: 'even' (split at every even-numbered page), 'odd' (split at every odd-numbered page), 'last' (split at the last page only), or 'all' (split into single pages). Examples: '1,4-2,last', 'odd', 'all'. Mixing special keywords with specific pages/ranges is not allowed."
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Specifies the resolution (in DPI) for the output images. Acceptable Range is from 20 to 1200."
+          },
+          {
+            "name": "image_smoothing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Determines the smoothing options to apply during image conversion. Valid values are 'none', 'all' or a combination of 'text', 'line', and 'image' (comma-separated).If not provided, no smoothing will be applied."
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "bw",
+                "gray",
+                "rgb",
+                "rgba",
+                "4-bit",
+                "8-bit"
+              ]
+            },
+            "description": "Specifies the color profile for the output PNG images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to convert. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF converted to PNG successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "b48e5ed0-e5ce-41bd-953c-6c590ded4b20",
+                      "inputIds": [
+                        "6d994947-3909-46cf-91fe-24316c457e2a"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingFileOrID": {
+                    "summary": "Missing File or ID",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:09.542Z",
+                      "path": "/v1.0/pdf/png",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidFileID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/pdf/png",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:51:11.802Z"
+                    }
+                  },
+                  "InvalidImageProfile": {
+                    "summary": "Invalid Image Profile",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.081Z",
+                      "path": "/v1.0/pdf/png",
+                      "status": 400,
+                      "error": "Invalid Image Profile",
+                      "message": "Please provide a valid image profile. Refer to the documentation for valid profiles."
+                    }
+                  },
+                  "InvalidImageSmoothing": {
+                    "summary": "Invalid Image Smoothing",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:11.203Z",
+                      "path": "/v1.0/pdf/png",
+                      "status": 400,
+                      "error": "Invalid Image Smoothing",
+                      "message": "Please provide a valid smoothing option or combination. Refer to the documentation for valid options."
+                    }
+                  },
+                  "InvalidImageResolution": {
+                    "summary": "Invalid Image Resolution",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.648Z",
+                      "path": "/v1.0/pdf/png",
+                      "status": 400,
+                      "error": "Invalid Image Resolution",
+                      "message": "Please provide a valid image resolution(dpi). Refer to the documentation for valid resolution values."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "pdfToImage"
+      }
+    },
+    "/pdf/jpg": {
+      "post": {
+        "tags": [
+          "PDF To Image APIs"
+        ],
+        "summary": "Convert PDF to JPG",
+        "description": "This API converts a given PDF file into a sequence of JPG images.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output unrestricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "quality",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Controls JPG compression quality. Higher values yield sharper images with larger file sizes."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies the pages or ranges at which to split the PDF. Accepts individual page numbers (e.g., '1') and/or page ranges (e.g., '4-2', 'last'). Ranges can be ascending or descending. Use commas to separate entries and hyphens for ranges. Alternatively, provide only one of the following keywords: 'even' (split at every even-numbered page), 'odd' (split at every odd-numbered page), 'last' (split at the last page only), or 'all' (split into single pages). Examples: '1,4-2,last', 'odd', 'all'. Mixing special keywords with specific pages/ranges is not allowed."
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Specifies the resolution (in DPI) for the output images. Acceptable Range is from 20 to 1200."
+          },
+          {
+            "name": "image_smoothing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Determines the smoothing options to apply during image conversion. Valid values are 'none', 'all' or a combination of 'text', 'line', and 'image' (comma-separated).If not provided, no smoothing will be applied."
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "gray",
+                "rgb",
+                "cmyk"
+              ]
+            },
+            "description": "Specifies the color profile for the output JPG images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to convert. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF converted to JPG successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
+                      "inputIds": [
+                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingFileOrID": {
+                    "summary": "Missing File or ID",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:09.542Z",
+                      "path": "/v1.0/pdf/jpg",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidFileID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/pdf/jpg",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:51:11.802Z"
+                    }
+                  },
+                  "InvalidImageProfile": {
+                    "summary": "Invalid Image Profile",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.081Z",
+                      "path": "/v1.0/pdf/jpg",
+                      "status": 400,
+                      "error": "Invalid Image Profile",
+                      "message": "Please provide a valid image profile. Refer to the documentation for valid profiles."
+                    }
+                  },
+                  "InvalidImageSmoothing": {
+                    "summary": "Invalid Image Smoothing",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:11.203Z",
+                      "path": "/v1.0/pdf/jpg",
+                      "status": 400,
+                      "error": "Invalid Image Smoothing",
+                      "message": "Please provide a valid smoothing option or combination. Refer to the documentation for valid options."
+                    }
+                  },
+                  "InvalidImageQuality": {
+                    "summary": "Invalid Image Quality",
+                    "value": {
+                      "timestamp": "2025-08-18T10:22:25.866Z",
+                      "path": "/v1.0/pdf/jpg",
+                      "status": 400,
+                      "error": "Invalid Image Quality",
+                      "message": "Please provide a valid image quality value from 1 to 100."
+                    }
+                  },
+                  "InvalidImageResolution": {
+                    "summary": "Invalid Image Resolution",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.648Z",
+                      "path": "/v1.0/pdf/jpg",
+                      "status": 400,
+                      "error": "Invalid Image Resolution",
+                      "message": "Please provide a valid image resolution(dpi). Refer to the documentation for valid resolution values."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pdf/tif": {
+      "post": {
+        "tags": [
+          "PDF To Image APIs"
+        ],
+        "summary": "Convert a PDF file into a sequence of TIFF images.",
+        "description": "This API converts a given PDF file into a sequence of TIFF images. The output images can be saved as a single TIFF file, or as a sequence of TIFF files.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output unrestricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies the pages or ranges at which to split the PDF. Accepts individual page numbers (e.g., '1') and/or page ranges (e.g., '4-2', 'last'). Ranges can be ascending or descending. Use commas to separate entries and hyphens for ranges. Alternatively, provide only one of the following keywords: 'even' (split at every even-numbered page), 'odd' (split at every odd-numbered page), 'last' (split at the last page only), or 'all' (split into single pages). Examples: '1,4-2,last', 'odd', 'all'. Mixing special keywords with specific pages/ranges is not allowed."
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Specifies the resolution (in DPI) for the output images. Acceptable Range is from 20 to 1200."
+          },
+          {
+            "name": "image_smoothing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Determines the smoothing options to apply during image conversion. Valid values are 'none', 'all' or a combination of 'text', 'line', and 'image' (comma-separated).If not provided, no smoothing will be applied."
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "bw",
+                "gray",
+                "rgb",
+                "rgba",
+                "cmyk"
+              ]
+            },
+            "description": "Specifies the color profile for the output TIF images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to convert. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF converted to TIF successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
+                      "inputIds": [
+                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingFileOrID": {
+                    "summary": "Missing File or ID",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:09.542Z",
+                      "path": "/v1.0/pdf/tif",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidFileID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/pdf/tif",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:51:11.802Z"
+                    }
+                  },
+                  "InvalidImageProfile": {
+                    "summary": "Invalid Image Profile",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.081Z",
+                      "path": "/v1.0/pdf/tif",
+                      "status": 400,
+                      "error": "Invalid Image Profile",
+                      "message": "Please provide a valid image profile. Refer to the documentation for valid profiles."
+                    }
+                  },
+                  "InvalidImageSmoothing": {
+                    "summary": "Invalid Image Smoothing",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:11.203Z",
+                      "path": "/v1.0/pdf/tif",
+                      "status": 400,
+                      "error": "Invalid Image Smoothing",
+                      "message": "Please provide a valid smoothing option or combination. Refer to the documentation for valid options."
+                    }
+                  },
+                  "InvalidImageResolution": {
+                    "summary": "Invalid Image Resolution",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.648Z",
+                      "path": "/v1.0/pdf/tif",
+                      "status": 400,
+                      "error": "Invalid Image Resolution",
+                      "message": "Please provide a valid image resolution(dpi). Refer to the documentation for valid resolution values."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pdf/bmp": {
+      "post": {
+        "tags": [
+          "PDF To Image APIs"
+        ],
+        "summary": "Convert PDF to BMP",
+        "description": "Converts a PDF file to a BMP image.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output unrestricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies the pages or ranges at which to split the PDF. Accepts individual page numbers (e.g., '1') and/or page ranges (e.g., '4-2', 'last'). Ranges can be ascending or descending. Use commas to separate entries and hyphens for ranges. Alternatively, provide only one of the following keywords: 'even' (split at every even-numbered page), 'odd' (split at every odd-numbered page), 'last' (split at the last page only), or 'all' (split into single pages). Examples: '1,4-2,last', 'odd', 'all'. Mixing special keywords with specific pages/ranges is not allowed."
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Specifies the resolution (in DPI) for the output images. Acceptable Range is from 20 to 1200."
+          },
+          {
+            "name": "image_smoothing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Determines the smoothing options to apply during image conversion. Valid values are 'none', 'all' or a combination of 'text', 'line', and 'image' (comma-separated).If not provided, no smoothing will be applied."
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "bw",
+                "gray",
+                "rgb",
+                "4-bit",
+                "8-bit"
+              ]
+            },
+            "description": "Specifies the color profile for the output BMP images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to convert. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF converted to BMP successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
+                      "inputIds": [
+                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingFileOrID": {
+                    "summary": "Missing File or ID",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:09.542Z",
+                      "path": "/v1.0/pdf/bmp",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidFileID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/pdf/bmp",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:51:11.802Z"
+                    }
+                  },
+                  "InvalidImageProfile": {
+                    "summary": "Invalid Image Profile",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.081Z",
+                      "path": "/v1.0/pdf/bmp",
+                      "status": 400,
+                      "error": "Invalid Image Profile",
+                      "message": "Please provide a valid image profile. Refer to the documentation for valid profiles."
+                    }
+                  },
+                  "InvalidImageSmoothing": {
+                    "summary": "Invalid Image Smoothing",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:11.203Z",
+                      "path": "/v1.0/pdf/bmp",
+                      "status": 400,
+                      "error": "Invalid Image Smoothing",
+                      "message": "Please provide a valid smoothing option or combination. Refer to the documentation for valid options."
+                    }
+                  },
+                  "InvalidImageResolution": {
+                    "summary": "Invalid Image Resolution",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.648Z",
+                      "path": "/v1.0/pdf/bmp",
+                      "status": 400,
+                      "error": "Invalid Image Resolution",
+                      "message": "Please provide a valid image resolution(dpi). Refer to the documentation for valid resolution values."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pdf/gif": {
+      "post": {
+        "tags": [
+          "PDF To Image APIs"
+        ],
+        "summary": "Convert PDF to GIF",
+        "description": "This API converts a given PDF file into a sequence of GIF images.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The unique ID of a PDF file already uploaded to the API Freaks server. Use this as an alternative to uploading a new file directly."
+          },
+          {
+            "name": "destroy",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If set to `true`, the input file(s) will be permanently deleted from the server immediately after the output PDF is generated."
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the output unrestricted PDF file. If not provided, a default name will be assigned."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Specifies the pages or ranges at which to split the PDF. Accepts individual page numbers (e.g., '1') and/or page ranges (e.g., '4-2', 'last'). Ranges can be ascending or descending. Use commas to separate entries and hyphens for ranges. Alternatively, provide only one of the following keywords: 'even' (split at every even-numbered page), 'odd' (split at every odd-numbered page), 'last' (split at the last page only), or 'all' (split into single pages). Examples: '1,4-2,last', 'odd', 'all'. Mixing special keywords with specific pages/ranges is not allowed."
+          },
+          {
+            "name": "resolution",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Specifies the resolution (in DPI) for the output images. Acceptable Range is from 20 to 1200."
+          },
+          {
+            "name": "image_smoothing",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Determines the smoothing options to apply during image conversion. Valid values are 'none', 'all' or a combination of 'text', 'line', and 'image' (comma-separated).If not provided, no smoothing will be applied."
+          },
+          {
+            "name": "profile",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "bw",
+                "gray",
+                "rgb",
+                "rgba",
+                "4-bit",
+                "8-bit"
+              ]
+            },
+            "description": "Specifies the color profile for the output GIF images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
+          },
+          {
+            "name": "webhook_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The URL to which the webhook notification will be sent after the task is completed."
+          },
+          {
+            "name": "webhook_failure_notification",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            },
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+          },
+          {
+            "name": "X-Webhook-Authorization",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional custom header for webhook requests. Format: `Key:Value` (e.g., `Authorization:Bearer token123`). This will be sent as an HTTP header in the webhook call."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file to convert. Alternatively, reference an already-uploaded file via the file_id query parameter instead of uploading here.",
+          "required": false,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/PdfFileUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF converted to GIF successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PDFResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Task created",
+                    "value": {
+                      "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
+                      "inputIds": [
+                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "MissingFileOrID": {
+                    "summary": "Missing File or ID",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:09.542Z",
+                      "path": "/v1.0/pdf/gif",
+                      "status": 400,
+                      "error": "Missing File or ID",
+                      "message": "Please provide either a file or a file ID."
+                    }
+                  },
+                  "InvalidFileID": {
+                    "summary": "file_id is malformed or does not exist",
+                    "value": {
+                      "error": "Invalid File ID Provided",
+                      "message": "Please provide a valid file ID",
+                      "path": "/pdf/gif",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:51:11.802Z"
+                    }
+                  },
+                  "InvalidImageProfile": {
+                    "summary": "Invalid Image Profile",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.081Z",
+                      "path": "/v1.0/pdf/gif",
+                      "status": 400,
+                      "error": "Invalid Image Profile",
+                      "message": "Please provide a valid image profile. Refer to the documentation for valid profiles."
+                    }
+                  },
+                  "InvalidImageSmoothing": {
+                    "summary": "Invalid Image Smoothing",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:11.203Z",
+                      "path": "/v1.0/pdf/gif",
+                      "status": 400,
+                      "error": "Invalid Image Smoothing",
+                      "message": "Please provide a valid smoothing option or combination. Refer to the documentation for valid options."
+                    }
+                  },
+                  "InvalidImageResolution": {
+                    "summary": "Invalid Image Resolution",
+                    "value": {
+                      "timestamp": "2026-07-27T10:51:10.648Z",
+                      "path": "/v1.0/pdf/gif",
+                      "status": 400,
+                      "error": "Invalid Image Resolution",
+                      "message": "Please provide a valid image resolution(dpi). Refer to the documentation for valid resolution values."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "PDFResponse": {
+        "type": "object",
+        "description": "Response containing the task ID and input file IDs for a PDF processing task.",
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "description": "Task ID of the requested task, used to check the task status."
+          },
+          "inputIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "File IDs for the input files provided for the task. Not returned when destroy parameter is true."
+          }
+        }
+      },
+      "PdfFileUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the PDF file to process.",
+        "required": [],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Raw PDF file bytes sent as a multipart/form-data field named 'file'. Omit this field entirely and pass file_id in the query string instead to use an already-uploaded file."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

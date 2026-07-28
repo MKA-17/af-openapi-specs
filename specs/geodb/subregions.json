@@ -1,0 +1,217 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Subregions API Reference",
+    "version": "1.0.0",
+    "description": "Retrieve all subregions within a specified geographical region, or all subregions across every region when none is specified. The region parameter is optional. Returns a flat array of subregion names such as Western Europe, Southern Asia, or Northern America. Invalid region names return a 400 error; a region with no subregions (Polar) returns a 404.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Subregions API Server"
+    }
+  ],
+  "paths": {
+    "/geo/subregions": {
+      "get": {
+        "tags": ["GeoDB APIs"],
+        "summary": "Retrieve subregions for a specific geographical region",
+        "description": "Returns all subregions within a specified region, or all subregions across every region when the region parameter is omitted.",
+        "operationId": "getSubregionsByRegion",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json, xml.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "description": "Name of the region to retrieve subregions for. Omit to return all subregions across every region.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with list of subregions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubregionsResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Filtered by region=Europe",
+                    "value": {
+                      "subregions": [
+                        "Eastern Europe",
+                        "Northern Europe",
+                        "Southern Europe",
+                        "Western Europe"
+                      ]
+                    }
+                  },
+                  "allRegions": {
+                    "summary": "region parameter omitted — all 22 subregions across every region",
+                    "value": {
+                      "subregions": [
+                        "Australia and New Zealand",
+                        "Caribbean",
+                        "Central America",
+                        "Central Asia",
+                        "Eastern Africa",
+                        "Eastern Asia",
+                        "Eastern Europe",
+                        "Melanesia",
+                        "Micronesia",
+                        "Middle Africa",
+                        "Northern Africa",
+                        "Northern America",
+                        "Northern Europe",
+                        "Polynesia",
+                        "South America",
+                        "South-Eastern Asia",
+                        "Southern Africa",
+                        "Southern Asia",
+                        "Southern Europe",
+                        "Western Africa",
+                        "Western Asia",
+                        "Western Europe"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Region name is not a recognized region",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidRegionName": {
+                    "summary": "Invalid region name",
+                    "value": {
+                      "timestamp": "2026-07-24T11:00:12.748Z",
+                      "path": "/v1/subregions",
+                      "status": 400,
+                      "error": "Invalid Region Name provided",
+                      "message": "Please provide a valid region name."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — Region is valid but has no subregions (e.g. Polar)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NoSubregions": {
+                    "summary": "No subregions for this region",
+                    "value": {
+                      "timestamp": "2026-07-24T11:00:06.003Z",
+                      "path": "/v1/subregions",
+                      "status": 404,
+                      "error": "No subregions exist",
+                      "message": "This region does not have any subregions."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "SubregionsResponse": {
+        "type": "object",
+        "description": "Response containing subregion names for the requested region, or all subregions across every region when unfiltered.",
+        "required": ["subregions"],
+        "properties": {
+          "subregions": {
+            "type": "array",
+            "description": "An array of subregion names within the specified region.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

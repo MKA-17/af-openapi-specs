@@ -1,0 +1,218 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Binary Resource Upload API Reference",
+    "version": "1.0.0",
+    "description": "Upload a PDF file as raw binary data in the request body. Returns file metadata including the file ID, file name, size, and type. This endpoint accepts the raw file bytes directly instead of multipart form-data.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Binary Resource Upload API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/resource/upload-binary": {
+      "post": {
+        "tags": [
+          "PDF Upload and Download APIs"
+        ],
+        "summary": "Upload a PDF in binary format",
+        "description": "This API uploads PDF files to the API Freaks server in binary format.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The desired name for the uploaded PDF file. This name will be used for storage on the server.\n\n\n **NOTE**: Please ensure file_name has extension `.pdf`."
+          }
+        ],
+        "requestBody": {
+          "description": "Raw PDF file bytes sent directly as the request body (not multipart).",
+          "required": true,
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary",
+                "description": "The PDF file to be uploaded to the API Freaks server in binary format."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF upload successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BinaryResourceUploadResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "File uploaded",
+                    "value": {
+                      "fileName": "binarytest.pdf",
+                      "fileId": "b0fbf78c-8fe2-49b6-ad3d-63efb4ac8e58"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing file_name or empty body",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingFileName": {
+                    "summary": "Missing file_name query parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/resource/upload-binary",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:48:14.902Z"
+                    }
+                  },
+                  "emptyBody": {
+                    "summary": "Empty request body",
+                    "value": {
+                      "timestamp": "2026-07-27T10:48:16.046Z",
+                      "path": "/v1.0/pdf/upload-binary",
+                      "status": 400,
+                      "error": "Invalid Parameter",
+                      "message": "Invalid parameter value provided for 'dataBufferFlux'."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 File extension not supported",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "UnsupportedFileType": {
+                    "summary": "Unsupported file type",
+                    "value": {
+                      "timestamp": "2026-07-27T10:48:15.449Z",
+                      "path": "/v1.0/pdf/upload-binary",
+                      "status": 415,
+                      "error": "Unsupported File Type",
+                      "message": "The provided file type is not supported. Refer to the documentation for valid file types."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "uploadResourceBinary"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "BinaryResourceUploadResponse": {
+        "type": "object",
+        "required": [
+          "fileName",
+          "fileId"
+        ],
+        "properties": {
+          "fileName": {
+            "type": "string",
+            "description": "The name of the uploaded file."
+          },
+          "fileId": {
+            "type": "string",
+            "description": "The unique identifier assigned to the uploaded file."
+          }
+        },
+        "description": "Binary resource upload response containing file metadata."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

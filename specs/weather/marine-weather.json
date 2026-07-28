@@ -1,0 +1,940 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Marine Weather API -  Ocean & Coastal Weather Data",
+    "version": "1.0.0",
+    "description": "Retrieve marine and ocean weather data for coastal and offshore locations by GPS coordinates, city name/address, or IP address. Returns wave height, wave direction, wave period, wind-wave and swell statistics, sea surface temperature, sea level height, and ocean current speed/direction. Omit `startDate`/`endDate` to get current conditions, or pass both to get a forecast up to 16 days ahead at `daily`, `hourly`, or `minutely` precision via the `precision` parameter. For locations with no nearby ocean data (inland cities, landlocked coordinates), the endpoint still returns a `200` response with every marine field set to `null` instead of an error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0/weather",
+      "description": "Marine Weather API Server"
+    }
+  ],
+  "paths": {
+    "/marine": {
+      "get": {
+        "tags": ["Weather APIs"],
+        "summary": "Dive into detailed marine weather forecasts for coastal and offshore locations",
+        "description": "Provides current or forecast marine conditions including wave height, wave direction, wave period, swell info, sea surface temperature, sea level height, and ocean currents. Accepts a location by GPS coordinates, city name/address, or IP address, and returns forecast data at daily, hourly, or minutely precision for up to 16 days ahead.",
+        "operationId": "getMarineWeather",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response. Possible values: json.",
+            "schema": {
+              "type": "string",
+              "enum": ["json"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "startDate",
+            "in": "query",
+            "required": false,
+            "description": "Starting date for marine forecast data in YYYY-MM-DD format. Must be today or a future date, and must be supplied together with endDate — providing only one of the two returns a 400 error. The difference between endDate and startDate must not exceed 16 days.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "endDate",
+            "in": "query",
+            "required": false,
+            "description": "End date for marine forecast data in YYYY-MM-DD format. Must be today or a future date, and must be supplied together with startDate — providing only one of the two returns a 400 error. The difference between endDate and startDate must not exceed 16 days.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "City name, place name, or full address.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "description": "Latitude of the location.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "required": false,
+            "description": "Longitude of the location.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "ip",
+            "in": "query",
+            "required": false,
+            "description": "IPv4, IPv6, or hostname for location inference. Defaults to the caller's IP address when location, lat/long, and ip are all omitted.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "precision",
+            "in": "query",
+            "required": false,
+            "description": "Precision of the marine forecast data. Only one of daily, hourly, or minutely is returned per request, matching this value. Default is daily.",
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "hourly", "minutely"],
+              "default": "daily"
+            }
+          },
+          {
+            "name": "timezone",
+            "in": "query",
+            "required": false,
+            "description": "IANA timezone identifier used to localize the results (e.g. America/New_York). Returns a 400 error if not a recognized timezone.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response — current marine conditions or a date-keyed forecast",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MarineResponse"
+                },
+                "examples": {
+                  "currentConditions": {
+                    "summary": "Current conditions (no date range)",
+                    "value": {
+                      "location": {
+                        "latitude": "51.50000",
+                        "longitude": "2.00000",
+                        "country_name": "United Kingdom",
+                        "state_prov": "",
+                        "city": "",
+                        "locality": "",
+                        "elevation": "",
+                        "timezone": "Etc/GMT",
+                        "timezone_abbreviation": "GMT"
+                      },
+                      "current": {
+                        "timestamp": "2026-07-24T11:30",
+                        "wave_height": 0.52,
+                        "wave_direction": 12,
+                        "wave_period": 5.75,
+                        "wind_wave_peak_period": 0.95,
+                        "wind_wave_height": 0,
+                        "wind_wave_direction": 220,
+                        "wind_wave_period": 0,
+                        "swell_wave_height": 0.52,
+                        "swell_wave_direction": 13,
+                        "swell_wave_period": 5.05,
+                        "swell_wave_peak_period": 6.3,
+                        "sea_level_height_msl": -1.04,
+                        "sea_surface_temperature": 20.5,
+                        "ocean_current_velocity": 0.4,
+                        "ocean_current_direction": 117
+                      }
+                    }
+                  },
+                  "inlandLocationNullData": {
+                    "summary": "Inland location — all marine fields null",
+                    "value": {
+                      "location": {
+                        "location_string": "Denver, Colorado",
+                        "country_name": "United States",
+                        "state_prov": "Colorado",
+                        "city": "Denver",
+                        "locality": "",
+                        "latitude": "39.73924",
+                        "longitude": "-104.98486",
+                        "elevation": "1609",
+                        "timezone": "America/Denver",
+                        "timezone_abbreviation": "GMT-6"
+                      },
+                      "current": {
+                        "timestamp": "2026-07-24T05:30",
+                        "wave_height": null,
+                        "wave_direction": null,
+                        "wave_period": null,
+                        "wind_wave_peak_period": null,
+                        "wind_wave_height": null,
+                        "wind_wave_direction": null,
+                        "wind_wave_period": null,
+                        "swell_wave_height": null,
+                        "swell_wave_direction": null,
+                        "swell_wave_period": null,
+                        "sea_level_height_msl": null,
+                        "sea_surface_temperature": null,
+                        "ocean_current_velocity": null,
+                        "ocean_current_direction": null
+                      }
+                    }
+                  },
+                  "dailyForecast": {
+                    "summary": "Daily forecast (startDate/endDate set)",
+                    "value": {
+                      "location": {
+                        "latitude": "51.50000",
+                        "longitude": "2.00000",
+                        "country_name": "United Kingdom",
+                        "state_prov": "",
+                        "city": "",
+                        "locality": "",
+                        "elevation": "",
+                        "timezone": "Etc/GMT",
+                        "timezone_abbreviation": "GMT"
+                      },
+                      "forecast": {
+                        "2026-07-25": {
+                          "daily": {
+                            "timestamp": "2026-07-25",
+                            "wave_height_max": 0.84,
+                            "wave_direction_dominant": 278,
+                            "wave_period_max": 4.05,
+                            "wind_wave_height_max": 0.78,
+                            "wind_wave_direction_dominant": 231,
+                            "wind_wave_period_max": 3.3,
+                            "wind_wave_peak_period_max": 4.3,
+                            "swell_wave_height_max": 0.56,
+                            "swell_wave_direction_dominant": 4,
+                            "swell_wave_period_max": 4.85,
+                            "swell_wave_peak_period_max": 6.3
+                          }
+                        },
+                        "2026-07-26": {
+                          "daily": {
+                            "timestamp": "2026-07-26",
+                            "wave_height_max": 1.02,
+                            "wave_direction_dominant": 238,
+                            "wave_period_max": 4.65,
+                            "wind_wave_height_max": 0.8,
+                            "wind_wave_direction_dominant": 269,
+                            "wind_wave_period_max": 3.3,
+                            "wind_wave_peak_period_max": 5.2,
+                            "swell_wave_height_max": 0.86,
+                            "swell_wave_direction_dominant": 218,
+                            "swell_wave_period_max": 4.7,
+                            "swell_wave_peak_period_max": 6.3
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — invalid or incomplete parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "invalidCoordinates": {
+                    "summary": "Invalid latitude/longitude",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:05.439Z",
+                      "status": 400,
+                      "message": "Invalid latitude or longitude values. Latitude must be between -90 and 90, and longitude must be between -180 and 180",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  },
+                  "invalidIp": {
+                    "summary": "Invalid IP address",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:18.421Z",
+                      "status": 400,
+                      "message": "Invalid IP address",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  },
+                  "invalidPrecision": {
+                    "summary": "Invalid precision value",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:19.621Z",
+                      "status": 400,
+                      "message": "Invalid precision",
+                      "error": "invalid-params",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  },
+                  "invalidTimezone": {
+                    "summary": "Invalid timezone",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:20.399Z",
+                      "status": 400,
+                      "message": "Invalid timezone",
+                      "error": "error",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  },
+                  "dateRangeExceeded": {
+                    "summary": "Forecast range exceeds 16 days",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:05.950Z",
+                      "status": 400,
+                      "message": "Forecast date range must be within 2026-07-24 to 2026-08-08",
+                      "error": "params-exception-error",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  },
+                  "incompleteDateRange": {
+                    "summary": "Only one of startDate/endDate supplied",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/weather/marine",
+                      "status": 400,
+                      "timestamp": "2026-07-24T11:35:30.525Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — location could not be resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "locationNotFound": {
+                    "summary": "Location not found",
+                    "value": {
+                      "timestamp": "2026-07-24T11:35:17.921Z",
+                      "status": 404,
+                      "message": "Location not found",
+                      "error": "error",
+                      "path": "/v1.0/weather/marine"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "MarineResponse": {
+        "type": "object",
+        "description": "Marine weather response. current and forecast are mutually exclusive: current is returned when startDate/endDate are omitted, forecast is returned when both are supplied. location is always present.",
+        "required": ["location"],
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/WeatherLocation"
+          },
+          "current": {
+            "$ref": "#/components/schemas/CurrentMarine",
+            "description": "Current marine conditions. Present only when startDate/endDate are not supplied."
+          },
+          "forecast": {
+            "$ref": "#/components/schemas/MarineForecastData",
+            "description": "Date-keyed forecast data. Present only when startDate and endDate are both supplied."
+          }
+        }
+      },
+      "LocationByCoordinates": {
+        "type": "object",
+        "description": "Location data when the target is specified by GPS coordinates (lat/long).",
+        "required": [
+          "latitude",
+          "longitude",
+          "country_name",
+          "state_prov",
+          "city",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude coordinate in decimal degrees, ranging from -90 (South Pole) to +90 (North Pole). Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude coordinate in decimal degrees, ranging from -180 (West) to +180 (East). Returned as a string, not a number."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full name of the country corresponding to the provided coordinates."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division name for the location. Can be an empty string."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name associated with the coordinate location. Can be an empty string."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, district, or village name within the broader area. Can be an empty string."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Height above mean sea level in meters for the specified coordinates. Returned as a string, not a number, and can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the location (e.g., America/New_York, Europe/London)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Abbreviated timezone representation based on current offset (e.g., EST, GMT, PST)."
+          }
+        }
+      },
+      "LocationByIP": {
+        "type": "object",
+        "description": "Location data when the target is inferred from an IP address.",
+        "required": [
+          "continent_code",
+          "continent_name",
+          "country_code2",
+          "country_code3",
+          "country_name",
+          "country_name_official",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "continent_code": {
+            "type": "string",
+            "description": "Two-letter continent code (e.g., NA for North America, EU for Europe, AS for Asia)."
+          },
+          "continent_name": {
+            "type": "string",
+            "description": "Full name of the continent where the IP address is registered."
+          },
+          "country_code2": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 two-letter country code (e.g., US, GB, FR)."
+          },
+          "country_code3": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3 three-letter country code (e.g., USA, GBR, FRA)."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Common name of the country associated with the IP address."
+          },
+          "country_name_official": {
+            "type": "string",
+            "description": "Official long-form country name as recognized internationally (e.g., United States of America)."
+          },
+          "is_eu": {
+            "type": "boolean",
+            "description": "Boolean flag indicating whether the country is a member state of the European Union."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division associated with the IP location."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "ISO 3166-2 subdivision code for the state or province (e.g., CA for California)."
+          },
+          "district": {
+            "type": "string",
+            "description": "District, county, or secondary administrative division within the region. Can be an empty string."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or urban area name where the IP address is geographically registered."
+          },
+          "zipcode": {
+            "type": "string",
+            "description": "Postal code or ZIP code for the approximate location of the IP address. Can be an empty string."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geographic latitude in decimal degrees for the IP geolocation, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geographic longitude in decimal degrees for the IP geolocation, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, or small area designation within the city. Can be an empty string."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters for the IP geolocation. Returned as a string, not a number, and can be an empty string when unavailable."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the IP location (e.g., America/Chicago, Asia/Tokyo)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation based on local offset (e.g., CST, JST, UTC)."
+          }
+        }
+      },
+      "LocationByAddress": {
+        "type": "object",
+        "description": "Location data when the target is specified by a city name or address string.",
+        "required": [
+          "location_string",
+          "country_name",
+          "state_prov",
+          "city",
+          "latitude",
+          "longitude",
+          "timezone",
+          "timezone_abbreviation"
+        ],
+        "properties": {
+          "location_string": {
+            "type": "string",
+            "description": "Original location query string as submitted, including full address or place name."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Resolved country name derived from the geocoded location query."
+          },
+          "state_prov": {
+            "type": "string",
+            "description": "State, province, or primary administrative division identified from the location."
+          },
+          "city": {
+            "type": "string",
+            "description": "City or municipal area name extracted from the geocoded location."
+          },
+          "locality": {
+            "type": "string",
+            "description": "Specific locality, neighborhood, suburb, or village within the geocoded area. Can be an empty string."
+          },
+          "latitude": {
+            "type": "string",
+            "description": "Geocoded latitude coordinate in decimal degrees, ranging from -90 to +90. Returned as a string, not a number."
+          },
+          "longitude": {
+            "type": "string",
+            "description": "Geocoded longitude coordinate in decimal degrees, ranging from -180 to +180. Returned as a string, not a number."
+          },
+          "elevation": {
+            "type": "string",
+            "description": "Elevation above mean sea level in meters at the geocoded coordinates. Returned as a string, not a number."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "IANA timezone database identifier for the geocoded location (e.g., America/Los_Angeles)."
+          },
+          "timezone_abbreviation": {
+            "type": "string",
+            "description": "Current timezone abbreviation for the location based on local offset (e.g., PDT, CET)."
+          }
+        }
+      },
+      "CurrentMarine": {
+        "type": "object",
+        "description": "Current marine weather conditions including wave, swell, sea level, and current data. For locations with no nearby ocean data (inland/landlocked), every field below timestamp is returned as null instead of an error.",
+        "required": [
+          "timestamp",
+          "wave_height",
+          "wave_direction",
+          "wave_period",
+          "wind_wave_height",
+          "wind_wave_direction",
+          "wind_wave_period",
+          "wind_wave_peak_period",
+          "swell_wave_height",
+          "swell_wave_direction",
+          "swell_wave_period",
+          "swell_wave_peak_period",
+          "sea_level_height_msl",
+          "sea_surface_temperature",
+          "ocean_current_velocity",
+          "ocean_current_direction"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp of the current observation."
+          },
+          "wave_height": {
+            "type": ["number", "null"],
+            "description": "Significant height of combined sea waves in meters. Null where no ocean data is available for this location."
+          },
+          "wave_direction": {
+            "type": ["number", "null"],
+            "description": "Direction from which the combined waves are coming, in degrees. Null where no ocean data is available for this location."
+          },
+          "wave_period": {
+            "type": ["number", "null"],
+            "description": "Average period of combined sea waves in seconds. Null where no ocean data is available for this location."
+          },
+          "wind_wave_height": {
+            "type": ["number", "null"],
+            "description": "Height of locally generated wind waves in meters. Null where no ocean data is available for this location."
+          },
+          "wind_wave_direction": {
+            "type": ["number", "null"],
+            "description": "Direction from which the wind waves are coming, in degrees. Null where no ocean data is available for this location."
+          },
+          "wind_wave_period": {
+            "type": ["number", "null"],
+            "description": "Average period of locally generated wind waves in seconds. Null where no ocean data is available for this location."
+          },
+          "wind_wave_peak_period": {
+            "type": ["number", "null"],
+            "description": "Peak period of locally generated wind waves in seconds. Frequently null even at locations with other wave data present."
+          },
+          "swell_wave_height": {
+            "type": ["number", "null"],
+            "description": "Height of swell waves in meters. Null where no ocean data is available for this location."
+          },
+          "swell_wave_direction": {
+            "type": ["number", "null"],
+            "description": "Direction from which the swell waves are coming, in degrees. Null where no ocean data is available for this location."
+          },
+          "swell_wave_period": {
+            "type": ["number", "null"],
+            "description": "Average period of swell waves in seconds. Null where no ocean data is available for this location."
+          },
+          "swell_wave_peak_period": {
+            "type": ["number", "null"],
+            "description": "Peak period of swell waves in seconds. Frequently null even at locations with other wave data present."
+          },
+          "sea_level_height_msl": {
+            "type": ["number", "null"],
+            "description": "Sea level height relative to mean sea level in meters. Null where no ocean data is available for this location."
+          },
+          "sea_surface_temperature": {
+            "type": ["number", "null"],
+            "description": "Temperature of the ocean surface in degrees Celsius. Null where no ocean data is available for this location."
+          },
+          "ocean_current_velocity": {
+            "type": ["number", "null"],
+            "description": "Speed of the ocean current in km/h. Null where no ocean data is available for this location."
+          },
+          "ocean_current_direction": {
+            "type": ["number", "null"],
+            "description": "Direction of the ocean current, in degrees. Null where no ocean data is available for this location."
+          }
+        }
+      },
+      "MarineDaily": {
+        "type": "object",
+        "description": "Daily marine forecast summary with wave, wind-wave, and swell statistics for one day.",
+        "required": [
+          "timestamp",
+          "wave_height_max",
+          "wave_direction_dominant",
+          "wave_period_max",
+          "wind_wave_height_max",
+          "wind_wave_direction_dominant",
+          "wind_wave_period_max",
+          "wind_wave_peak_period_max",
+          "swell_wave_height_max",
+          "swell_wave_direction_dominant",
+          "swell_wave_period_max",
+          "swell_wave_peak_period_max"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date",
+            "description": "Date of this forecast entry in YYYY-MM-DD format."
+          },
+          "wave_height_max": {
+            "type": ["number", "null"],
+            "description": "Maximum significant wave height for the day, in meters."
+          },
+          "wave_direction_dominant": {
+            "type": ["integer", "null"],
+            "description": "Dominant direction of waves for the day, in degrees."
+          },
+          "wave_period_max": {
+            "type": ["number", "null"],
+            "description": "Maximum wave period for the day, in seconds."
+          },
+          "wind_wave_height_max": {
+            "type": ["number", "null"],
+            "description": "Maximum wind-driven wave height for the day, in meters."
+          },
+          "wind_wave_direction_dominant": {
+            "type": ["integer", "null"],
+            "description": "Dominant wind-wave direction for the day, in degrees."
+          },
+          "wind_wave_period_max": {
+            "type": ["number", "null"],
+            "description": "Maximum wind-wave period for the day, in seconds."
+          },
+          "wind_wave_peak_period_max": {
+            "type": ["number", "null"],
+            "description": "Maximum peak period of wind-driven waves for the day, in seconds. Frequently null."
+          },
+          "swell_wave_height_max": {
+            "type": ["number", "null"],
+            "description": "Maximum swell wave height for the day, in meters."
+          },
+          "swell_wave_direction_dominant": {
+            "type": ["integer", "null"],
+            "description": "Dominant swell wave direction for the day, in degrees."
+          },
+          "swell_wave_period_max": {
+            "type": ["number", "null"],
+            "description": "Maximum swell wave period for the day, in seconds."
+          },
+          "swell_wave_peak_period_max": {
+            "type": ["number", "null"],
+            "description": "Maximum peak period of swell waves for the day, in seconds. Frequently null."
+          }
+        }
+      },
+      "MarineHourly": {
+        "type": "object",
+        "description": "Hourly marine weather reading with wave, swell, and sea surface data for a single hour.",
+        "required": [
+          "timestamp",
+          "wave_height",
+          "wave_direction",
+          "wave_period",
+          "wind_wave_height",
+          "wind_wave_peak_period",
+          "wind_wave_direction",
+          "wind_wave_period",
+          "swell_wave_height",
+          "swell_wave_direction",
+          "swell_wave_period",
+          "swell_wave_peak_period",
+          "sea_surface_temperature",
+          "sea_level_height_msl",
+          "ocean_current_velocity",
+          "ocean_current_direction"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp of this hourly entry."
+          },
+          "wave_height": {
+            "type": ["number", "null"],
+            "description": "Significant wave height at the given hour, in meters."
+          },
+          "wave_direction": {
+            "type": ["integer", "null"],
+            "description": "Wave direction at the given hour, in degrees."
+          },
+          "wave_period": {
+            "type": ["number", "null"],
+            "description": "Wave period at the given hour, in seconds."
+          },
+          "wind_wave_height": {
+            "type": ["number", "null"],
+            "description": "Wind-driven wave height at the given hour, in meters."
+          },
+          "wind_wave_peak_period": {
+            "type": ["number", "null"],
+            "description": "Peak period of wind-driven waves at the given hour, in seconds."
+          },
+          "wind_wave_direction": {
+            "type": ["integer", "null"],
+            "description": "Wind-wave direction at the given hour, in degrees."
+          },
+          "wind_wave_period": {
+            "type": ["number", "null"],
+            "description": "Wind-wave period at the given hour, in seconds."
+          },
+          "swell_wave_height": {
+            "type": ["number", "null"],
+            "description": "Swell wave height at the given hour, in meters."
+          },
+          "swell_wave_direction": {
+            "type": ["integer", "null"],
+            "description": "Swell wave direction at the given hour, in degrees."
+          },
+          "swell_wave_period": {
+            "type": ["number", "null"],
+            "description": "Swell wave period at the given hour, in seconds."
+          },
+          "swell_wave_peak_period": {
+            "type": ["number", "null"],
+            "description": "Peak period of swell waves at the given hour, in seconds."
+          },
+          "sea_surface_temperature": {
+            "type": ["number", "null"],
+            "description": "Sea surface temperature at the given hour, in degrees Celsius."
+          },
+          "sea_level_height_msl": {
+            "type": ["number", "null"],
+            "description": "Sea level height relative to mean sea level at the given hour, in meters."
+          },
+          "ocean_current_velocity": {
+            "type": ["number", "null"],
+            "description": "Speed of ocean current at the given hour, in km/h."
+          },
+          "ocean_current_direction": {
+            "type": ["integer", "null"],
+            "description": "Direction of ocean current at the given hour, in degrees."
+          }
+        }
+      },
+      "MarineMinutely": {
+        "type": "object",
+        "description": "Minute-by-minute marine data point for ocean current and sea level measurements.",
+        "required": [
+          "timestamp",
+          "ocean_current_velocity",
+          "ocean_current_direction",
+          "sea_level_height_msl"
+        ],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 formatted timestamp of this minute-level entry."
+          },
+          "ocean_current_velocity": {
+            "type": ["number", "null"],
+            "description": "Speed of ocean current at this minute, in km/h."
+          },
+          "ocean_current_direction": {
+            "type": ["integer", "null"],
+            "description": "Direction of ocean current at this minute, in degrees."
+          },
+          "sea_level_height_msl": {
+            "type": ["number", "null"],
+            "description": "Sea level height relative to mean sea level at this minute, in meters."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "WeatherLocation": {
+        "type": "object",
+        "description": "Location information. Shape depends on how the location was resolved (coordinates, IP, or address/city name).",
+        "oneOf": [
+          {
+            "description": "Location data when the target is specified by GPS coordinates (lat/long).",
+            "$ref": "#/components/schemas/LocationByCoordinates"
+          },
+          {
+            "description": "Location data when the target is inferred from an IP address.",
+            "$ref": "#/components/schemas/LocationByIP"
+          },
+          {
+            "description": "Location data when the target is specified by a city name or address string.",
+            "$ref": "#/components/schemas/LocationByAddress"
+          }
+        ]
+      },
+      "MarineForecastData": {
+        "type": "object",
+        "description": "Forecast data keyed by date (YYYY-MM-DD). Each key is a forecast date and its value is a MarineForecastDay.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/MarineForecastDay"
+        }
+      },
+      "MarineForecastDay": {
+        "type": "object",
+        "description": "Marine forecast for a single day. Exactly one of daily, hourly, or minutely is present, matching whichever precision value was requested (default daily) — the other two are omitted, not just empty.",
+        "properties": {
+          "daily": {
+            "$ref": "#/components/schemas/MarineDaily",
+            "description": "Daily marine forecast summary. Present when precision=daily (the default)."
+          },
+          "hourly": {
+            "type": "array",
+            "description": "Array of hourly marine readings for the day. Present when precision=hourly.",
+            "items": {
+              "$ref": "#/components/schemas/MarineHourly"
+            }
+          },
+          "minutely": {
+            "type": "array",
+            "description": "Array of minute-by-minute marine data points for the day. Present when precision=minutely.",
+            "items": {
+              "$ref": "#/components/schemas/MarineMinutely"
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

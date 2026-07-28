@@ -1,0 +1,698 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Bulk WHOIS Lookup API - Accurate and Efficient Mass Domain Queries",
+    "version": "1.0.0",
+    "description": "Retrieve the same real-time WHOIS registration and ownership data as the single-domain WHOIS Lookup API for up to 100 domain names in one request. The response is an object containing a `bulk_whois_response` array in request order; each entry is either a full WHOIS result (registrar, contacts, name servers, status codes, raw WHOIS text) or, if that specific domain's extension is unsupported or the lookup otherwise fails, an error object with `status: false` --- a bad domain in the batch does not fail the whole request. When the batch contains at least one such error alongside successful results, the endpoint returns `206 Partial Content` instead of `200`. Submitting more than 100 domain names returns a `413` error.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v2.0",
+      "description": "Bulk Domain WHOIS Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/domain/whois/live": {
+      "post": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Retrieve real-time WHOIS registration and ownership data for up to 100 domain names in a single request",
+        "description": "Returns the current WHOIS record for each requested domain, in request order. Supports up to 100 domain names per request; a domain that fails to resolve yields an error item instead of failing the whole batch.",
+        "operationId": "bulkWhoisLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkWhoisLookupRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Typical bulk lookup request",
+                  "value": {
+                    "domainNames": ["microsoft.com", "example.xn--tckwe"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "WHOIS data retrieved successfully for every requested domain",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkWhoisLookupResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "All domains resolved",
+                    "value": {
+                      "bulk_whois_response": [
+                        {
+                          "status": true,
+                          "domain_name": "example.xn--tckwe",
+                          "query_time": "2026-07-23 09:28:42",
+                          "whois_server": "https://tld-rdap.verisign.com/xn--tckwe/v1/",
+                          "domain_registered": "no"
+                        },
+                        {
+                          "status": true,
+                          "domain_name": "microsoft.com",
+                          "query_time": "2026-07-23 09:28:43",
+                          "whois_server": "whois.verisign-grs.com",
+                          "domain_registered": "yes",
+                          "create_date": "1991-05-02",
+                          "update_date": "2026-01-29",
+                          "expiry_date": "2027-05-03",
+                          "domain_registrar": {
+                            "iana_id": "292",
+                            "status": "accredited",
+                            "registrar_name": "MarkMonitor, Inc",
+                            "normalized_name": "markmonitor",
+                            "whois_server": "whois.markmonitor.com",
+                            "rdap_server": "https://rdap.markmonitor.com/rdap/",
+                            "website_url": "http://www.markmonitor.com",
+                            "email_address": "abusecomplaints@markmonitor.com",
+                            "phone_number": "+12086851750"
+                          },
+                          "registrant_contact": {
+                            "name": "Domain Administrator",
+                            "company": "Microsoft Corporation",
+                            "street": "One Microsoft Way,",
+                            "city": "Redmond",
+                            "state": "WA",
+                            "zip_code": "98052",
+                            "country_name": "United States",
+                            "country_code": "US",
+                            "email_address": "admin@domains.microsoft",
+                            "phone": "+14258828080",
+                            "fax": "+14259367329"
+                          },
+                          "technical_contact": {
+                            "name": "MSN Hostmaster",
+                            "country_name": "United States",
+                            "country_code": "US",
+                            "email_address": "msnhst@microsoft.com",
+                            "phone": "+14258828080"
+                          },
+                          "name_servers": [
+                            "ns4-39.azure-dns.info",
+                            "ns3-39.azure-dns.org",
+                            "ns1-39.azure-dns.com",
+                            "ns2-39.azure-dns.net"
+                          ],
+                          "domain_status": [
+                            "clientupdateprohibited",
+                            "clienttransferprohibited",
+                            "clientdeleteprohibited",
+                            "serverdeleteprohibited",
+                            "serverupdateprohibited",
+                            "servertransferprohibited"
+                          ],
+                          "whois_raw_domain": "\nDomain Name: microsoft.com\nRegistry Domain ID: 2724960_DOMAIN_COM-VRSN\nRegistrar WHOIS Server: whois.markmonitor.com\nRegistrar URL: http://www.markmonitor.com\nUpdated Date: 2026-01-29T18:46:57+0000\nCreation Date: 1991-05-02T04:00:00+0000\nRegistrar Registration Expiration Date: 2027-05-03T00:00:00+0000\nRegistrar: MarkMonitor, Inc.\nRegistrar IANA ID: 292\nRegistrar Abuse Contact: https://corp.markmonitor.com/domain/ui/abuse-report\nRegistrar Abuse Contact Phone: +1.2086851750\nDomain Status: clientUpdateProhibited (https://www.icann.org/epp#clientUpdateProhibited)\nDomain Status: clientTransferProhibited (https://www.icann.org/epp#clientTransferProhibited)\nDomain Status: clientDeleteProhibited (https://www.icann.org/epp#clientDeleteProhibited)\nDomain Status: serverUpdateProhibited (https://www.icann.org/epp#serverUpdateProhibited)\nDomain Status: serverTransferProhibited (https://www.icann.org/epp#serverTransferProhibited)\nDomain Status: serverDeleteProhibited (https://www.icann.org/epp#serverDeleteProhibited)\nRegistrant Name: Domain Administrator\nRegistrant Organization: Microsoft Corporation\nRegistrant Street: One Microsoft Way, \nRegistrant City: Redmond\nRegistrant State/Province: WA\nRegistrant Postal Code: 98052\nRegistrant Country: US\nRegistrant Phone: +1.4258828080\nRegistrant Phone Ext: \nRegistrant Fax: +1.4259367329\nRegistrant Fax Ext: \nRegistrant Email: admin@domains.microsoft\nTech Name: MSN Hostmaster\nTech Phone: +1.4258828080\nTech Email: msnhst@microsoft.com\nName Server: ns1-39.azure-dns.com\nName Server: ns3-39.azure-dns.org\nName Server: ns2-39.azure-dns.net\nName Server: ns4-39.azure-dns.info\nDNSSEC: unsigned\nURL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/\n>>> Last update of WHOIS database: 2026-07-23T09:28:02+0000 <<<\n\nFor more information on WHOIS status codes, please visit:\n  https://www.icann.org/resources/pages/epp-status-codes\n\nIf you wish to contact this domain’s Registrant or Technical\ncontact, and such email address is not visible above, you may do so via our web\nform, pursuant to ICANN’s Temporary Specification. To verify that you are not a\nrobot, please enter your email address to receive a link to a page that\nfacilitates email communication with the relevant contact(s).\n\nWeb-based WHOIS:\n  https://domains.markmonitor.com/whois/contact/microsoft.com\n\nIf you have a legitimate interest in viewing the non-public WHOIS details, send\nyour request and the reasons for your request to whoisrequest@markmonitor.com\nand specify the domain name in the subject line. We will review that request and\nmay ask for supporting documentation and explanation.\n\nThe data in MarkMonitor’s WHOIS database is provided for information purposes,\nand to assist persons in obtaining information about or related to a domain\nname’s registration record. While MarkMonitor believes the data to be accurate,\nthe data is provided \"as is\" with no guarantee or warranties regarding its\naccuracy.\n\nBy submitting a WHOIS query, you agree that you will use this data only for\nlawful purposes and that, under no circumstances will you use this data to:\n  (1) allow, enable, or otherwise support the transmission by email, telephone,\nor facsimile of mass, unsolicited, commercial advertising, or spam; or\n  (2) enable high volume, automated, or electronic processes that send queries,\ndata, or email to MarkMonitor (or its systems) or the domain name contacts (or\nits systems).\n\nMarkMonitor reserves the right to modify these terms at any time.\n\nBy submitting this query, you agree to abide by this policy.\n\nMarkMonitor Domain Management(TM)\nProtecting companies and consumers in a digital world.\n\nVisit MarkMonitor at https://www.markmonitor.com\nContact us at +1.8007459229\nIn Europe, at +44.02032062220\n----",
+                          "registry_data": {
+                            "domain_name": "MICROSOFT.COM",
+                            "query_time": "2026-07-23 09:28:42",
+                            "whois_server": "whois.verisign-grs.com",
+                            "domain_registered": "yes",
+                            "create_date": "1991-05-02",
+                            "update_date": "2026-01-29",
+                            "expiry_date": "2027-05-03",
+                            "domain_registrar": {
+                              "iana_id": "292",
+                              "registrar_name": "MarkMonitor Inc",
+                              "whois_server": "whois.markmonitor.com",
+                              "website_url": "http://www.markmonitor.com"
+                            },
+                            "name_servers": [
+                              "ns4-39.azure-dns.info",
+                              "ns3-39.azure-dns.org",
+                              "ns1-39.azure-dns.com",
+                              "ns2-39.azure-dns.net"
+                            ],
+                            "domain_status": [
+                              "clientupdateprohibited",
+                              "clientdeleteprohibited",
+                              "clienttransferprohibited",
+                              "serverdeleteprohibited",
+                              "serverupdateprohibited",
+                              "servertransferprohibited"
+                            ],
+                            "whois_raw_registery": "\nDomain Name: MICROSOFT.COM\n   Registry Domain ID: 2724960_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2026-01-29T18:46:57Z\n   Creation Date: 1991-05-02T04:00:00Z\n   Registry Expiry Date: 2027-05-03T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2086851750\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1-39.AZURE-DNS.COM\n   Name Server: NS2-39.AZURE-DNS.NET\n   Name Server: NS3-39.AZURE-DNS.ORG\n   Name Server: NS4-39.AZURE-DNS.INFO\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2026-07-23T09:28:23Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial Content — At least one domain in the batch returned an error; other domains in the same batch still resolved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkWhoisLookupResponse"
+                },
+                "examples": {
+                  "partialFailure": {
+                    "summary": "One domain unsupported, one resolved",
+                    "value": {
+                      "bulk_whois_response": [
+                        {
+                          "status": false,
+                          "domain_name": "zzzz.local",
+                          "status_code": 403,
+                          "error": "NotSupportedDomainExtException",
+                          "message": "We are not providing the whois of this domain extension (local)"
+                        },
+                        {
+                          "status": true,
+                          "domain_name": "microsoft.com",
+                          "query_time": "2026-07-23 09:28:55",
+                          "whois_server": "whois.verisign-grs.com",
+                          "domain_registered": "yes",
+                          "create_date": "1991-05-02",
+                          "update_date": "2026-01-29",
+                          "expiry_date": "2027-05-03",
+                          "domain_registrar": {
+                            "iana_id": "292",
+                            "status": "accredited",
+                            "registrar_name": "MarkMonitor, Inc",
+                            "normalized_name": "markmonitor",
+                            "whois_server": "whois.markmonitor.com",
+                            "rdap_server": "https://rdap.markmonitor.com/rdap/",
+                            "website_url": "http://www.markmonitor.com",
+                            "email_address": "abusecomplaints@markmonitor.com",
+                            "phone_number": "+12086851750"
+                          },
+                          "registrant_contact": {
+                            "name": "Domain Administrator",
+                            "company": "Microsoft Corporation",
+                            "street": "One Microsoft Way,",
+                            "city": "Redmond",
+                            "state": "WA",
+                            "zip_code": "98052",
+                            "country_name": "United States",
+                            "country_code": "US",
+                            "email_address": "admin@domains.microsoft",
+                            "phone": "+14258828080",
+                            "fax": "+14259367329"
+                          },
+                          "technical_contact": {
+                            "name": "MSN Hostmaster",
+                            "country_name": "United States",
+                            "country_code": "US",
+                            "email_address": "msnhst@microsoft.com",
+                            "phone": "+14258828080"
+                          },
+                          "name_servers": [
+                            "ns4-39.azure-dns.info",
+                            "ns3-39.azure-dns.org",
+                            "ns1-39.azure-dns.com",
+                            "ns2-39.azure-dns.net"
+                          ],
+                          "domain_status": [
+                            "clientupdateprohibited",
+                            "clienttransferprohibited",
+                            "clientdeleteprohibited",
+                            "serverdeleteprohibited",
+                            "serverupdateprohibited",
+                            "servertransferprohibited"
+                          ],
+                          "whois_raw_domain": "\nDomain Name: microsoft.com\nRegistry Domain ID: 2724960_DOMAIN_COM-VRSN\nRegistrar WHOIS Server: whois.markmonitor.com\nRegistrar URL: http://www.markmonitor.com\nUpdated Date: 2026-01-29T18:46:57+0000\nCreation Date: 1991-05-02T04:00:00+0000\nRegistrar Registration Expiration Date: 2027-05-03T00:00:00+0000\nRegistrar: MarkMonitor, Inc.\nRegistrar IANA ID: 292\nRegistrar Abuse Contact: https://corp.markmonitor.com/domain/ui/abuse-report\nRegistrar Abuse Contact Phone: +1.2086851750\nDomain Status: clientUpdateProhibited (https://www.icann.org/epp#clientUpdateProhibited)\nDomain Status: clientTransferProhibited (https://www.icann.org/epp#clientTransferProhibited)\nDomain Status: clientDeleteProhibited (https://www.icann.org/epp#clientDeleteProhibited)\nDomain Status: serverUpdateProhibited (https://www.icann.org/epp#serverUpdateProhibited)\nDomain Status: serverTransferProhibited (https://www.icann.org/epp#serverTransferProhibited)\nDomain Status: serverDeleteProhibited (https://www.icann.org/epp#serverDeleteProhibited)\nRegistrant Name: Domain Administrator\nRegistrant Organization: Microsoft Corporation\nRegistrant Street: One Microsoft Way, \nRegistrant City: Redmond\nRegistrant State/Province: WA\nRegistrant Postal Code: 98052\nRegistrant Country: US\nRegistrant Phone: +1.4258828080\nRegistrant Phone Ext: \nRegistrant Fax: +1.4259367329\nRegistrant Fax Ext: \nRegistrant Email: admin@domains.microsoft\nTech Name: MSN Hostmaster\nTech Phone: +1.4258828080\nTech Email: msnhst@microsoft.com\nName Server: ns1-39.azure-dns.com\nName Server: ns3-39.azure-dns.org\nName Server: ns2-39.azure-dns.net\nName Server: ns4-39.azure-dns.info\nDNSSEC: unsigned\nURL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/\n>>> Last update of WHOIS database: 2026-07-23T09:28:02+0000 <<<\n\nFor more information on WHOIS status codes, please visit:\n  https://www.icann.org/resources/pages/epp-status-codes\n\nIf you wish to contact this domain’s Registrant or Technical\ncontact, and such email address is not visible above, you may do so via our web\nform, pursuant to ICANN’s Temporary Specification. To verify that you are not a\nrobot, please enter your email address to receive a link to a page that\nfacilitates email communication with the relevant contact(s).\n\nWeb-based WHOIS:\n  https://domains.markmonitor.com/whois/contact/microsoft.com\n\nIf you have a legitimate interest in viewing the non-public WHOIS details, send\nyour request and the reasons for your request to whoisrequest@markmonitor.com\nand specify the domain name in the subject line. We will review that request and\nmay ask for supporting documentation and explanation.\n\nThe data in MarkMonitor’s WHOIS database is provided for information purposes,\nand to assist persons in obtaining information about or related to a domain\nname’s registration record. While MarkMonitor believes the data to be accurate,\nthe data is provided \"as is\" with no guarantee or warranties regarding its\naccuracy.\n\nBy submitting a WHOIS query, you agree that you will use this data only for\nlawful purposes and that, under no circumstances will you use this data to:\n  (1) allow, enable, or otherwise support the transmission by email, telephone,\nor facsimile of mass, unsolicited, commercial advertising, or spam; or\n  (2) enable high volume, automated, or electronic processes that send queries,\ndata, or email to MarkMonitor (or its systems) or the domain name contacts (or\nits systems).\n\nMarkMonitor reserves the right to modify these terms at any time.\n\nBy submitting this query, you agree to abide by this policy.\n\nMarkMonitor Domain Management(TM)\nProtecting companies and consumers in a digital world.\n\nVisit MarkMonitor at https://www.markmonitor.com\nContact us at +1.8007459229\nIn Europe, at +44.02032062220\n----",
+                          "registry_data": {
+                            "domain_name": "MICROSOFT.COM",
+                            "query_time": "2026-07-23 09:28:54",
+                            "whois_server": "whois.verisign-grs.com",
+                            "domain_registered": "yes",
+                            "create_date": "1991-05-02",
+                            "update_date": "2026-01-29",
+                            "expiry_date": "2027-05-03",
+                            "domain_registrar": {
+                              "iana_id": "292",
+                              "registrar_name": "MarkMonitor Inc",
+                              "whois_server": "whois.markmonitor.com",
+                              "website_url": "http://www.markmonitor.com"
+                            },
+                            "name_servers": [
+                              "ns4-39.azure-dns.info",
+                              "ns3-39.azure-dns.org",
+                              "ns1-39.azure-dns.com",
+                              "ns2-39.azure-dns.net"
+                            ],
+                            "domain_status": [
+                              "clientupdateprohibited",
+                              "clientdeleteprohibited",
+                              "clienttransferprohibited",
+                              "serverdeleteprohibited",
+                              "serverupdateprohibited",
+                              "servertransferprohibited"
+                            ],
+                            "whois_raw_registery": "\nDomain Name: MICROSOFT.COM\n   Registry Domain ID: 2724960_DOMAIN_COM-VRSN\n   Registrar WHOIS Server: whois.markmonitor.com\n   Registrar URL: http://www.markmonitor.com\n   Updated Date: 2026-01-29T18:46:57Z\n   Creation Date: 1991-05-02T04:00:00Z\n   Registry Expiry Date: 2027-05-03T04:00:00Z\n   Registrar: MarkMonitor Inc.\n   Registrar IANA ID: 292\n   Registrar Abuse Contact Email: abusecomplaints@markmonitor.com\n   Registrar Abuse Contact Phone: +1.2086851750\n   Domain Status: clientDeleteProhibited https://icann.org/epp#clientDeleteProhibited\n   Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited\n   Domain Status: clientUpdateProhibited https://icann.org/epp#clientUpdateProhibited\n   Domain Status: serverDeleteProhibited https://icann.org/epp#serverDeleteProhibited\n   Domain Status: serverTransferProhibited https://icann.org/epp#serverTransferProhibited\n   Domain Status: serverUpdateProhibited https://icann.org/epp#serverUpdateProhibited\n   Name Server: NS1-39.AZURE-DNS.COM\n   Name Server: NS2-39.AZURE-DNS.NET\n   Name Server: NS3-39.AZURE-DNS.ORG\n   Name Server: NS4-39.AZURE-DNS.INFO\n   DNSSEC: unsigned\n   URL of the ICANN Whois Inaccuracy Complaint Form: https://www.icann.org/wicf/\n>>> Last update of whois database: 2026-07-23T09:28:38Z <<<\n\nFor more information on Whois status codes, please visit https://icann.org/epp\n\nNOTICE: The expiration date displayed in this record is the date the\nregistrar's sponsorship of the domain name registration in the registry is\ncurrently set to expire. This date does not necessarily reflect the expiration\ndate of the domain name registrant's agreement with the sponsoring\nregistrar.  Users may consult the sponsoring registrar's Whois database to\nview the registrar's reported date of expiration for this registration.\n\nTERMS OF USE: You are not authorized to access or query our Whois\ndatabase through the use of electronic processes that are high-volume and\nautomated except as reasonably necessary to register domain names or\nmodify existing registrations; the Data in VeriSign Global Registry\nServices' (\"VeriSign\") Whois database is provided by VeriSign for\ninformation purposes only, and to assist persons in obtaining information\nabout or related to a domain name registration record. VeriSign does not\nguarantee its accuracy. By submitting a Whois query, you agree to abide\nby the following terms of use: You agree that you may use this Data only\nfor lawful purposes and that under no circumstances will you use this Data\nto: (1) allow, enable, or otherwise support the transmission of mass\nunsolicited, commercial advertising or solicitations via e-mail, telephone,\nor facsimile; or (2) enable high volume, automated, electronic processes\nthat apply to VeriSign (or its computer systems). The compilation,\nrepackaging, dissemination or other use of this Data is expressly\nprohibited without the prior written consent of VeriSign. You agree not to\nuse electronic processes that are automated and high-volume to access or\nquery the Whois database except as reasonably necessary to register\ndomain names or modify existing registrations. VeriSign reserves the right\nto restrict your access to the Whois database in its sole discretion to ensure\noperational stability.  VeriSign may restrict or terminate your access to the\nWhois database for failure to abide by these terms of use. VeriSign\nreserves the right to modify these terms at any time.\n\nThe Registry database contains ONLY .COM, .NET, .EDU domains and\nRegistrars."
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingBody": {
+                    "summary": "Missing domainNames array",
+                    "value": {
+                      "error": "Invalid request body Exception",
+                      "message": "Please provide data in required format in request body",
+                      "path": "/v2.0/domain/whois/live",
+                      "status": 400,
+                      "timestamp": "2026-07-23T09:28:56.641Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large — Request exceeds the 100-domain batch limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "payloadTooLarge": {
+                    "summary": "More than 100 domain names submitted",
+                    "value": {
+                      "error": "Payload too large Exception",
+                      "message": "Maximum request body size limit exceeded",
+                      "path": "/v2.0/domain/whois/live",
+                      "status": 413,
+                      "timestamp": "2026-07-23T09:28:57.228Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "BulkWhoisLookupRequest": {
+        "type": "object",
+        "description": "Request body for bulk domain WHOIS lookup.",
+        "required": ["domainNames"],
+        "properties": {
+          "domainNames": {
+            "type": "array",
+            "description": "List of domain names to retrieve WHOIS data for.",
+            "maxItems": 100,
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BulkWhoisLookupResponse": {
+        "type": "object",
+        "description": "Wrapper object containing one WHOIS result or error per requested domain, in request order.",
+        "required": ["bulk_whois_response"],
+        "properties": {
+          "bulk_whois_response": {
+            "type": "array",
+            "description": "Array of per-domain results, one entry per requested domain. Each entry is either a full WHOIS result or, if that domain could not be resolved, an error object.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/DomainWhoisLookupResponse"
+                },
+                {
+                  "$ref": "#/components/schemas/BulkWhoisLookupItemError"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "BulkWhoisLookupItemError": {
+        "type": "object",
+        "description": "Per-item error, returned in place of a WHOIS result when an individual domain's extension is unsupported or its lookup otherwise fails.",
+        "required": ["status", "domain_name", "status_code", "message"],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "enum": [false],
+            "description": "Always false for a per-item error."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name that this error applies to."
+          },
+          "status_code": {
+            "type": "integer",
+            "description": "HTTP-equivalent status code for this item's failure (e.g. 403 for an unsupported extension)."
+          },
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable reason this domain could not be resolved."
+          }
+        }
+      },
+      "DomainWhoisLookupResponse": {
+        "type": "object",
+        "description": "Current WHOIS registration record for one successfully resolved domain.",
+        "required": [
+          "status",
+          "domain_name",
+          "query_time",
+          "whois_server",
+          "domain_registered"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "true if this item was successfully processed."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name that was queried."
+          },
+          "query_time": {
+            "type": "string",
+            "description": "Timestamp when the WHOIS query was executed."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS or RDAP server that provided this record."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status; 'restricted' means the registry withholds registration details."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain was originally registered, when the domain is registered."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration was last updated, when the domain is registered."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the domain registration is set to expire, when the domain is registered."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record for the domain."
+          },
+          "reseller_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Reseller contact details, when the domain was registered through a reseller."
+          },
+          "registrant_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Domain registrant (owner) contact details."
+          },
+          "administrative_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Administrative contact details."
+          },
+          "technical_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Technical contact details."
+          },
+          "billing_contact": {
+            "$ref": "#/components/schemas/WhoisContactDetail",
+            "description": "Billing contact details."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers currently recorded for the domain.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes currently recorded for the domain.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_domain": {
+            "type": "string",
+            "description": "Raw WHOIS text as returned by the registrar's WHOIS server."
+          },
+          "registry_data": {
+            "$ref": "#/components/schemas/DomainWhoisRegistryData"
+          }
+        }
+      },
+      "DomainRegistrar": {
+        "type": "object",
+        "description": "Registrar of record for a domain, as published by either the registrar or the registry.",
+        "properties": {
+          "iana_id": {
+            "type": "string",
+            "description": "IANA registrar ID."
+          },
+          "status": {
+            "type": "string",
+            "description": "Registrar's ICANN accreditation status (e.g. accredited), when published at the registrar level."
+          },
+          "registrar_name": {
+            "type": "string",
+            "description": "Registered name of the registrar."
+          },
+          "normalized_name": {
+            "type": "string",
+            "description": "Lowercased, normalized form of the registrar name, when published at the registrar level."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "WHOIS server operated by the registrar."
+          },
+          "rdap_server": {
+            "type": "string",
+            "description": "RDAP server URL operated by the registrar, when published at the registrar level."
+          },
+          "website_url": {
+            "type": "string",
+            "description": "Registrar's website URL."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Registrar abuse or contact email address."
+          },
+          "phone_number": {
+            "type": "string",
+            "description": "Registrar contact phone number."
+          }
+        }
+      },
+      "WhoisContactDetail": {
+        "type": "object",
+        "description": "A contact record (registrant, administrative, technical, billing, or reseller) published in the domain's WHOIS record.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Contact's full name."
+          },
+          "company": {
+            "type": "string",
+            "description": "Contact's organization or company name."
+          },
+          "street": {
+            "type": "string",
+            "description": "Street address."
+          },
+          "city": {
+            "type": "string",
+            "description": "City."
+          },
+          "state": {
+            "type": "string",
+            "description": "State or province."
+          },
+          "zip_code": {
+            "type": "string",
+            "description": "Postal/ZIP code."
+          },
+          "country_name": {
+            "type": "string",
+            "description": "Full country name."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "email_address": {
+            "type": "string",
+            "description": "Contact email address, or a privacy-service redirect instruction."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Contact phone number."
+          },
+          "fax": {
+            "type": "string",
+            "description": "Contact fax number."
+          },
+          "mailing_address": {
+            "type": "string",
+            "description": "Full combined mailing address, when published as a single string."
+          }
+        }
+      },
+      "DomainWhoisRegistryData": {
+        "type": "object",
+        "description": "Registry-level (as opposed to registrar-level) WHOIS data, sourced directly from the TLD registry.",
+        "properties": {
+          "domain_name": {
+            "type": "string",
+            "description": "Domain name as recorded by the registry."
+          },
+          "query_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the registry-level record was queried."
+          },
+          "whois_server": {
+            "type": "string",
+            "description": "Registry WHOIS server that returned this data."
+          },
+          "domain_registered": {
+            "type": "string",
+            "enum": ["yes", "no", "restricted"],
+            "description": "Domain registration status as recorded by the registry."
+          },
+          "create_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain creation date as recorded by the registry."
+          },
+          "update_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain last-updated date as recorded by the registry."
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Domain expiry date as recorded by the registry."
+          },
+          "name_servers": {
+            "type": "array",
+            "description": "Name servers as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": "array",
+            "description": "EPP domain status codes as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_registery": {
+            "type": "string",
+            "description": "Raw WHOIS text as returned directly by the registry server."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar",
+            "description": "Registrar of record as recorded directly by the registry."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

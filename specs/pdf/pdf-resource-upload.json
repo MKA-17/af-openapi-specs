@@ -1,0 +1,248 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Resource Upload API Reference",
+    "version": "1.0.0",
+    "description": "Upload one or more PDF files to the server using multipart form-data. Returns an array of file metadata objects, one per uploaded file, each containing a `fileName` and a `fileId` for use in subsequent PDF processing operations (merge, split, compress, status checks, download, delete). Repeat the `file` form field to upload multiple files in a single request. Unsupported file types return a `415` error instead of a partial upload.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Resource Upload API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/resource/upload": {
+      "post": {
+        "tags": [
+          "PDF Upload and Download APIs"
+        ],
+        "summary": "Upload multiple PDFs and get file IDs",
+        "description": "This API uploads multiple PDF files to the API Freaks server and generates their unique file IDs.",
+        "operationId": "uploadResource",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "json",
+                "xml"
+              ],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the PDF file(s) to upload. Repeat the file field to upload multiple files in one request.",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/ResourceUploadRequest"
+              },
+              "examples": {
+                "typicalUpload": {
+                  "summary": "Upload a single PDF file",
+                  "value": {
+                    "file": "<binary PDF file content>"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF upload successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceUploadResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Single file uploaded",
+                    "value": {
+                      "files": [
+                        {
+                          "fileName": "test.pdf",
+                          "fileId": "b61a80d1-9b2d-4748-b3d1-04d747dedc8c"
+                        }
+                      ]
+                    }
+                  },
+                  "multipleFiles": {
+                    "summary": "Multiple files uploaded in one request",
+                    "value": {
+                      "files": [
+                        {
+                          "fileName": "test.pdf",
+                          "fileId": "9922d104-25a0-432c-8c26-2be2ba14798a"
+                        },
+                        {
+                          "fileName": "test.pdf",
+                          "fileId": "8a6b3332-6fe0-42b0-a808-df7a36926a79"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingFile": {
+                    "summary": "No file provided in the request body",
+                    "value": {
+                      "timestamp": "2026-07-27T10:42:36.770Z",
+                      "path": "/v1.0/pdf/upload",
+                      "status": 400,
+                      "error": "Missing or Invalid Parameters",
+                      "message": "One or more required parameters are missing or incorrect."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 File type not supported",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "unsupportedFileType": {
+                    "summary": "Unsupported file type",
+                    "value": {
+                      "timestamp": "2026-07-27T10:47:37.481Z",
+                      "path": "/v1.0/pdf/upload",
+                      "status": 415,
+                      "error": "Unsupported File Type",
+                      "message": "The provided file type is not supported. Refer to the documentation for valid file types."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ResourceUploadResponse": {
+        "type": "object",
+        "required": [
+          "files"
+        ],
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "fileName",
+                "fileId"
+              ],
+              "properties": {
+                "fileName": {
+                  "type": "string",
+                  "description": "Name of the uploaded file."
+                },
+                "fileId": {
+                  "type": "string",
+                  "description": "Unique ID of the uploaded file, used to reference it in processing operations."
+                }
+              }
+            },
+            "description": "Array of uploaded file metadata objects."
+          }
+        },
+        "description": "Resource upload response containing file metadata."
+      },
+      "ResourceUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the file to upload.",
+        "required": [],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "Raw PDF file bytes sent as a multipart/form-data field named 'file'. Repeat this field to upload multiple files in one request."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

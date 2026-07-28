@@ -1,0 +1,311 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "ZIP Code Distance Match API Reference",
+    "version": "1.0.0",
+    "description": "Find all pairs of postal codes within a specified distance threshold from a list of up to 100 input codes. Specify a maximum distance and receive every pair of codes whose separation is at or below that value; if no pairs fall within the threshold, a 200 with an empty results array is returned rather than a 404. Supports six distance units: kilometers, miles, yards, meters, feet, and inches. A `country` code is always required. Results include each matched pair with its calculated distance.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "ZIP Code Distance Match API Server"
+    }
+  ],
+  "paths": {
+    "/zipcode/distance/match": {
+      "post": {
+        "tags": ["ZIP Code APIs"],
+        "summary": "Get matching ZIP/postal code pairs within a distance",
+        "operationId": "getZipcodeDistanceMatch",
+        "description": "Returns every pair of the requested ZIP/postal codes whose distance from each other is at or below the given threshold.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response. Possible values: json, xml."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "The list of codes, their country, and an optional distance threshold and unit.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DistanceMatchRequest"
+              },
+              "examples": {
+                "typicalRequest": {
+                  "summary": "Find pairs within 5km",
+                  "value": {
+                    "codes": ["90210", "90211", "90212", "10001"],
+                    "country": "US",
+                    "distance": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response with matching ZIP code pairs. If none of the codes are within the distance threshold of each other, results is an empty array — this is not a 404.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZipcodeDistanceMatchResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Pairs within threshold",
+                    "value": {
+                      "result_count": 2,
+                      "results": [
+                        {
+                          "code_1": "90211",
+                          "code_2": "90212",
+                          "distance": 1.958
+                        },
+                        {
+                          "code_1": "90210",
+                          "code_2": "90212",
+                          "distance": 4.704
+                        }
+                      ]
+                    }
+                  },
+                  "noPairsWithinThreshold": {
+                    "summary": "No pairs within the threshold",
+                    "value": {
+                      "result_count": 0,
+                      "results": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing/invalid body, country, or unit, or over the 100-code limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidBody": {
+                    "summary": "codes field missing or malformed",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:58.473Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 400,
+                      "error": "Request Body Invalid",
+                      "message": "Request body is missing required fields or is not in the expected format. Please refer to the API documentation."
+                    }
+                  },
+                  "MissingCountry": {
+                    "summary": "Missing required country field",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:42.483Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 400,
+                      "error": "Country Code Missing",
+                      "message": "Provide a valid ISO 3166-1 alpha-2 country code."
+                    }
+                  },
+                  "BadCountry": {
+                    "summary": "country is not a valid ISO 3166-1 alpha-2 code",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:57.332Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 400,
+                      "error": "Invalid Country Code Provided",
+                      "message": "Only ISO 3166-1 alpha-2 codes country codes are supported."
+                    }
+                  },
+                  "InvalidUnit": {
+                    "summary": "unit is not one of the supported symbols",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:56.749Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 400,
+                      "error": "Invalid Unit Symbol",
+                      "message": "The provided unit symbol is invalid. Please refer to the documentation for supported units."
+                    }
+                  },
+                  "OverLimit": {
+                    "summary": "More than 100 codes submitted",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:57.961Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 400,
+                      "error": "Maximum Postal/Zip Code Limit Exceeded",
+                      "message": "A maximum of 100 postal/zip codes can be processed per request."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — None of the submitted codes matched anything",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "NotFound": {
+                    "summary": "No codes matched",
+                    "value": {
+                      "timestamp": "2026-07-27T11:21:59.589Z",
+                      "path": "/v1.0/zipcode/distance/match",
+                      "status": 404,
+                      "error": "Postal/Zip Codes Not Found",
+                      "message": "None of the provided postal/zip codes were found in our database."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ZipcodeDistanceMatchResponse": {
+        "type": "object",
+        "description": "Matching ZIP/postal code pairs within the requested distance threshold.",
+        "required": ["result_count", "results"],
+        "properties": {
+          "result_count": {
+            "type": "integer",
+            "description": "Number of matching ZIP/postal code pairs returned. Zero when no pairs fall within the threshold."
+          },
+          "results": {
+            "type": "array",
+            "description": "Array of matching code pairs within the requested distance threshold.",
+            "items": {
+              "$ref": "#/components/schemas/ZipcodeDistanceMatchItem"
+            }
+          }
+        }
+      },
+      "ZipcodeDistanceMatchItem": {
+        "type": "object",
+        "description": "A single matched pair of ZIP/postal codes with the distance between them.",
+        "required": ["code_1", "code_2", "distance"],
+        "properties": {
+          "code_1": {
+            "type": "string",
+            "description": "First ZIP/postal code in the pair."
+          },
+          "code_2": {
+            "type": "string",
+            "description": "Second ZIP/postal code in the pair."
+          },
+          "distance": {
+            "type": "number",
+            "format": "float",
+            "description": "Distance between the ZIP/postal code pair, in the unit specified by the unit field (default km)."
+          }
+        }
+      },
+      "DistanceMatchRequest": {
+        "type": "object",
+        "description": "Request body specifying the codes, country, and distance threshold to match pairs within.",
+        "required": ["codes", "country"],
+        "properties": {
+          "codes": {
+            "type": "array",
+            "description": "List of ZIP or postal codes to find pairs within the specified distance. Maximum 100 codes.",
+            "items": {
+              "$ref": "#/components/schemas/DistanceMatchInputCode"
+            }
+          },
+          "country": {
+            "type": "string",
+            "description": "Country of the codes in ISO 3166-1 alpha-2 format. Required."
+          },
+          "distance": {
+            "type": "number",
+            "format": "float",
+            "description": "Maximum distance threshold. All pairs within this distance are returned. If omitted, the API applies a default threshold."
+          },
+          "unit": {
+            "type": "string",
+            "enum": ["km", "mi", "yd", "m", "ft", "in"],
+            "default": "km",
+            "description": "Distance unit. Default: km."
+          }
+        }
+      },
+      "DistanceMatchInputCode": {
+        "type": "string",
+        "description": "A ZIP or postal code to find distance matches for."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -1,0 +1,466 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "DNS Lookup API - Live DNS Records, TTLs & PTR Lookups for Any Hostname",
+    "version": "1.0.0",
+    "description": "Performs a live DNS lookup for any hostname or IP address, returning real-time records from authoritative name servers. Supports A, AAAA, MX, NS, SOA, SPF, TXT, and CNAME record types, plus PTR records when querying by IP address via the ipAddress parameter. Each record object includes parsed fields such as address, target, priority, TTL, serial, or verification strings, depending on the record type. Pass a comma-separated list of record types with the type parameter, or use 'all' to retrieve every supported type. The optional format parameter allows switching between JSON and XML output.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "DNS Lookup API Server"
+    }
+  ],
+  "paths": {
+    "/domain/dns/live": {
+      "get": {
+        "tags": ["DNS APIs"],
+        "summary": "Perform a live DNS lookup for any hostname or IP address",
+        "description": "Retrieve real-time DNS records for any hostname or IP address. Returns A, AAAA, MX, NS, SOA, SPF, TXT, CNAME, and PTR records with full parsed fields.",
+        "operationId": "dnsLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Format of the response."
+          },
+          {
+            "name": "host-name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Hostname or URL whose DNS records are required."
+          },
+          {
+            "name": "ipAddress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The IP address for requested DNS's PTR record. 'type' parameter must be set to 'all'."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "A",
+                "AAAA",
+                "MX",
+                "NS",
+                "SOA",
+                "SPF",
+                "TXT",
+                "CNAME",
+                "all"
+              ]
+            },
+            "description": "A comma-separated list of DNS record types for lookup. Possible values: A, AAAA, MX, NS, SOA, SPF, TXT, CNAME, or all. When ipAddress is provided, type must be \"all\"."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful DNS lookup response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DNSLookupResponse"
+                },
+                "examples": {
+                  "default": {
+                    "value": {
+                      "status": true,
+                      "queryTime": "2026-06-06 10:43:05",
+                      "domainName": "example.com",
+                      "domainRegistered": true,
+                      "dnsTypes": {
+                        "A": 1,
+                        "NS": 2,
+                        "SOA": 6,
+                        "MX": 15,
+                        "TXT": 16,
+                        "AAAA": 28,
+                        "SPF": 99
+                      },
+                      "dnsRecords": [
+                        {
+                          "name": "example.com",
+                          "type": 1,
+                          "dnsType": "A",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tA\t104.20.23.154",
+                          "rRsetType": 1,
+                          "address": "104.20.23.154"
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 1,
+                          "dnsType": "A",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tA\t172.66.147.243",
+                          "rRsetType": 1,
+                          "address": "172.66.147.243"
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 2,
+                          "dnsType": "NS",
+                          "ttl": 21600,
+                          "rawText": "example.com.\t\t21600\tIN\tNS\telliott.ns.cloudflare.com.",
+                          "rRsetType": 2,
+                          "singleName": "elliott.ns.cloudflare.com."
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 2,
+                          "dnsType": "NS",
+                          "ttl": 21600,
+                          "rawText": "example.com.\t\t21600\tIN\tNS\thera.ns.cloudflare.com.",
+                          "rRsetType": 2,
+                          "singleName": "hera.ns.cloudflare.com."
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 6,
+                          "dnsType": "SOA",
+                          "ttl": 1800,
+                          "rawText": "example.com.\t\t1800\tIN\tSOA\telliott.ns.cloudflare.com. dns.cloudflare.com. 2405749864 10000 2400 604800 1800",
+                          "rRsetType": 6,
+                          "admin": "dns.cloudflare.com.",
+                          "host": "elliott.ns.cloudflare.com.",
+                          "expire": 604800,
+                          "minimum": 1800,
+                          "refresh": 10000,
+                          "retry": 2400,
+                          "serial": 2405749864
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 15,
+                          "dnsType": "MX",
+                          "ttl": 236,
+                          "rawText": "example.com.\t\t236\tIN\tMX\t0 .",
+                          "rRsetType": 15,
+                          "target": ".",
+                          "priority": 0
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 16,
+                          "dnsType": "TXT",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tTXT\t\"_k2n1y4vw3qtb4skdx9e7dxt97qrmmq9\"",
+                          "rRsetType": 16,
+                          "strings": ["_k2n1y4vw3qtb4skdx9e7dxt97qrmmq9"]
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 28,
+                          "dnsType": "AAAA",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tAAAA\t2606:4700:10:0:0:0:ac42:93f3",
+                          "rRsetType": 28,
+                          "address": "2606:4700:10:0:0:0:ac42:93f3"
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 28,
+                          "dnsType": "AAAA",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tAAAA\t2606:4700:10:0:0:0:6814:179a",
+                          "rRsetType": 28,
+                          "address": "2606:4700:10:0:0:0:6814:179a"
+                        },
+                        {
+                          "name": "example.com",
+                          "type": 99,
+                          "dnsType": "SPF",
+                          "ttl": 300,
+                          "rawText": "example.com.\t\t300\tIN\tSPF\t\"v=spf1 -all\"",
+                          "rRsetType": 99,
+                          "strings": ["v=spf1 -all"]
+                        }
+                      ]
+                    }
+                  },
+                  "ptrLookup": {
+                    "summary": "PTR lookup via ipAddress",
+                    "value": {
+                      "status": true,
+                      "queryTime": "2026-07-23 09:51:24",
+                      "ipAddress": "8.8.8.8",
+                      "dnsTypes": {
+                        "PTR": 12
+                      },
+                      "dnsRecords": [
+                        {
+                          "name": "8.8.8.8.in-addr.arpa",
+                          "type": 12,
+                          "dnsType": "PTR",
+                          "ttl": 16954,
+                          "rawText": "8.8.8.8.in-addr.arpa.\t16954\tIN\tPTR\tdns.google.",
+                          "rRsetType": 12,
+                          "singleName": "dns.google."
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing or invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingParams": {
+                    "summary": "Missing required parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/domain/dns/live",
+                      "status": 400,
+                      "timestamp": "2026-07-23T09:50:58.722Z"
+                    }
+                  },
+                  "invalidType": {
+                    "summary": "Unsupported DNS record type",
+                    "value": {
+                      "timestamp": "2026-07-23T09:51:08.447Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please provide correct dns records type(s) [For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v2.0/dns/live"
+                    }
+                  },
+                  "malformedHostname": {
+                    "summary": "Hostname missing a valid TLD",
+                    "value": {
+                      "timestamp": "2026-07-23T09:54:13.140Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass domain param correct value[For Technical Support: support@whoisfreaks.com]",
+                      "path": "/v2.0/dns/live"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "DNSLookupResponse": {
+        "type": "object",
+        "required": ["status", "queryTime", "dnsTypes", "dnsRecords"],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "description": "Indicates whether the query was processed successfully."
+          },
+          "queryTime": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Time at which the query was made (Format:YYYY-MM-DD HH:mm:ss)."
+          },
+          "domainName": {
+            "type": "string",
+            "description": "Queried domain name."
+          },
+          "domainRegistered": {
+            "type": "boolean",
+            "description": "Indicates whether the domain is registered."
+          },
+          "ipAddress": {
+            "type": "string",
+            "description": "IP address queried (present when ipAddress parameter is used instead of host-name)."
+          },
+          "dnsTypes": {
+            "$ref": "#/components/schemas/DnsTypes"
+          },
+          "dnsRecords": {
+            "type": "array",
+            "description": "List of DNS records. Field presence varies by dnsType — see DnsRecord for which fields apply to which type.",
+            "items": {
+              "$ref": "#/components/schemas/DnsRecord"
+            }
+          }
+        }
+      },
+      "DnsTypes": {
+        "type": "object",
+        "description": "Map of each DNS record type present in dnsRecords to its IANA DNS resource record type code (e.g. A: 1, AAAA: 28, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99, PTR: 12). Indicates which record types were found, not how many of each — count entries in dnsRecords for that.",
+        "additionalProperties": {
+          "title": "DnsTypeCode",
+          "type": "integer",
+          "description": "IANA DNS resource record type code for this DNS record type (A: 1, AAAA: 28, CNAME: 5, MX: 15, NS: 2, SOA: 6, TXT: 16, SPF: 99, PTR: 12)."
+        }
+      },
+      "DnsRecord": {
+        "type": "object",
+        "description": "A single DNS resource record. name, type, dnsType, ttl, rawText, and rRsetType are always present; every other field is populated only for the dnsType(s) noted in its description.",
+        "required": ["name", "type", "dnsType", "ttl", "rawText", "rRsetType"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the queried domain, or the reverse DNS name (e.g. '8.8.8.8.in-addr.arpa') for PTR records."
+          },
+          "type": {
+            "type": "integer",
+            "description": "DNS type code (1=A, 28=AAAA, 5=CNAME, 15=MX, 2=NS, 6=SOA, 16=TXT, 99=SPF, 12=PTR)."
+          },
+          "dnsType": {
+            "type": "string",
+            "enum": [
+              "A",
+              "AAAA",
+              "CNAME",
+              "MX",
+              "NS",
+              "SOA",
+              "TXT",
+              "SPF",
+              "PTR"
+            ],
+            "description": "DNS record type as a string."
+          },
+          "ttl": {
+            "type": "integer",
+            "description": "Time to live in seconds."
+          },
+          "rawText": {
+            "type": "string",
+            "description": "Raw (un-parsed) DNS record text."
+          },
+          "rRsetType": {
+            "type": "integer",
+            "description": "Resource record set type code."
+          },
+          "address": {
+            "type": "string",
+            "description": "IPv4 or IPv6 address. Present only when dnsType is A or AAAA."
+          },
+          "target": {
+            "type": "string",
+            "description": "Target hostname. Present only when dnsType is CNAME or MX."
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Mail server priority. Present only when dnsType is MX."
+          },
+          "singleName": {
+            "type": "string",
+            "description": "Authoritative name server (NS) or reverse-resolved hostname (PTR). Present only when dnsType is NS or PTR."
+          },
+          "admin": {
+            "type": "string",
+            "description": "Administrative contact email. Present only when dnsType is SOA."
+          },
+          "host": {
+            "type": "string",
+            "description": "Primary name server. Present only when dnsType is SOA."
+          },
+          "expire": {
+            "type": "integer",
+            "description": "Expiry time in seconds. Present only when dnsType is SOA."
+          },
+          "minimum": {
+            "type": "integer",
+            "description": "Minimum TTL in seconds. Present only when dnsType is SOA."
+          },
+          "refresh": {
+            "type": "integer",
+            "description": "Refresh interval in seconds. Present only when dnsType is SOA."
+          },
+          "retry": {
+            "type": "integer",
+            "description": "Retry interval in seconds. Present only when dnsType is SOA."
+          },
+          "serial": {
+            "type": "integer",
+            "description": "Serial number. Present only when dnsType is SOA."
+          },
+          "strings": {
+            "type": "array",
+            "description": "Verification or policy strings. Present only when dnsType is TXT or SPF.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

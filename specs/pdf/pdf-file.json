@@ -1,0 +1,190 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Delete File API Reference",
+    "version": "1.0.0",
+    "description": "Delete a PDF file from the server using its unique file ID. Once deleted, the file ID cannot be used in other API calls. Returns a success indicator and confirmation message.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Delete File API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/file": {
+      "delete": {
+        "tags": ["Task Status and File Info APIs"],
+        "summary": "Delete a PDF file",
+        "description": "This API deletes a PDF file using its unique file ID.",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            },
+            "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
+          },
+          {
+            "name": "file_id",
+            "in": "query",
+            "description": "The unique ID of the file to be deleted.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFileResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "File deleted",
+                    "value": {
+                      "fileId": "abc123",
+                      "success": true,
+                      "message": "File deleted successfully."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Missing required file_id parameter",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingFileId": {
+                    "summary": "Missing file_id parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/file",
+                      "status": 400,
+                      "timestamp": "2026-07-27T10:45:56.656Z"
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File ID Not Found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "error": {
+                    "summary": "File ID not found or already deleted",
+                    "value": {
+                      "timestamp": "2026-07-27T10:45:55.737Z",
+                      "path": "/v1.0/pdf/file",
+                      "status": 404,
+                      "error": "File ID Not Found",
+                      "message": "Please provide a valid file ID."
+                    }
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deleteFile"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "DeleteFileResponse": {
+        "type": "object",
+        "required": ["fileId", "success", "message"],
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "description": "The unique identifier of the file."
+          },
+          "success": {
+            "type": "boolean",
+            "description": "Indicates whether the file deletion request was successful."
+          },
+          "message": {
+            "type": "string",
+            "description": "A message indicating the result of the file deletion request."
+          }
+        },
+        "description": "File deletion response containing the result of the delete operation."
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

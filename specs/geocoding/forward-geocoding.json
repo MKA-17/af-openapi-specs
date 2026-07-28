@@ -1,0 +1,402 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Forward Geocoding API - Convert Address to Lat/Long Coordinates",
+    "version": "1.0.0",
+    "description": "Convert a free-form address, place name, or point of interest into geographic coordinates. Returns up to 40 ranked matches per request, each with latitude/longitude, a structured address breakdown (street, city, state, country), a WGS84 bounding box, and any points of interest at that location. Use the `limit` parameter to control result count, the four `min_lat`/`max_lat`/`min_lon`/`max_lon` parameters together to bias results toward a geographic viewbox, and the `Accept-Language` header to localize result names. A query that matches nothing returns a `404` error rather than an empty array.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Forward Geocoding API Server"
+    }
+  ],
+  "paths": {
+    "/geocoder/search": {
+      "get": {
+        "tags": ["Geocoder APIs"],
+        "summary": "Convert an address or place name into geographic coordinates",
+        "description": "Search for a free-form address, place name, or point of interest and return matching locations with coordinates, structured address components, and a bounding box.",
+        "operationId": "forwardGeocode",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Free-form search query, e.g. `Wembley Stadium, London`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of results to return. May return fewer if matches are weak.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 40,
+              "default": 1
+            }
+          },
+          {
+            "name": "min_lat",
+            "in": "query",
+            "required": false,
+            "description": "Minimum latitude of the viewbox used to bias results. Must be provided together with `max_lat`, `min_lon`, and `max_lon`, and must be less than or equal to `max_lat`.",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "minimum": -90,
+              "maximum": 90
+            }
+          },
+          {
+            "name": "max_lat",
+            "in": "query",
+            "required": false,
+            "description": "Maximum latitude of the viewbox used to bias results. Must be provided together with `min_lat`, `min_lon`, and `max_lon`, and must be greater than or equal to `min_lat`.",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "minimum": -90,
+              "maximum": 90
+            }
+          },
+          {
+            "name": "min_lon",
+            "in": "query",
+            "required": false,
+            "description": "Minimum longitude of the viewbox used to bias results. Must be provided together with `min_lat`, `max_lat`, and `max_lon`, and must be less than or equal to `max_lon`.",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "minimum": -180,
+              "maximum": 180
+            }
+          },
+          {
+            "name": "max_lon",
+            "in": "query",
+            "required": false,
+            "description": "Maximum longitude of the viewbox used to bias results. Must be provided together with `min_lat`, `max_lat`, and `min_lon`, and must be greater than or equal to `min_lon`.",
+            "schema": {
+              "type": "number",
+              "format": "float",
+              "minimum": -180,
+              "maximum": 180
+            }
+          },
+          {
+            "name": "Accept-Language",
+            "in": "header",
+            "required": false,
+            "description": "Preferred language order for result names, as a comma-separated list of language codes or a single code. Results are returned in the first matched language, falling back to `en` if none match.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful geocoding response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForwardGeocodeResponse"
+                },
+                "examples": {
+                  "typicalSuccess": {
+                    "summary": "Typical successful response",
+                    "value": [
+                      {
+                        "lat": 51.55606945,
+                        "lon": -0.27960339379401444,
+                        "name": "Wembley Stadium",
+                        "category": "tourism",
+                        "type": "attraction",
+                        "poi": [
+                          {
+                            "name": "Wembley Stadium",
+                            "category": "leisure",
+                            "type": "stadium"
+                          }
+                        ],
+                        "street": "Pacific Crescent",
+                        "area": "London Borough of Brent",
+                        "postcode": "HA9 0SL",
+                        "city": "Greater London",
+                        "state_code": "GB-ENG",
+                        "state": "England",
+                        "country_code": "GB",
+                        "country": "United Kingdom",
+                        "full_address": "Wembley Stadium, Pacific Crescent, London Borough of Brent, Greater London, England, HA9 0SL, United Kingdom",
+                        "bounding_box": [
+                          "51.5547925",
+                          "51.5573402",
+                          "-0.2817245",
+                          "-0.2774831"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request — Invalid or missing parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingQuery": {
+                    "summary": "Missing required `query` parameter",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/geocoder/search",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:30.362Z"
+                    }
+                  },
+                  "invalidLimit": {
+                    "summary": "`limit` outside the 1-40 range",
+                    "value": {
+                      "error": "Invalid Query Limit Provided",
+                      "message": "Please provide a valid limit. Valid range is from 1 to 40.",
+                      "path": "/v1.0/geocoder/search",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:29:30.894Z"
+                    }
+                  },
+                  "invalidViewboxLatitudeOrder": {
+                    "summary": "`min_lat` greater than `max_lat`",
+                    "value": {
+                      "error": "Invalid Viewbox Latitude",
+                      "message": "Minimum latitude cannot be greater than maximum latitude in the viewbox.",
+                      "path": "/v1.0/geocoder/search",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:30:11.104Z"
+                    }
+                  },
+                  "invalidViewboxLongitudeOrder": {
+                    "summary": "`min_lon` greater than `max_lon`",
+                    "value": {
+                      "error": "Invalid Viewbox Longitude",
+                      "message": "Minimum longitude cannot be greater than maximum longitude in the viewbox.",
+                      "path": "/v1.0/geocoder/search",
+                      "status": 400,
+                      "timestamp": "2026-07-22T14:30:11.104Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found — No results matched the query",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "noResults": {
+                    "summary": "Query matched no locations",
+                    "value": {
+                      "error": "No Result Found",
+                      "message": "No results found for the given query.",
+                      "path": "/v1.0/geocoder/search",
+                      "status": 404,
+                      "timestamp": "2026-07-22T14:29:58.349Z"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "ForwardGeocodeResponse": {
+        "type": "array",
+        "title": "Forward Geocoding Results",
+        "description": "List of locations matching the search query, one entry per match, up to the number requested via `limit`.",
+        "items": {
+          "$ref": "#/components/schemas/GeocodeResponse"
+        }
+      },
+      "GeocodeResponse": {
+        "type": "object",
+        "description": "A single geocoded location with coordinates and structured address components.",
+        "required": [
+          "lat",
+          "lon",
+          "country_code",
+          "country",
+          "full_address",
+          "bounding_box"
+        ],
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "float",
+            "description": "WGS84 latitude value for the location."
+          },
+          "lon": {
+            "type": "number",
+            "format": "float",
+            "description": "WGS84 longitude value for the location."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the primary place searched."
+          },
+          "category": {
+            "type": "string",
+            "description": "High-level category of the place, e.g. amenity, place, natural, building, highway."
+          },
+          "type": {
+            "type": "string",
+            "description": "Specific kind within the category, e.g. fast_food, city, park, residential, house_number."
+          },
+          "poi": {
+            "type": "array",
+            "description": "Points of interest at this location.",
+            "items": {
+              "$ref": "#/components/schemas/PointOfInterest"
+            }
+          },
+          "street": {
+            "type": "string",
+            "description": "Street or road name."
+          },
+          "area": {
+            "type": "string",
+            "description": "Intra-city area below city level, e.g. suburb, borough, ward, district, tehsil, neighbourhood."
+          },
+          "postcode": {
+            "type": "string",
+            "description": "Postal code of the area."
+          },
+          "city": {
+            "type": "string",
+            "description": "Settlement label appropriate to the country, e.g. city, town, municipality."
+          },
+          "county": {
+            "type": "string",
+            "description": "Second-tier administrative area, e.g. county, district, prefecture."
+          },
+          "state_code": {
+            "type": "string",
+            "description": "Subdivision code, typically ISO-3166-2 (e.g. US-TX, PK-PB)."
+          },
+          "state": {
+            "type": "string",
+            "description": "First-tier administrative area, e.g. state, region, province, division."
+          },
+          "country_code": {
+            "type": "string",
+            "description": "Two-letter country code in upper case, ISO-3166-1 alpha-2."
+          },
+          "country": {
+            "type": "string",
+            "description": "Country name of the searched place."
+          },
+          "full_address": {
+            "type": "string",
+            "description": "Single-line, human-readable address of the location."
+          },
+          "bounding_box": {
+            "type": "array",
+            "description": "Extent of the feature as `[lat_min, lat_max, lon_min, lon_max]` in WGS84 decimal degrees.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        }
+      },
+      "PointOfInterest": {
+        "type": "object",
+        "description": "A point of interest located at or near a geocoded result.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the point of interest."
+          },
+          "category": {
+            "type": "string",
+            "description": "High-level category of the point of interest, e.g. amenity, place, natural, building, highway."
+          },
+          "type": {
+            "type": "string",
+            "description": "Specific kind within the category, e.g. fast_food, city, park, residential, house_number."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

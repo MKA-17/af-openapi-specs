@@ -1,0 +1,625 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Reverse WHOIS API - Search Domains by Owner Name, Email, Company, or Keyword",
+    "version": "1.0.0",
+    "description": "Search all domain names registered under a particular owner, email, company name, or keyword using reverse WHOIS lookup. Returns matching domains with full registration details (default mode) or a condensed summary (mini mode). Supports exact-match filtering and paginated results (50 per page in default mode, 100 in mini mode). At least one search parameter (keyword, email, owner, or company) is required. A 404 is returned when no domains match the search criteria.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "Reverse WHOIS API Server"
+    }
+  ],
+  "paths": {
+    "/domain/whois/reverse": {
+      "get": {
+        "tags": ["WHOIS APIs"],
+        "summary": "Search domains by owner name, email, company, or keyword",
+        "description": "Performs a reverse WHOIS search returning matching domains with registration details. Use mode=default for full WHOIS data or mode=mini for a condensed summary. When mode=default, each item in whois_domains_historical matches the ReverseWhoisDomainDefault schema (full registrar, contacts, name servers, status, and registry data). When mode=mini, each item matches the ReverseWhoisDomainMini schema (domain name, create/update/expiry dates, owner name, email, and company only).",
+        "operationId": "reverseWhoisLookup",
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "required": false,
+            "description": "Format of the response.",
+            "schema": {
+              "type": "string",
+              "enum": ["json", "xml"],
+              "default": "json"
+            }
+          },
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "description": "Keyword to search for in domain names (case-insensitive pattern matching).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "email",
+            "in": "query",
+            "required": false,
+            "description": "Email address to search for in registrant records (case-insensitive exact or regex match; * wildcard supported).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "owner",
+            "in": "query",
+            "required": false,
+            "description": "Registrant or owner name to search for (full-text phrase matching).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "company",
+            "in": "query",
+            "required": false,
+            "description": "Organization or company name to search for (full-text phrase matching).",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "exact",
+            "in": "query",
+            "required": false,
+            "description": "Set to true to return only exact matches for keyword, owner, or company. Default is false.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "required": false,
+            "description": "Response detail level. 'default' returns full WHOIS data per domain; 'mini' returns only key fields.",
+            "schema": {
+              "type": "string",
+              "enum": ["default", "mini"],
+              "default": "default"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for paginated results.",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful reverse WHOIS search response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReverseWhoisResponse"
+                },
+                "examples": {
+                  "defaultMode": {
+                    "summary": "Default mode (full WHOIS data)",
+                    "value": {
+                      "total_Result": 8,
+                      "total_Pages": 1,
+                      "current_Page": 1,
+                      "whois_domains_historical": [
+                        {
+                          "num": 1,
+                          "status": true,
+                          "domain_name": "ipgeolocationdatabase.com",
+                          "query_time": "2026-05-21 04:00:28",
+                          "create_date": "2010-04-14",
+                          "update_date": "2026-05-19",
+                          "expiry_date": "2027-04-14",
+                          "domain_registrar": {
+                            "iana_id": "269",
+                            "registrar_name": "Key-Systems GmbH",
+                            "whois_server": "whois.rrpproxy.net",
+                            "website_url": "http://www.key-systems.net",
+                            "email_address": "abuse@key-systems.net",
+                            "phone_number": "+4968949396850"
+                          },
+                          "registrant_contact": {
+                            "id": "Not Available From Registry",
+                            "name": "On behalf of ipgeolocationdatabase.com OWNER",
+                            "company": "c/o whoisproxy.com",
+                            "city": "Alexandria",
+                            "state": "VA",
+                            "zip_code": "22314",
+                            "country_name": "United States",
+                            "country_code": "US",
+                            "email_address": "720ed14de67db24c4eb07295ecae369f9f1bfe8a4dd5cd0c51f0e4754ee24895@ipgeolocationdatabase.com.whoisproxy.org",
+                            "phone": "+6448319528"
+                          },
+                          "name_servers": [
+                            "dale.ns.cloudflare.com",
+                            "olga.ns.cloudflare.com"
+                          ],
+                          "domain_status": ["clienttransferprohibited"],
+                          "whois_raw_domain": "Domain Name: ipgeolocationdatabase.com\nRegistry Domain ID: ...\nRegistrar WHOIS Server: whois.rrpproxy.net\n...",
+                          "registry_data": {
+                            "domain_name": "ipgeolocationdatabase.com",
+                            "domain_registrar": {
+                              "registrar_name": "Key-Systems GmbH"
+                            },
+                            "name_servers": [
+                              "dale.ns.cloudflare.com",
+                              "olga.ns.cloudflare.com"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "miniMode": {
+                    "summary": "Mini mode (condensed fields)",
+                    "value": {
+                      "total_Result": 8,
+                      "total_Pages": 1,
+                      "current_Page": 1,
+                      "whois_domains_historical": [
+                        {
+                          "num": 1,
+                          "domain_name": "ipgeolocationdatabase.com",
+                          "create_date": "2010-04-14",
+                          "update_date": "2026-05-19",
+                          "expiry_date": "2027-04-14",
+                          "name": "On behalf of ipgeolocationdatabase.com OWNER",
+                          "email": "720ed14de67db24c4eb07295ecae369f9f1bfe8a4dd5cd0c51f0e4754ee24895@ipgeolocationdatabase.com.whoisproxy.org",
+                          "company_name": "c/o whoisproxy.com"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request -- Missing or invalid search parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "missingParam": {
+                    "summary": "Missing required search parameter",
+                    "value": {
+                      "timestamp": "2025-08-14T10:01:46.601Z",
+                      "status": 400,
+                      "error": "Invalid Param Exception",
+                      "message": "Please pass param value.",
+                      "path": "/v1.0/domain/whois/reverse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found -- No domains match the search criteria",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "recordNotFound": {
+                    "summary": "No matching domains found",
+                    "value": {
+                      "timestamp": "2025-08-14T10:01:54.778Z",
+                      "status": 404,
+                      "error": "Record not found",
+                      "message": "Record not found.",
+                      "path": "/v1.0/domain/whois/reverse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apiKey",
+        "description": "Pass your API key via the X-apiKey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      },
+      "ReverseWhoisResponse": {
+        "type": "object",
+        "description": "Paginated reverse WHOIS search result containing total matches, page info, and an array of matching domain records.",
+        "required": [
+          "total_Result",
+          "total_Pages",
+          "current_Page",
+          "whois_domains_historical"
+        ],
+        "properties": {
+          "total_Result": {
+            "type": "integer",
+            "description": "Total number of domain records matching the search criteria."
+          },
+          "total_Pages": {
+            "type": "integer",
+            "description": "Total number of pages available (50 records per page in default mode, 100 in mini mode)."
+          },
+          "current_Page": {
+            "type": "integer",
+            "description": "Current page number in the paginated result."
+          },
+          "whois_domains_historical": {
+            "type": "array",
+            "description": "Array of matching domain records. In default mode each entry contains full WHOIS data; in mini mode each entry contains only key fields.",
+            "items": {
+              "oneOf": [
+                {
+                  "$ref": "#/components/schemas/ReverseWhoisDomainDefault"
+                },
+                {
+                  "$ref": "#/components/schemas/ReverseWhoisDomainMini"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ReverseWhoisDomainDefault": {
+        "type": "object",
+        "description": "Full WHOIS record for a matching domain in default mode, including registrar, contacts, name servers, status, and registry data.",
+        "required": ["num", "status", "domain_name"],
+        "properties": {
+          "num": {
+            "type": "integer",
+            "description": "Sequential result number."
+          },
+          "status": {
+            "type": "boolean",
+            "description": "Indicates whether the WHOIS request was successfully processed."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "The matched domain name."
+          },
+          "query_time": {
+            "type": ["string", "null"],
+            "description": "Timestamp of the WHOIS query (YYYY-MM-DD HH:mm:ss)."
+          },
+          "whois_server": {
+            "type": ["string", "null"],
+            "description": "WHOIS server that provided the domain information."
+          },
+          "domain_registered": {
+            "type": ["string", "null"],
+            "enum": ["yes", "no", "restricted"],
+            "description": "Registration status: 'yes' if registered, 'no' if available, 'restricted' if locked by the registry."
+          },
+          "create_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date when the domain was initially registered (YYYY-MM-DD)."
+          },
+          "update_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date of the most recent update to the domain registration (YYYY-MM-DD)."
+          },
+          "expiry_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date when the domain registration expires if not renewed (YYYY-MM-DD)."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar"
+          },
+          "reseller_contact": {
+            "$ref": "#/components/schemas/WhoisContact"
+          },
+          "registrant_contact": {
+            "$ref": "#/components/schemas/WhoisContact"
+          },
+          "administrative_contact": {
+            "$ref": "#/components/schemas/WhoisContact"
+          },
+          "technical_contact": {
+            "$ref": "#/components/schemas/WhoisContact"
+          },
+          "billing_contact": {
+            "$ref": "#/components/schemas/WhoisContact"
+          },
+          "name_servers": {
+            "type": ["array", "null"],
+            "description": "List of authoritative name servers for the domain.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": ["array", "null"],
+            "description": "List of domain status codes (EPP status codes).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_domain": {
+            "type": ["string", "null"],
+            "description": "Raw WHOIS output returned by the registrar's WHOIS server."
+          },
+          "registry_data": {
+            "$ref": "#/components/schemas/RegistryData"
+          }
+        }
+      },
+      "ReverseWhoisDomainMini": {
+        "type": "object",
+        "description": "Condensed WHOIS record for a matching domain in mini mode, containing only key registration fields.",
+        "required": ["num", "domain_name"],
+        "properties": {
+          "num": {
+            "type": "integer",
+            "description": "Sequential result number."
+          },
+          "domain_name": {
+            "type": "string",
+            "description": "The matched domain name."
+          },
+          "create_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date when the domain was initially registered (YYYY-MM-DD)."
+          },
+          "update_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date of the most recent update to the domain registration (YYYY-MM-DD)."
+          },
+          "expiry_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Date when the domain registration expires if not renewed (YYYY-MM-DD)."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Registrant or owner name."
+          },
+          "email": {
+            "type": ["string", "null"],
+            "description": "Registrant email address."
+          },
+          "company_name": {
+            "type": ["string", "null"],
+            "description": "Registrant company or organization name."
+          }
+        }
+      },
+      "DomainRegistrar": {
+        "type": "object",
+        "description": "Registrar information for the domain, including IANA ID, name, WHOIS/RDAP servers, website, and contact details.",
+        "required": [],
+        "properties": {
+          "iana_id": {
+            "type": ["string", "null"],
+            "description": "IANA (Internet Assigned Numbers Authority) ID of the registrar."
+          },
+          "status": {
+            "type": ["string", "null"],
+            "description": "Accreditation status of the registrar (e.g., 'accredited')."
+          },
+          "registrar_name": {
+            "type": ["string", "null"],
+            "description": "Name of the registrar managing the domain."
+          },
+          "normalized_name": {
+            "type": ["string", "null"],
+            "description": "Normalized (lowercase, stripped) registrar name."
+          },
+          "whois_server": {
+            "type": ["string", "null"],
+            "description": "WHOIS server of the registrar."
+          },
+          "rdap_server": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "description": "RDAP (Registration Data Access Protocol) server URL of the registrar."
+          },
+          "website_url": {
+            "type": ["string", "null"],
+            "format": "uri",
+            "description": "Website URL of the registrar."
+          },
+          "email_address": {
+            "type": ["string", "null"],
+            "description": "Contact or abuse email address of the registrar."
+          },
+          "phone_number": {
+            "type": ["string", "null"],
+            "description": "Contact phone number of the registrar."
+          }
+        }
+      },
+      "WhoisContact": {
+        "type": "object",
+        "description": "Contact information for a domain stakeholder (registrant, administrative, technical, billing, or reseller). All fields are optional and depend on the contact type and privacy settings.",
+        "required": [],
+        "properties": {
+          "id": {
+            "type": ["string", "null"],
+            "description": "Contact identifier."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Name of the contact person."
+          },
+          "company": {
+            "type": ["string", "null"],
+            "description": "Company or organization name."
+          },
+          "street": {
+            "type": ["string", "null"],
+            "description": "Street address."
+          },
+          "city": {
+            "type": ["string", "null"],
+            "description": "City."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "State or province."
+          },
+          "zip_code": {
+            "type": ["string", "null"],
+            "description": "ZIP or postal code."
+          },
+          "country_name": {
+            "type": ["string", "null"],
+            "description": "Country name."
+          },
+          "country_code": {
+            "type": ["string", "null"],
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "email_address": {
+            "type": ["string", "null"],
+            "description": "Email address of the contact."
+          },
+          "phone": {
+            "type": ["string", "null"],
+            "description": "Phone number of the contact."
+          },
+          "fax": {
+            "type": ["string", "null"],
+            "description": "Fax number of the contact."
+          },
+          "mailing_address": {
+            "type": ["string", "null"],
+            "description": "Full mailing address as a single string."
+          }
+        }
+      },
+      "RegistryData": {
+        "type": "object",
+        "description": "Normalized registry-level WHOIS data. Contains the same structure as the top-level response but reflects data from the registry's own WHOIS server rather than the registrar's.",
+        "required": [],
+        "properties": {
+          "domain_name": {
+            "type": ["string", "null"],
+            "description": "Domain name as recorded by the registry."
+          },
+          "query_time": {
+            "type": ["string", "null"],
+            "description": "Timestamp of the registry WHOIS query (YYYY-MM-DD HH:mm:ss)."
+          },
+          "whois_server": {
+            "type": ["string", "null"],
+            "description": "Registry WHOIS server that provided this data."
+          },
+          "domain_registered": {
+            "type": ["string", "null"],
+            "enum": ["yes", "no", "restricted"],
+            "description": "Registration status from the registry."
+          },
+          "create_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Domain creation date as recorded by the registry (YYYY-MM-DD)."
+          },
+          "update_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Last update date as recorded by the registry (YYYY-MM-DD)."
+          },
+          "expiry_date": {
+            "type": ["string", "null"],
+            "format": "date",
+            "description": "Domain expiry date as recorded by the registry (YYYY-MM-DD)."
+          },
+          "domain_registrar": {
+            "$ref": "#/components/schemas/DomainRegistrar"
+          },
+          "name_servers": {
+            "type": ["array", "null"],
+            "description": "List of name servers as recorded by the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "domain_status": {
+            "type": ["array", "null"],
+            "description": "List of domain status codes from the registry.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "whois_raw_registery": {
+            "type": ["string", "null"],
+            "description": "Raw WHOIS output from the registry server."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}
