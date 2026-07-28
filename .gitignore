@@ -4,3 +4,5 @@ dist/
 *.tsbuildinfo
 output/
 PRD-openapi-specs-npm-package.md
+.npmrc
+.env*
