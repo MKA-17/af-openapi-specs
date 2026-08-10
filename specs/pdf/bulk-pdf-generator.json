@@ -1,0 +1,290 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Generator API - Bulk PDF Generation from CSV",
+    "version": "1.0.0",
+    "description": "Generate one PDF per row from an uploaded CSV file against a template you designed in the APIFreaks PDF Template Builder. Each row is processed independently, and the response returns an array of results, each with its own pdf_url. Authentication is done with your APIFreaks API key passed in the X-apikey header.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Generator API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/template/generate/bulk": {
+      "post": {
+        "tags": ["PDF Template APIs"],
+        "summary": "Generate PDFs in bulk from a CSV",
+        "description": "Upload a CSV file where each row is one record. The API generates one PDF per row and returns an array of results, each with its own pdf_url. Rows are processed independently, so a failure in one row does not block the rest of the batch. The response gives a row-by-row breakdown of which PDFs succeeded and which failed.",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The template to render, from the APIFreaks PDF Template Builder. Copy it from your dashboard when you save the template."
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^v"
+            },
+            "description": "Template version to render, e.g. v2. Must start with v. Omit this parameter entirely to use the latest version; the literal value 'latest' is not accepted by the API."
+          }
+        ],
+        "requestBody": {
+          "description": "Multipart form-data body carrying the CSV file to render. Each row in the CSV is one record and produces one PDF.",
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/CsvUploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDFs generated successfully. The response is an array of results, one entry per CSV row, each with its own pdf_url.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TemplateGenerationResponse"
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Generated PDFs for two rows",
+                    "value": [
+                      {
+                        "template_id": "73691bce-1c58-4370-acc6-64b2dd14f81c",
+                        "pdf_url": "https://s3.eu-central-2.wasabisys.com/w.storage.apifreaks.com/pdf_templates/73691bce-1c58-4370-acc6-64b2dd14f81c/Candidate%20Resume_20260810141245054106_1.pdf",
+                        "created_at": "2026-08-10T14:12:47.887Z",
+                        "expiration_time": "2026-11-10T14:12:47.887Z"
+                      },
+                      {
+                        "template_id": "73691bce-1c58-4370-acc6-64b2dd14f81c",
+                        "pdf_url": "https://s3.eu-central-2.wasabisys.com/w.storage.apifreaks.com/pdf_templates/73691bce-1c58-4370-acc6-64b2dd14f81c/Candidate%20Resume_20260810141245054154_2.pdf",
+                        "created_at": "2026-08-10T14:12:47.940Z",
+                        "expiration_time": "2026-11-10T14:12:47.940Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing parameters, a file that is not a CSV, or data larger than 10 MB.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "CsvFileRequired": {
+                    "summary": "Uploaded file is not a CSV",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:14.497Z",
+                      "path": "/v1.0/generate-pdf/bulk",
+                      "status": 400,
+                      "error": "CSV File Required",
+                      "message": "Only CSV files are supported. Please upload a valid CSV file."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 The API key is missing or invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidApiKey": {
+                    "summary": "Provided API key is invalid",
+                    "value": {
+                      "error": "API Access Exception",
+                      "message": "Provided API key is invalid. [For Technical Support: support@apifreaks.com]",
+                      "path": "/v1.0/pdf/template/generate/bulk",
+                      "status": 401,
+                      "timestamp": "2026-08-10T14:13:14.996Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2014 The account does not have access to this template.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found \u2014 No template matches the template_id, or the requested version does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 The request Content-Type is not supported for this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity \u2014 The request contains invalid or missing data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error \u2014 An unexpected error occurred, or the PDF could not be generated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Gateway Timeout \u2014 The request went past the 100 second processing limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "generatePdfsFromCsv"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apikey",
+        "description": "Pass your API key via the X-apikey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "TemplateGenerationResponse": {
+        "type": "object",
+        "description": "Result of a PDF generation request, containing the hosted URL of the generated PDF.",
+        "required": ["template_id", "pdf_url", "created_at", "expiration_time"],
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "description": "The template that was rendered."
+          },
+          "pdf_url": {
+            "type": "string",
+            "description": "Hosted URL of the generated PDF."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the PDF was generated (ISO 8601)."
+          },
+          "expiration_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the hosted PDF expires (ISO 8601)."
+          }
+        }
+      },
+      "CsvUploadRequest": {
+        "type": "object",
+        "description": "Multipart form-data request body containing the CSV file to render in bulk.",
+        "required": ["file"],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "description": "A CSV file uploaded as form-data where each row is one record. One PDF is generated per row."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

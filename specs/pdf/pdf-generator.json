@@ -1,0 +1,444 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "PDF Generator API - Create PDFs from Templates",
+    "version": "1.0.0",
+    "description": "Generate PDFs from templates you design once in the APIFreaks PDF Template Builder. Send JSON in the request body or provide a data_url, and the API renders your template into a hosted PDF document. Authentication is done with your APIFreaks API key passed in the X-apikey header.",
+    "contact": {
+      "name": "APIFreaks Support",
+      "url": "https://apifreaks.com/contact",
+      "email": "support@apifreaks.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.apifreaks.com/v1.0",
+      "description": "PDF Generator API Server"
+    }
+  ],
+  "paths": {
+    "/pdf/template/generate": {
+      "post": {
+        "tags": ["PDF Template APIs"],
+        "summary": "Generate a PDF from a template",
+        "description": "Renders the template identified by template_id with the JSON data supplied in the request body (or fetched from data_url). Returns a hosted URL for the generated PDF. Provide either a request body or a data_url; one of the two is required. The keys of the data object are the fields you bound when you designed the template in the APIFreaks PDF Template Builder, so the exact shape is up to you. Pin the version parameter to a specific template version (e.g. version=v2) so later design changes never touch what is already live; omit it to use the latest version.",
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The template to render, from the APIFreaks PDF Template Builder. Copy it from your dashboard when you save the template."
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "pattern": "^v"
+            },
+            "description": "Template version to render, e.g. v2. Must start with v. Omit this parameter entirely to use the latest version; the literal value 'latest' is not accepted by the API."
+          },
+          {
+            "name": "data_url",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "uri"
+            },
+            "description": "A URL the API fetches your JSON data from, instead of the request body. Provide this when you are not sending a request body."
+          }
+        ],
+        "requestBody": {
+          "description": "The template's data as a JSON object. The keys are the fields you bound when you designed the template, so the exact shape is up to you. Provide the body when you are not passing a data_url; one of the two is required.",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Free-form JSON object whose keys map to the fields bound in the template."
+              },
+              "examples": {
+                "resumeTemplate": {
+                  "summary": "Resume template data",
+                  "value": {
+                    "candidate_name": "Ava Thompson",
+                    "candidate_title": "Senior Operations Analyst",
+                    "email": "ava.thompson@example.com",
+                    "phone": "+1 (555) 381-2048",
+                    "city": "Austin, TX",
+                    "portfolio_url": "portfolio.example.com",
+                    "profile_summary": "Analytical operations professional with 8+ years of experience improving reporting pipelines, streamlining process documentation, and coordinating cross-functional delivery for distributed teams across multiple time zones.",
+                    "company_name": "Northwind Logistics",
+                    "job_title": "Operations Analyst",
+                    "employment_period": "2021 - Present",
+                    "job_achievement_1": "Led weekly KPI reporting for finance, fulfillment, and customer success stakeholders across three business units.",
+                    "job_achievement_2": "Reduced manual reconciliation work by 35% through workflow redesign and documentation automation.",
+                    "job_achievement_3": "Spearheaded a cross-team initiative that improved on-time delivery metrics by 18% within six months.",
+                    "skills": [
+                      {
+                        "skill": "Process Improvement",
+                        "level": "Advanced",
+                        "years": "7"
+                      },
+                      {
+                        "skill": "Stakeholder Reporting",
+                        "level": "Expert",
+                        "years": "8"
+                      },
+                      {
+                        "skill": "Cross-functional Coordination",
+                        "level": "Advanced",
+                        "years": "5"
+                      },
+                      {
+                        "skill": "Workflow Documentation",
+                        "level": "Advanced",
+                        "years": "6"
+                      }
+                    ],
+                    "degree": "B.S. in Information Systems",
+                    "institution": "University of Texas",
+                    "graduation_year": "2018",
+                    "certification_1": "Certified Business Analysis Professional (CBAP)",
+                    "certification_2": "Six Sigma Green Belt",
+                    "languages": "English (Native), Spanish (Professional)"
+                  }
+                },
+                "businessReport": {
+                  "summary": "Business report template data",
+                  "value": {
+                    "report_title": "Quarterly Business Report",
+                    "report_period": "Q4 2024",
+                    "prepared_by": "Marketing Team",
+                    "revenue": 125000,
+                    "growth_rate": 15,
+                    "customer_count": 520,
+                    "monthly_comparison": [
+                      {
+                        "metric": "Revenue",
+                        "previous": "$108,000",
+                        "current": "$125,000",
+                        "change": "+15.7%"
+                      },
+                      {
+                        "metric": "Active Customers",
+                        "previous": "480",
+                        "current": "520",
+                        "change": "+8.3%"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF generated successfully. The response contains the hosted URL of the rendered PDF along with its creation and expiration times.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateGenerationResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Generated PDF",
+                    "value": {
+                      "template_id": "73691bce-1c58-4370-acc6-64b2dd14f81c",
+                      "pdf_url": "https://s3.eu-central-2.wasabisys.com/w.storage.apifreaks.com/pdf_templates/73691bce-1c58-4370-acc6-64b2dd14f81c/Candidate%20Resume_20260810141214723405.pdf",
+                      "created_at": "2026-08-10T14:12:17.673Z",
+                      "expiration_time": "2026-11-10T14:12:17.673Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request \u2014 Missing or malformed parameters, missing data, or an unreachable data_url.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "MissingTemplateId": {
+                    "summary": "template_id is missing",
+                    "value": {
+                      "error": "Invalid Param Exception",
+                      "message": "please pass correct parameters",
+                      "path": "/v1.0/pdf/template/generate",
+                      "status": 400,
+                      "timestamp": "2026-08-10T14:13:13.195Z"
+                    }
+                  },
+                  "InvalidVersion": {
+                    "summary": "version does not start with v",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:13.689Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 400,
+                      "error": "Invalid Template Version",
+                      "message": "Please provide a valid template version starting with 'v'."
+                    }
+                  },
+                  "NoData": {
+                    "summary": "No data supplied to fill the template",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:14.172Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 400,
+                      "error": "Template Data Not Provided",
+                      "message": "No data provided for the template. Please provide valid data to generate pdf."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized \u2014 The API key is missing or invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidApiKey": {
+                    "summary": "Provided API key is invalid",
+                    "value": {
+                      "error": "API Access Exception",
+                      "message": "Provided API key is invalid. [For Technical Support: support@apifreaks.com]",
+                      "path": "/v1.0/pdf/template/generate",
+                      "status": 401,
+                      "timestamp": "2026-08-10T14:13:14.996Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden \u2014 The account does not have access to this template.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "AccessDenied": {
+                    "summary": "No access to the template",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:15.000Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 403,
+                      "error": "Template Access Denied",
+                      "message": "Your account does not have access to this template."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found \u2014 No template matches the template_id, or the requested version does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "TemplateNotFound": {
+                    "summary": "No template matches the template_id",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:14.677Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 404,
+                      "error": "Template Not Found",
+                      "message": "Please provide a valid template ID."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported Media Type \u2014 The request Content-Type is not supported for this endpoint.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "UnsupportedMediaType": {
+                    "summary": "Content-Type is not supported",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:15.500Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 415,
+                      "error": "Unsupported Media Type",
+                      "message": "The request Content-Type is not supported for this endpoint."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity \u2014 The request contains invalid or missing data.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "InvalidData": {
+                    "summary": "Invalid or missing data",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:16.100Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 422,
+                      "error": "Invalid Template Data",
+                      "message": "The request contains invalid or missing data."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error \u2014 An unexpected error occurred, or the PDF could not be generated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "GenerationFailed": {
+                    "summary": "PDF could not be generated",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:16.700Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 500,
+                      "error": "PDF Generation Failed",
+                      "message": "The PDF could not be generated. Try the request again."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "Gateway Timeout \u2014 The request went past the 100 second processing limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "ProcessingLimit": {
+                    "summary": "Request exceeded the 100 second processing limit",
+                    "value": {
+                      "timestamp": "2026-08-10T14:13:17.300Z",
+                      "path": "/v1.0/generate-pdf",
+                      "status": 504,
+                      "error": "Processing Timeout",
+                      "message": "The request went past the 100 second processing limit. Reduce the input size or retry."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "generatePdfFromTemplate"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuthHeader": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-apikey",
+        "description": "Pass your API key via the X-apikey request header."
+      },
+      "ApiKeyAuthQuery": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey",
+        "description": "Pass your API key via the apiKey query parameter."
+      }
+    },
+    "schemas": {
+      "TemplateGenerationResponse": {
+        "type": "object",
+        "description": "Result of a PDF generation request, containing the hosted URL of the generated PDF.",
+        "required": ["template_id", "pdf_url", "created_at", "expiration_time"],
+        "properties": {
+          "template_id": {
+            "type": "string",
+            "description": "The template that was rendered."
+          },
+          "pdf_url": {
+            "type": "string",
+            "description": "Hosted URL of the generated PDF."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the PDF was generated (ISO 8601)."
+          },
+          "expiration_time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the hosted PDF expires (ISO 8601)."
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope returned by the API on failed requests.",
+        "required": ["message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Short error category or exception type."
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error message describing the failure."
+          },
+          "path": {
+            "type": "string",
+            "description": "API endpoint path that produced the error."
+          },
+          "status": {
+            "type": "integer",
+            "description": "HTTP status code returned with the error."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the error occurred (ISO 8601)."
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuthHeader": []
+    },
+    {
+      "ApiKeyAuthQuery": []
+    }
+  ]
+}

@@ -52,57 +52,59 @@ import _s47 from '../specs/ip-intelligence/bulk-ip-threat-intelligence.json' wit
 import _s48 from '../specs/ip-intelligence/ip-locator.json' with { type: 'json' };
 import _s49 from '../specs/ip-intelligence/ip-threat-intelligence.json' with { type: 'json' };
 import _s50 from '../specs/other/astronomy-data.json' with { type: 'json' };
-import _s51 from '../specs/pdf/delete-pdf-page.json' with { type: 'json' };
-import _s52 from '../specs/pdf/linearize-pdf.json' with { type: 'json' };
-import _s53 from '../specs/pdf/merge-pdf.json' with { type: 'json' };
-import _s54 from '../specs/pdf/pdf-compress.json' with { type: 'json' };
-import _s55 from '../specs/pdf/pdf-decrypt.json' with { type: 'json' };
-import _s56 from '../specs/pdf/pdf-encrypt.json' with { type: 'json' };
-import _s57 from '../specs/pdf/pdf-extract-pages.json' with { type: 'json' };
-import _s58 from '../specs/pdf/pdf-file-status.json' with { type: 'json' };
-import _s59 from '../specs/pdf/pdf-file.json' with { type: 'json' };
-import _s60 from '../specs/pdf/pdf-files.json' with { type: 'json' };
-import _s61 from '../specs/pdf/pdf-resource-download.json' with { type: 'json' };
-import _s62 from '../specs/pdf/pdf-resource-upload-binary.json' with { type: 'json' };
-import _s63 from '../specs/pdf/pdf-resource-upload.json' with { type: 'json' };
-import _s64 from '../specs/pdf/pdf-restrict.json' with { type: 'json' };
-import _s65 from '../specs/pdf/pdf-split-pages.json' with { type: 'json' };
-import _s66 from '../specs/pdf/pdf-task-status.json' with { type: 'json' };
-import _s67 from '../specs/pdf/pdf-to-image.json' with { type: 'json' };
-import _s68 from '../specs/pdf/pdf-unrestrict.json' with { type: 'json' };
-import _s69 from '../specs/pdf/rotate-pdf-pages.json' with { type: 'json' };
-import _s70 from '../specs/phone-validation/bulk-phone-number-validation.json' with { type: 'json' };
-import _s71 from '../specs/phone-validation/phone-number-validation.json' with { type: 'json' };
-import _s72 from '../specs/scraper/web-scraper.json' with { type: 'json' };
-import _s73 from '../specs/screenshot/bulk-screenshot.json' with { type: 'json' };
-import _s74 from '../specs/screenshot/website-screenshot.json' with { type: 'json' };
-import _s75 from '../specs/ssl/ssl-certificate-chain-lookup.json' with { type: 'json' };
-import _s76 from '../specs/ssl/ssl-certificate-lookup.json' with { type: 'json' };
-import _s77 from '../specs/timezone/timezone-converter.json' with { type: 'json' };
-import _s78 from '../specs/timezone/timezone-lookup.json' with { type: 'json' };
-import _s79 from '../specs/user-agent/bulk-user-agent-parser.json' with { type: 'json' };
-import _s80 from '../specs/user-agent/user-agent-parser.json' with { type: 'json' };
-import _s81 from '../specs/weather/air-quality.json' with { type: 'json' };
-import _s82 from '../specs/weather/bulk-live-weather.json' with { type: 'json' };
-import _s83 from '../specs/weather/flood-forecast.json' with { type: 'json' };
-import _s84 from '../specs/weather/historical-weather.json' with { type: 'json' };
-import _s85 from '../specs/weather/live-weather.json' with { type: 'json' };
-import _s86 from '../specs/weather/marine-weather.json' with { type: 'json' };
-import _s87 from '../specs/weather/time-series-weather.json' with { type: 'json' };
-import _s88 from '../specs/weather/weather-forecast.json' with { type: 'json' };
-import _s89 from '../specs/whois/asn-lookup.json' with { type: 'json' };
-import _s90 from '../specs/whois/bulk-whois-lookup.json' with { type: 'json' };
-import _s91 from '../specs/whois/domain-whois-history-lookup.json' with { type: 'json' };
-import _s92 from '../specs/whois/reverse-whois.json' with { type: 'json' };
-import _s93 from '../specs/whois/whois-domain-lookup.json' with { type: 'json' };
-import _s94 from '../specs/whois/whois-ip-lookup.json' with { type: 'json' };
-import _s95 from '../specs/zip-code/bulk-zip-code-lookup.json' with { type: 'json' };
-import _s96 from '../specs/zip-code/zip-code-api.json' with { type: 'json' };
-import _s97 from '../specs/zip-code/zip-code-distance-match.json' with { type: 'json' };
-import _s98 from '../specs/zip-code/zip-code-distance.json' with { type: 'json' };
-import _s99 from '../specs/zip-code/zip-codes-by-city.json' with { type: 'json' };
-import _s100 from '../specs/zip-code/zip-codes-by-region.json' with { type: 'json' };
-import _s101 from '../specs/zip-code/zip-codes-radius-search.json' with { type: 'json' };
+import _s51 from '../specs/pdf/bulk-pdf-generator.json' with { type: 'json' };
+import _s52 from '../specs/pdf/delete-pdf-page.json' with { type: 'json' };
+import _s53 from '../specs/pdf/linearize-pdf.json' with { type: 'json' };
+import _s54 from '../specs/pdf/merge-pdf.json' with { type: 'json' };
+import _s55 from '../specs/pdf/pdf-compress.json' with { type: 'json' };
+import _s56 from '../specs/pdf/pdf-decrypt.json' with { type: 'json' };
+import _s57 from '../specs/pdf/pdf-encrypt.json' with { type: 'json' };
+import _s58 from '../specs/pdf/pdf-extract-pages.json' with { type: 'json' };
+import _s59 from '../specs/pdf/pdf-file-status.json' with { type: 'json' };
+import _s60 from '../specs/pdf/pdf-file.json' with { type: 'json' };
+import _s61 from '../specs/pdf/pdf-files.json' with { type: 'json' };
+import _s62 from '../specs/pdf/pdf-generator.json' with { type: 'json' };
+import _s63 from '../specs/pdf/pdf-resource-download.json' with { type: 'json' };
+import _s64 from '../specs/pdf/pdf-resource-upload-binary.json' with { type: 'json' };
+import _s65 from '../specs/pdf/pdf-resource-upload.json' with { type: 'json' };
+import _s66 from '../specs/pdf/pdf-restrict.json' with { type: 'json' };
+import _s67 from '../specs/pdf/pdf-split-pages.json' with { type: 'json' };
+import _s68 from '../specs/pdf/pdf-task-status.json' with { type: 'json' };
+import _s69 from '../specs/pdf/pdf-to-image.json' with { type: 'json' };
+import _s70 from '../specs/pdf/pdf-unrestrict.json' with { type: 'json' };
+import _s71 from '../specs/pdf/rotate-pdf-pages.json' with { type: 'json' };
+import _s72 from '../specs/phone-validation/bulk-phone-number-validation.json' with { type: 'json' };
+import _s73 from '../specs/phone-validation/phone-number-validation.json' with { type: 'json' };
+import _s74 from '../specs/scraper/web-scraper.json' with { type: 'json' };
+import _s75 from '../specs/screenshot/bulk-screenshot.json' with { type: 'json' };
+import _s76 from '../specs/screenshot/website-screenshot.json' with { type: 'json' };
+import _s77 from '../specs/ssl/ssl-certificate-chain-lookup.json' with { type: 'json' };
+import _s78 from '../specs/ssl/ssl-certificate-lookup.json' with { type: 'json' };
+import _s79 from '../specs/timezone/timezone-converter.json' with { type: 'json' };
+import _s80 from '../specs/timezone/timezone-lookup.json' with { type: 'json' };
+import _s81 from '../specs/user-agent/bulk-user-agent-parser.json' with { type: 'json' };
+import _s82 from '../specs/user-agent/user-agent-parser.json' with { type: 'json' };
+import _s83 from '../specs/weather/air-quality.json' with { type: 'json' };
+import _s84 from '../specs/weather/bulk-live-weather.json' with { type: 'json' };
+import _s85 from '../specs/weather/flood-forecast.json' with { type: 'json' };
+import _s86 from '../specs/weather/historical-weather.json' with { type: 'json' };
+import _s87 from '../specs/weather/live-weather.json' with { type: 'json' };
+import _s88 from '../specs/weather/marine-weather.json' with { type: 'json' };
+import _s89 from '../specs/weather/time-series-weather.json' with { type: 'json' };
+import _s90 from '../specs/weather/weather-forecast.json' with { type: 'json' };
+import _s91 from '../specs/whois/asn-lookup.json' with { type: 'json' };
+import _s92 from '../specs/whois/bulk-whois-lookup.json' with { type: 'json' };
+import _s93 from '../specs/whois/domain-whois-history-lookup.json' with { type: 'json' };
+import _s94 from '../specs/whois/reverse-whois.json' with { type: 'json' };
+import _s95 from '../specs/whois/whois-domain-lookup.json' with { type: 'json' };
+import _s96 from '../specs/whois/whois-ip-lookup.json' with { type: 'json' };
+import _s97 from '../specs/zip-code/bulk-zip-code-lookup.json' with { type: 'json' };
+import _s98 from '../specs/zip-code/zip-code-api.json' with { type: 'json' };
+import _s99 from '../specs/zip-code/zip-code-distance-match.json' with { type: 'json' };
+import _s100 from '../specs/zip-code/zip-code-distance.json' with { type: 'json' };
+import _s101 from '../specs/zip-code/zip-codes-by-city.json' with { type: 'json' };
+import _s102 from '../specs/zip-code/zip-codes-by-region.json' with { type: 'json' };
+import _s103 from '../specs/zip-code/zip-codes-radius-search.json' with { type: 'json' };
 
 export const SPECS: Record<string, OpenAPISpec> = {
   'commodity-fluctuation': _s0 as OpenAPISpec,
@@ -156,60 +158,62 @@ export const SPECS: Record<string, OpenAPISpec> = {
   'ip-locator': _s48 as OpenAPISpec,
   'ip-threat-intelligence': _s49 as OpenAPISpec,
   'astronomy-data': _s50 as OpenAPISpec,
-  'delete-pdf-page': _s51 as OpenAPISpec,
-  'linearize-pdf': _s52 as OpenAPISpec,
-  'merge-pdf': _s53 as OpenAPISpec,
-  'pdf-compress': _s54 as OpenAPISpec,
-  'pdf-decrypt': _s55 as OpenAPISpec,
-  'pdf-encrypt': _s56 as OpenAPISpec,
-  'pdf-extract-pages': _s57 as OpenAPISpec,
-  'pdf-file-status': _s58 as OpenAPISpec,
-  'pdf-file': _s59 as OpenAPISpec,
-  'pdf-files': _s60 as OpenAPISpec,
-  'pdf-resource-download': _s61 as OpenAPISpec,
-  'pdf-resource-upload-binary': _s62 as OpenAPISpec,
-  'pdf-resource-upload': _s63 as OpenAPISpec,
-  'pdf-restrict': _s64 as OpenAPISpec,
-  'pdf-split-pages': _s65 as OpenAPISpec,
-  'pdf-task-status': _s66 as OpenAPISpec,
-  'pdf-to-image': _s67 as OpenAPISpec,
-  'pdf-unrestrict': _s68 as OpenAPISpec,
-  'rotate-pdf-pages': _s69 as OpenAPISpec,
-  'bulk-phone-number-validation': _s70 as OpenAPISpec,
-  'phone-number-validation': _s71 as OpenAPISpec,
-  'web-scraper': _s72 as OpenAPISpec,
-  'bulk-screenshot': _s73 as OpenAPISpec,
-  'website-screenshot': _s74 as OpenAPISpec,
-  'ssl-certificate-chain-lookup': _s75 as OpenAPISpec,
-  'ssl-certificate-lookup': _s76 as OpenAPISpec,
-  'timezone-converter': _s77 as OpenAPISpec,
-  'timezone-lookup': _s78 as OpenAPISpec,
-  'bulk-user-agent-parser': _s79 as OpenAPISpec,
-  'user-agent-parser': _s80 as OpenAPISpec,
-  'air-quality': _s81 as OpenAPISpec,
-  'bulk-live-weather': _s82 as OpenAPISpec,
-  'flood-forecast': _s83 as OpenAPISpec,
-  'historical-weather': _s84 as OpenAPISpec,
-  'live-weather': _s85 as OpenAPISpec,
-  'marine-weather': _s86 as OpenAPISpec,
-  'time-series-weather': _s87 as OpenAPISpec,
-  'weather-forecast': _s88 as OpenAPISpec,
-  'asn-lookup': _s89 as OpenAPISpec,
-  'bulk-whois-lookup': _s90 as OpenAPISpec,
-  'domain-whois-history-lookup': _s91 as OpenAPISpec,
-  'reverse-whois': _s92 as OpenAPISpec,
-  'whois-domain-lookup': _s93 as OpenAPISpec,
-  'whois-ip-lookup': _s94 as OpenAPISpec,
-  'bulk-zip-code-lookup': _s95 as OpenAPISpec,
-  'zip-code-api': _s96 as OpenAPISpec,
-  'zip-code-distance-match': _s97 as OpenAPISpec,
-  'zip-code-distance': _s98 as OpenAPISpec,
-  'zip-codes-by-city': _s99 as OpenAPISpec,
-  'zip-codes-by-region': _s100 as OpenAPISpec,
-  'zip-codes-radius-search': _s101 as OpenAPISpec,
+  'bulk-pdf-generator': _s51 as OpenAPISpec,
+  'delete-pdf-page': _s52 as OpenAPISpec,
+  'linearize-pdf': _s53 as OpenAPISpec,
+  'merge-pdf': _s54 as OpenAPISpec,
+  'pdf-compress': _s55 as OpenAPISpec,
+  'pdf-decrypt': _s56 as OpenAPISpec,
+  'pdf-encrypt': _s57 as OpenAPISpec,
+  'pdf-extract-pages': _s58 as OpenAPISpec,
+  'pdf-file-status': _s59 as OpenAPISpec,
+  'pdf-file': _s60 as OpenAPISpec,
+  'pdf-files': _s61 as OpenAPISpec,
+  'pdf-generator': _s62 as OpenAPISpec,
+  'pdf-resource-download': _s63 as OpenAPISpec,
+  'pdf-resource-upload-binary': _s64 as OpenAPISpec,
+  'pdf-resource-upload': _s65 as OpenAPISpec,
+  'pdf-restrict': _s66 as OpenAPISpec,
+  'pdf-split-pages': _s67 as OpenAPISpec,
+  'pdf-task-status': _s68 as OpenAPISpec,
+  'pdf-to-image': _s69 as OpenAPISpec,
+  'pdf-unrestrict': _s70 as OpenAPISpec,
+  'rotate-pdf-pages': _s71 as OpenAPISpec,
+  'bulk-phone-number-validation': _s72 as OpenAPISpec,
+  'phone-number-validation': _s73 as OpenAPISpec,
+  'web-scraper': _s74 as OpenAPISpec,
+  'bulk-screenshot': _s75 as OpenAPISpec,
+  'website-screenshot': _s76 as OpenAPISpec,
+  'ssl-certificate-chain-lookup': _s77 as OpenAPISpec,
+  'ssl-certificate-lookup': _s78 as OpenAPISpec,
+  'timezone-converter': _s79 as OpenAPISpec,
+  'timezone-lookup': _s80 as OpenAPISpec,
+  'bulk-user-agent-parser': _s81 as OpenAPISpec,
+  'user-agent-parser': _s82 as OpenAPISpec,
+  'air-quality': _s83 as OpenAPISpec,
+  'bulk-live-weather': _s84 as OpenAPISpec,
+  'flood-forecast': _s85 as OpenAPISpec,
+  'historical-weather': _s86 as OpenAPISpec,
+  'live-weather': _s87 as OpenAPISpec,
+  'marine-weather': _s88 as OpenAPISpec,
+  'time-series-weather': _s89 as OpenAPISpec,
+  'weather-forecast': _s90 as OpenAPISpec,
+  'asn-lookup': _s91 as OpenAPISpec,
+  'bulk-whois-lookup': _s92 as OpenAPISpec,
+  'domain-whois-history-lookup': _s93 as OpenAPISpec,
+  'reverse-whois': _s94 as OpenAPISpec,
+  'whois-domain-lookup': _s95 as OpenAPISpec,
+  'whois-ip-lookup': _s96 as OpenAPISpec,
+  'bulk-zip-code-lookup': _s97 as OpenAPISpec,
+  'zip-code-api': _s98 as OpenAPISpec,
+  'zip-code-distance-match': _s99 as OpenAPISpec,
+  'zip-code-distance': _s100 as OpenAPISpec,
+  'zip-codes-by-city': _s101 as OpenAPISpec,
+  'zip-codes-by-region': _s102 as OpenAPISpec,
+  'zip-codes-radius-search': _s103 as OpenAPISpec,
 };
 
-export const SPEC_SLUGS: string[] = ['commodity-fluctuation', 'commodity-prices', 'commodity-symbols', 'commodity-time-series', 'historical-commodity-prices', 'currency-converter', 'currency-fluctuation', 'currency-historical-data-limit', 'currency-rate', 'currency-supported', 'currency-symbols', 'currency-time-series', 'geolocalized-currency-conversion', 'historical-currency-converter', 'historical-currency-rate', 'bulk-dns-lookup', 'dns-history-lookup', 'dns-lookup', 'reverse-dns-lookup', 'bulk-domain-checker', 'domain-search-with-suggestions', 'domain-search', 'subdomain-lookup', 'bulk-email-validation', 'email-checker', 'bulk-vat-rates-country', 'financial-apis-supported-countries', 'iban-validation', 'swift-code-finder', 'swift-code-lookup', 'vat-number-validation', 'vat-rates-by-ip', 'vat-rates-country', 'usage-credits', 'forward-geocoding', 'reverse-geocoding', 'administrative-units-details', 'administrative-units-levels', 'administrative-units', 'cities', 'countries-details', 'countries', 'flags-supported', 'flags', 'regions', 'subregions', 'bulk-ip-lookup', 'bulk-ip-threat-intelligence', 'ip-locator', 'ip-threat-intelligence', 'astronomy-data', 'delete-pdf-page', 'linearize-pdf', 'merge-pdf', 'pdf-compress', 'pdf-decrypt', 'pdf-encrypt', 'pdf-extract-pages', 'pdf-file-status', 'pdf-file', 'pdf-files', 'pdf-resource-download', 'pdf-resource-upload-binary', 'pdf-resource-upload', 'pdf-restrict', 'pdf-split-pages', 'pdf-task-status', 'pdf-to-image', 'pdf-unrestrict', 'rotate-pdf-pages', 'bulk-phone-number-validation', 'phone-number-validation', 'web-scraper', 'bulk-screenshot', 'website-screenshot', 'ssl-certificate-chain-lookup', 'ssl-certificate-lookup', 'timezone-converter', 'timezone-lookup', 'bulk-user-agent-parser', 'user-agent-parser', 'air-quality', 'bulk-live-weather', 'flood-forecast', 'historical-weather', 'live-weather', 'marine-weather', 'time-series-weather', 'weather-forecast', 'asn-lookup', 'bulk-whois-lookup', 'domain-whois-history-lookup', 'reverse-whois', 'whois-domain-lookup', 'whois-ip-lookup', 'bulk-zip-code-lookup', 'zip-code-api', 'zip-code-distance-match', 'zip-code-distance', 'zip-codes-by-city', 'zip-codes-by-region', 'zip-codes-radius-search'];
+export const SPEC_SLUGS: string[] = ['commodity-fluctuation', 'commodity-prices', 'commodity-symbols', 'commodity-time-series', 'historical-commodity-prices', 'currency-converter', 'currency-fluctuation', 'currency-historical-data-limit', 'currency-rate', 'currency-supported', 'currency-symbols', 'currency-time-series', 'geolocalized-currency-conversion', 'historical-currency-converter', 'historical-currency-rate', 'bulk-dns-lookup', 'dns-history-lookup', 'dns-lookup', 'reverse-dns-lookup', 'bulk-domain-checker', 'domain-search-with-suggestions', 'domain-search', 'subdomain-lookup', 'bulk-email-validation', 'email-checker', 'bulk-vat-rates-country', 'financial-apis-supported-countries', 'iban-validation', 'swift-code-finder', 'swift-code-lookup', 'vat-number-validation', 'vat-rates-by-ip', 'vat-rates-country', 'usage-credits', 'forward-geocoding', 'reverse-geocoding', 'administrative-units-details', 'administrative-units-levels', 'administrative-units', 'cities', 'countries-details', 'countries', 'flags-supported', 'flags', 'regions', 'subregions', 'bulk-ip-lookup', 'bulk-ip-threat-intelligence', 'ip-locator', 'ip-threat-intelligence', 'astronomy-data', 'bulk-pdf-generator', 'delete-pdf-page', 'linearize-pdf', 'merge-pdf', 'pdf-compress', 'pdf-decrypt', 'pdf-encrypt', 'pdf-extract-pages', 'pdf-file-status', 'pdf-file', 'pdf-files', 'pdf-generator', 'pdf-resource-download', 'pdf-resource-upload-binary', 'pdf-resource-upload', 'pdf-restrict', 'pdf-split-pages', 'pdf-task-status', 'pdf-to-image', 'pdf-unrestrict', 'rotate-pdf-pages', 'bulk-phone-number-validation', 'phone-number-validation', 'web-scraper', 'bulk-screenshot', 'website-screenshot', 'ssl-certificate-chain-lookup', 'ssl-certificate-lookup', 'timezone-converter', 'timezone-lookup', 'bulk-user-agent-parser', 'user-agent-parser', 'air-quality', 'bulk-live-weather', 'flood-forecast', 'historical-weather', 'live-weather', 'marine-weather', 'time-series-weather', 'weather-forecast', 'asn-lookup', 'bulk-whois-lookup', 'domain-whois-history-lookup', 'reverse-whois', 'whois-domain-lookup', 'whois-ip-lookup', 'bulk-zip-code-lookup', 'zip-code-api', 'zip-code-distance-match', 'zip-code-distance', 'zip-codes-by-city', 'zip-codes-by-region', 'zip-codes-radius-search'];
 
 export const SPEC_CATEGORIES: string[] = ['commodity', 'currency', 'dns', 'domain', 'email-validation', 'financial', 'general', 'geocoding', 'geodb', 'ip-intelligence', 'other', 'pdf', 'phone-validation', 'scraper', 'screenshot', 'ssl', 'timezone', 'user-agent', 'weather', 'whois', 'zip-code'];
 
@@ -225,7 +229,7 @@ export const SPECS_BY_CATEGORY: Record<string, string[]> = {
   'geodb': ['administrative-units-details', 'administrative-units-levels', 'administrative-units', 'cities', 'countries-details', 'countries', 'flags-supported', 'flags', 'regions', 'subregions'],
   'ip-intelligence': ['bulk-ip-lookup', 'bulk-ip-threat-intelligence', 'ip-locator', 'ip-threat-intelligence'],
   'other': ['astronomy-data'],
-  'pdf': ['delete-pdf-page', 'linearize-pdf', 'merge-pdf', 'pdf-compress', 'pdf-decrypt', 'pdf-encrypt', 'pdf-extract-pages', 'pdf-file-status', 'pdf-file', 'pdf-files', 'pdf-resource-download', 'pdf-resource-upload-binary', 'pdf-resource-upload', 'pdf-restrict', 'pdf-split-pages', 'pdf-task-status', 'pdf-to-image', 'pdf-unrestrict', 'rotate-pdf-pages'],
+  'pdf': ['bulk-pdf-generator', 'delete-pdf-page', 'linearize-pdf', 'merge-pdf', 'pdf-compress', 'pdf-decrypt', 'pdf-encrypt', 'pdf-extract-pages', 'pdf-file-status', 'pdf-file', 'pdf-files', 'pdf-generator', 'pdf-resource-download', 'pdf-resource-upload-binary', 'pdf-resource-upload', 'pdf-restrict', 'pdf-split-pages', 'pdf-task-status', 'pdf-to-image', 'pdf-unrestrict', 'rotate-pdf-pages'],
   'phone-validation': ['bulk-phone-number-validation', 'phone-number-validation'],
   'scraper': ['web-scraper'],
   'screenshot': ['bulk-screenshot', 'website-screenshot'],
@@ -255,6 +259,7 @@ export const SpecSlug = {
   BULK_IP_LOOKUP: 'bulk-ip-lookup',
   BULK_IP_THREAT_INTELLIGENCE: 'bulk-ip-threat-intelligence',
   BULK_LIVE_WEATHER: 'bulk-live-weather',
+  BULK_PDF_GENERATOR: 'bulk-pdf-generator',
   BULK_PHONE_NUMBER_VALIDATION: 'bulk-phone-number-validation',
   BULK_SCREENSHOT: 'bulk-screenshot',
   BULK_USER_AGENT_PARSER: 'bulk-user-agent-parser',
@@ -306,6 +311,7 @@ export const SpecSlug = {
   PDF_FILE: 'pdf-file',
   PDF_FILE_STATUS: 'pdf-file-status',
   PDF_FILES: 'pdf-files',
+  PDF_GENERATOR: 'pdf-generator',
   PDF_RESOURCE_DOWNLOAD: 'pdf-resource-download',
   PDF_RESOURCE_UPLOAD: 'pdf-resource-upload',
   PDF_RESOURCE_UPLOAD_BINARY: 'pdf-resource-upload-binary',
