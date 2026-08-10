@@ -2,8 +2,8 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Merge PDF API - Instantly Combine PDFs at Scale",
-    "version": "1.0.0",
-    "description": "Merge multiple PDF files into a single PDF document in the order they are provided. Accepts up to 100 files per request via file upload or existing file IDs. Returns a task ID for tracking the merge progress.",
+    "version": "1.0.1",
+    "description": "Merge multiple PDF files into a single PDF document in the order they are provided. Accepts input files up to 1GB in size via file upload or existing file IDs. Returns a task ID for tracking the merge progress.",
     "contact": {
       "name": "APIFreaks Support",
       "url": "https://apifreaks.com/contact",
