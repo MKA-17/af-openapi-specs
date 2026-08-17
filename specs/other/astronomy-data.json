@@ -340,10 +340,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2013 Invalid parameters provided",
+            "description": "Bad Request – Invalid parameters provided",
             "content": {
               "application/json": {
                 "schema": {
@@ -370,6 +375,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "404": {
@@ -387,6 +397,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -427,7 +442,6 @@
         },
         "description": "Astronomy data response containing location information and astronomical data."
       },
-
       "AstronomyLocation": {
         "type": "object",
         "description": "Geographic location information for the astronomy calculation. The set of populated fields depends on which lookup mode the request used: (1) location param (geocode-by-address) returns location_string plus a basic field set (country_name, state_prov, city, locality, latitude, longitude, elevation); (2) lat + long params (geocode-by-coordinates) returns the same basic field set minus location_string, and locality may be an empty string when the coordinates don't resolve to a named sub-area; (3) ip param, or no location/lat/long/ip param at all (falls back to geo-IP lookup of the client's IP), returns the full geo-IP field set — continent_code, continent_name, country_code2, country_code3, country_name_official, is_eu, state_code, district, zipcode — in addition to the basic fields, but never location_string. elevation can be an empty string when elevation data is unavailable for the resolved location.",
@@ -788,6 +802,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

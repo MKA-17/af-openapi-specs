@@ -87,6 +87,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -200,6 +205,14 @@
             "type": "string",
             "description": "Full name of the unit of measurement (e.g., Troy Ounce)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

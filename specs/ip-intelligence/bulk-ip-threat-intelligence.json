@@ -176,6 +176,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
@@ -197,6 +202,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -402,6 +412,14 @@
             "type": "string",
             "description": "Name of the cloud provider, if the IP address belongs to a cloud provider."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

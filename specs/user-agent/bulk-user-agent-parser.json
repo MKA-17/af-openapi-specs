@@ -151,7 +151,7 @@
                     ]
                   },
                   "mixedWithUnparsable": {
-                    "summary": "Batch with a malformed (non-empty) string \u2014 still 200, that entry comes back as Hacker",
+                    "summary": "Batch with a malformed (non-empty) string — still 200, that entry comes back as Hacker",
                     "value": [
                       {
                         "user_agent_string": "asdkjaslkdjaslkdj12312",
@@ -209,10 +209,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Invalid/missing request body, or an empty/null string anywhere in uaStrings (fails the whole batch, not a per-item error)",
+            "description": "Bad Request — Invalid/missing request body, or an empty/null string anywhere in uaStrings (fails the whole batch, not a per-item error)",
             "content": {
               "application/json": {
                 "schema": {
@@ -236,6 +241,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -426,6 +436,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

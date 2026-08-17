@@ -175,6 +175,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
@@ -197,49 +202,10 @@
                   }
                 }
               }
-            }
-          },
-          "413": {
-            "description": "Payload Too Large – Request body exceeds the size limit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "payloadTooLarge": {
-                    "summary": "Too many numbers / body too large",
-                    "value": {
-                      "error": "Payload too large Exception",
-                      "message": "Maximum request body size limit exceeded",
-                      "path": "/v1.0/phone/validation/bulk",
-                      "status": 413,
-                      "timestamp": "2026-07-27T12:57:03.711Z"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "408": {
-            "description": "Request Timeout – Timed out while connecting to the remote server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                },
-                "examples": {
-                  "error": {
-                    "summary": "Error response",
-                    "value": {
-                      "timestamp": "2026-06-06T14:00:00.000Z",
-                      "path": "/v1.0/phone/validation/bulk",
-                      "status": 408,
-                      "error": "Request Timeout",
-                      "message": "Timed out while connecting to the remote URL."
-                    }
-                  }
-                }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           },
@@ -263,6 +229,65 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
+            }
+          },
+          "408": {
+            "description": "Request Timeout – Timed out while connecting to the remote server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "error": {
+                    "summary": "Error response",
+                    "value": {
+                      "timestamp": "2026-06-06T14:00:00.000Z",
+                      "path": "/v1.0/phone/validation/bulk",
+                      "status": 408,
+                      "error": "Request Timeout",
+                      "message": "Timed out while connecting to the remote URL."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
+            }
+          },
+          "413": {
+            "description": "Payload Too Large – Request body exceeds the size limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "payloadTooLarge": {
+                    "summary": "Too many numbers / body too large",
+                    "value": {
+                      "error": "Payload too large Exception",
+                      "message": "Maximum request body size limit exceeded",
+                      "path": "/v1.0/phone/validation/bulk",
+                      "status": 413,
+                      "timestamp": "2026-07-27T12:57:03.711Z"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "429": {
@@ -284,6 +309,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -504,6 +534,14 @@
         },
         "description": "Standard error envelope returned by the API on failed requests.",
         "required": ["message"]
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
+        }
       }
     }
   },

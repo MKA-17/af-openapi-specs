@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/encrypt": {
       "post": {
-        "tags": [
-          "PDF Security APIs"
-        ],
+        "tags": ["PDF Security APIs"],
         "summary": "Add password protection to a PDF",
         "description": "This API encrypts a PDF file by setting a password required to open it.",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -109,7 +104,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -145,17 +140,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "c11f7d84-33f5-46da-a64c-e70b3704284e",
-                      "inputIds": [
-                        "2d11e722-85cc-4105-b345-f395d48b326e"
-                      ]
+                      "inputIds": ["2d11e722-85cc-4105-b345-f395d48b326e"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters, file ID, or password",
+            "description": "Bad Request — Missing/invalid parameters, file ID, or password",
             "content": {
               "application/json": {
                 "examples": {
@@ -194,10 +192,15 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "examples": {
@@ -215,6 +218,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -242,9 +250,7 @@
       "PDFResponse": {
         "type": "object",
         "description": "Response containing the task ID and input file IDs for a PDF processing task.",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -274,9 +280,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -299,6 +303,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

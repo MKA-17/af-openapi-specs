@@ -421,6 +421,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
@@ -463,6 +468,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "404": {
@@ -486,6 +496,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -577,7 +592,7 @@
           },
           "current_time": {
             "type": "string",
-            "description": "The current date and time with timezone offset in YYYY-MM-DD HH:mm:ss.SSS\u00b1ZZZZ format."
+            "description": "The current date and time with timezone offset in YYYY-MM-DD HH:mm:ss.SSS±ZZZZ format."
           },
           "current_time_unix": {
             "type": "number",
@@ -602,7 +617,7 @@
           },
           "date_time_ymd": {
             "type": "string",
-            "description": "The date and time with timezone offset in ISO 8601 format YYYY-MM-DDTHH:mm:ss\u00b1HHMM."
+            "description": "The date and time with timezone offset in ISO 8601 format YYYY-MM-DDTHH:mm:ss±HHMM."
           },
           "time_24": {
             "type": "string",
@@ -895,6 +910,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

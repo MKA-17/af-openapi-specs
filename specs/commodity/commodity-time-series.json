@@ -19,9 +19,7 @@
   "paths": {
     "/commodity/time-series": {
       "get": {
-        "tags": [
-          "Commodity APIs"
-        ],
+        "tags": ["Commodity APIs"],
         "summary": "Get commodity price time series",
         "description": "Returns day-by-day OHLC data for the requested commodity symbols within a date range.",
         "operationId": "getCommodityTimeSeries",
@@ -34,9 +32,7 @@
             "schema": {
               "type": "string",
               "default": "json",
-              "enum": [
-                "json"
-              ]
+              "enum": ["json"]
             }
           },
           {
@@ -112,10 +108,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing parameters, invalid dates, or date range exceeded",
+            "description": "Bad Request — Missing parameters, invalid dates, or date range exceeded",
             "content": {
               "application/json": {
                 "examples": {
@@ -164,6 +165,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "404": {
@@ -196,6 +202,11 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -220,12 +231,7 @@
     "schemas": {
       "CommodityTimeSeriesResponse": {
         "type": "object",
-        "required": [
-          "success",
-          "startDate",
-          "endDate",
-          "rates"
-        ],
+        "required": ["success", "startDate", "endDate", "rates"],
         "properties": {
           "success": {
             "type": "boolean",
@@ -314,6 +320,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

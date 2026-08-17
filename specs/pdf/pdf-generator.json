@@ -159,10 +159,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing or malformed parameters, missing data, or an unreachable data_url.",
+            "description": "Bad Request — Missing or malformed parameters, missing data, or an unreachable data_url.",
             "content": {
               "application/json": {
                 "schema": {
@@ -201,10 +206,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "401": {
-            "description": "Unauthorized \u2014 The API key is missing or invalid.",
+            "description": "Unauthorized — The API key is missing or invalid.",
             "content": {
               "application/json": {
                 "schema": {
@@ -223,10 +233,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "403": {
-            "description": "Forbidden \u2014 The account does not have access to this template.",
+            "description": "Forbidden — The account does not have access to this template.",
             "content": {
               "application/json": {
                 "schema": {
@@ -245,10 +260,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "404": {
-            "description": "Not Found \u2014 No template matches the template_id, or the requested version does not exist.",
+            "description": "Not Found — No template matches the template_id, or the requested version does not exist.",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,10 +287,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 The request Content-Type is not supported for this endpoint.",
+            "description": "Unsupported Media Type — The request Content-Type is not supported for this endpoint.",
             "content": {
               "application/json": {
                 "schema": {
@@ -289,10 +314,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "422": {
-            "description": "Unprocessable Entity \u2014 The request contains invalid or missing data.",
+            "description": "Unprocessable Entity — The request contains invalid or missing data.",
             "content": {
               "application/json": {
                 "schema": {
@@ -311,10 +341,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "500": {
-            "description": "Internal Server Error \u2014 An unexpected error occurred, or the PDF could not be generated.",
+            "description": "Internal Server Error — An unexpected error occurred, or the PDF could not be generated.",
             "content": {
               "application/json": {
                 "schema": {
@@ -333,10 +368,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "504": {
-            "description": "Gateway Timeout \u2014 The request went past the 100 second processing limit.",
+            "description": "Gateway Timeout — The request went past the 100 second processing limit.",
             "content": {
               "application/json": {
                 "schema": {
@@ -354,6 +394,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -429,6 +474,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

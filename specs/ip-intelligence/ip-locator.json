@@ -127,7 +127,7 @@
                         "is_eu": false,
                         "country_flag": "https://ipgeolocation.io/static/flags/us_64.png",
                         "geoname_id": "6301403",
-                        "country_emoji": "\ud83c\uddfa\ud83c\uddf8"
+                        "country_emoji": "🇺🇸"
                       },
                       "country_metadata": {
                         "calling_code": "+1",
@@ -194,10 +194,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Invalid or missing parameters",
+            "description": "Bad Request — Invalid or missing parameters",
             "content": {
               "application/json": {
                 "schema": {
@@ -212,10 +217,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "404": {
-            "description": "Not Found \u2014 IP address not in database",
+            "description": "Not Found — IP address not in database",
             "content": {
               "application/json": {
                 "schema": {
@@ -230,10 +240,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "423": {
-            "description": "Locked \u2014 Bogon or reserved IP address",
+            "description": "Locked — Bogon or reserved IP address",
             "content": {
               "application/json": {
                 "schema": {
@@ -247,6 +262,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -743,7 +763,7 @@
           },
           "current_time": {
             "type": "string",
-            "description": "Local date/time in YYYY-MM-DD HH:mm:ss.SSS\u00b1ZZZZ format."
+            "description": "Local date/time in YYYY-MM-DD HH:mm:ss.SSS±ZZZZ format."
           },
           "current_time_unix": {
             "type": "number",
@@ -926,6 +946,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

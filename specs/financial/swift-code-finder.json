@@ -74,7 +74,13 @@
                 "examples": {
                   "allCountries": {
                     "summary": "No parameters — all supported countries",
-                    "value": ["Albania", "Algeria", "Andorra", "Germany", "United States"]
+                    "value": [
+                      "Albania",
+                      "Algeria",
+                      "Andorra",
+                      "Germany",
+                      "United States"
+                    ]
                   },
                   "banksInCountry": {
                     "summary": "country only — bank names in that country",
@@ -82,7 +88,12 @@
                   },
                   "citiesForBank": {
                     "summary": "country + bank — cities that bank operates in",
-                    "value": ["AACHEN", "BERLIN", "FRANKFURT AM MAIN", "MUENCHEN"]
+                    "value": [
+                      "AACHEN",
+                      "BERLIN",
+                      "FRANKFURT AM MAIN",
+                      "MUENCHEN"
+                    ]
                   },
                   "swiftCodes": {
                     "summary": "country + bank + city — matching SWIFT/BIC codes",
@@ -99,6 +110,11 @@
                     "value": []
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           },
@@ -117,6 +133,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -177,6 +198,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

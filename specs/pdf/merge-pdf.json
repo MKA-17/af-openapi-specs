@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/merge": {
       "post": {
-        "tags": [
-          "PDF Operations APIs"
-        ],
+        "tags": ["PDF Operations APIs"],
         "summary": "Combine multiple PDF files into one",
         "description": "This API merges multiple PDF files into a single PDF, in the order they are provided",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -87,7 +82,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -123,12 +118,15 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
-                      "inputIds": [
-                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
-                      ]
+                      "inputIds": ["7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"]
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           },
@@ -162,10 +160,15 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "examples": {
@@ -183,6 +186,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -209,9 +217,7 @@
     "schemas": {
       "PDFResponse": {
         "type": "object",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -245,9 +251,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -270,6 +274,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

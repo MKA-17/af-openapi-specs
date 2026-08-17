@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/restrict": {
       "post": {
-        "tags": [
-          "PDF Security APIs"
-        ],
+        "tags": ["PDF Security APIs"],
         "summary": "Apply permission restrictions on a PDF file",
         "description": "This API applies permission restrictions on a PDF file, such as disabling printing, copying, or editing. This can include password protection to enforce restrictions.",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -100,7 +95,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "A comma-separated list of restrictions to apply to the PDF. These define what the end-user is *not* allowed to do with the PDF. Available options are:\n\n\n* **print_high** \u2013 Disables high-quality printing.\n* **print_low** \u2013 Disables low-resolution printing.\n* **edit_document_assembly** \u2013 Prevents reordering or inserting pages.\n* **fill_form_fields** \u2013 Disallows filling in PDF form fields.\n* **edit_annotations** \u2013 Disables adding or modifying annotations or comments.\n* **modify_content** \u2013 Prevents modifying existing content in the PDF.\n* **copy_and_extract_content** \u2013 Disables copying text or images from the PDF.\n* **use_accessibility** \u2013 Prevents screen readers or accessibility tools from accessing content. An invalid restriction keyword returns a 400 with error \"Invalid PDF Restriction\"."
+            "description": "A comma-separated list of restrictions to apply to the PDF. These define what the end-user is *not* allowed to do with the PDF. Available options are:\n\n\n* **print_high** – Disables high-quality printing.\n* **print_low** – Disables low-resolution printing.\n* **edit_document_assembly** – Prevents reordering or inserting pages.\n* **fill_form_fields** – Disallows filling in PDF form fields.\n* **edit_annotations** – Disables adding or modifying annotations or comments.\n* **modify_content** – Prevents modifying existing content in the PDF.\n* **copy_and_extract_content** – Disables copying text or images from the PDF.\n* **use_accessibility** – Prevents screen readers or accessibility tools from accessing content. An invalid restriction keyword returns a 400 with error \"Invalid PDF Restriction\"."
           },
           {
             "name": "webhook_url",
@@ -118,7 +113,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -154,17 +149,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "42839406-7e1b-4f64-96bb-d94bb054e8d3",
-                      "inputIds": [
-                        "2c682ade-eccc-4ab5-9c06-d16e415cbecb"
-                      ]
+                      "inputIds": ["2c682ade-eccc-4ab5-9c06-d16e415cbecb"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters, file ID, or password",
+            "description": "Bad Request — Missing/invalid parameters, file ID, or password",
             "content": {
               "application/json": {
                 "examples": {
@@ -223,10 +221,15 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "schema": {
@@ -244,6 +247,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -271,9 +279,7 @@
       "PDFResponse": {
         "type": "object",
         "description": "Response containing the task ID and input file IDs for a PDF processing task.",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -303,9 +309,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -328,6 +332,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

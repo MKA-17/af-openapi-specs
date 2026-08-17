@@ -58,7 +58,11 @@
                     "summary": "Typical successful response (truncated)",
                     "value": {
                       "VAT_Supported_Countries_And_States": [
-                        { "germany": { "code": "de" } },
+                        {
+                          "germany": {
+                            "code": "de"
+                          }
+                        },
                         {
                           "united_states": {
                             "code": "us",
@@ -71,16 +75,33 @@
                         }
                       ],
                       "IBAN_Supported_Countries": [
-                        { "countryCode": "DE", "name": "Germany" },
-                        { "countryCode": "GB", "name": "United Kingdom" }
+                        {
+                          "countryCode": "DE",
+                          "name": "Germany"
+                        },
+                        {
+                          "countryCode": "GB",
+                          "name": "United Kingdom"
+                        }
                       ],
                       "SWIFT_Supported_Countries": [
-                        { "name": "Germany", "countryCode": "DE" },
-                        { "name": "United States", "countryCode": "US" }
+                        {
+                          "name": "Germany",
+                          "countryCode": "DE"
+                        },
+                        {
+                          "name": "United States",
+                          "countryCode": "US"
+                        }
                       ]
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -189,6 +210,14 @@
             "type": "string",
             "description": "ISO 3166-1 alpha-2 country code."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

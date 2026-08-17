@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/png": {
       "post": {
-        "tags": [
-          "PDF To Image APIs"
-        ],
+        "tags": ["PDF To Image APIs"],
         "summary": "Convert PDF to PNG",
         "description": "This API converts a given PDF file into a sequence of PNG images.",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -99,14 +94,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "bw",
-                "gray",
-                "rgb",
-                "rgba",
-                "4-bit",
-                "8-bit"
-              ]
+              "enum": ["bw", "gray", "rgb", "rgba", "4-bit", "8-bit"]
             },
             "description": "Specifies the color profile for the output PNG images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
           },
@@ -126,7 +114,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -162,17 +150,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "b48e5ed0-e5ce-41bd-953c-6c590ded4b20",
-                      "inputIds": [
-                        "6d994947-3909-46cf-91fe-24316c457e2a"
-                      ]
+                      "inputIds": ["6d994947-3909-46cf-91fe-24316c457e2a"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -231,6 +222,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         },
@@ -239,9 +235,7 @@
     },
     "/pdf/jpg": {
       "post": {
-        "tags": [
-          "PDF To Image APIs"
-        ],
+        "tags": ["PDF To Image APIs"],
         "summary": "Convert PDF to JPG",
         "description": "This API converts a given PDF file into a sequence of JPG images.",
         "parameters": [
@@ -251,10 +245,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -328,11 +319,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "gray",
-                "rgb",
-                "cmyk"
-              ]
+              "enum": ["gray", "rgb", "cmyk"]
             },
             "description": "Specifies the color profile for the output JPG images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
           },
@@ -352,7 +339,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -388,17 +375,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
-                      "inputIds": [
-                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
-                      ]
+                      "inputIds": ["7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -467,6 +457,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -474,9 +469,7 @@
     },
     "/pdf/tif": {
       "post": {
-        "tags": [
-          "PDF To Image APIs"
-        ],
+        "tags": ["PDF To Image APIs"],
         "summary": "Convert a PDF file into a sequence of TIFF images.",
         "description": "This API converts a given PDF file into a sequence of TIFF images. The output images can be saved as a single TIFF file, or as a sequence of TIFF files.",
         "parameters": [
@@ -486,10 +479,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -554,13 +544,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "bw",
-                "gray",
-                "rgb",
-                "rgba",
-                "cmyk"
-              ]
+              "enum": ["bw", "gray", "rgb", "rgba", "cmyk"]
             },
             "description": "Specifies the color profile for the output TIF images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
           },
@@ -580,7 +564,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -616,17 +600,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
-                      "inputIds": [
-                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
-                      ]
+                      "inputIds": ["7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -685,6 +672,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -692,9 +684,7 @@
     },
     "/pdf/bmp": {
       "post": {
-        "tags": [
-          "PDF To Image APIs"
-        ],
+        "tags": ["PDF To Image APIs"],
         "summary": "Convert PDF to BMP",
         "description": "Converts a PDF file to a BMP image.",
         "parameters": [
@@ -704,10 +694,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -772,13 +759,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "bw",
-                "gray",
-                "rgb",
-                "4-bit",
-                "8-bit"
-              ]
+              "enum": ["bw", "gray", "rgb", "4-bit", "8-bit"]
             },
             "description": "Specifies the color profile for the output BMP images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
           },
@@ -798,7 +779,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -834,17 +815,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
-                      "inputIds": [
-                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
-                      ]
+                      "inputIds": ["7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -903,6 +887,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -910,9 +899,7 @@
     },
     "/pdf/gif": {
       "post": {
-        "tags": [
-          "PDF To Image APIs"
-        ],
+        "tags": ["PDF To Image APIs"],
         "summary": "Convert PDF to GIF",
         "description": "This API converts a given PDF file into a sequence of GIF images.",
         "parameters": [
@@ -922,10 +909,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -990,14 +974,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "bw",
-                "gray",
-                "rgb",
-                "rgba",
-                "4-bit",
-                "8-bit"
-              ]
+              "enum": ["bw", "gray", "rgb", "rgba", "4-bit", "8-bit"]
             },
             "description": "Specifies the color profile for the output GIF images. Acceptable values: bw (1-bit black & white, smallest size, no grayscale or color), gray (8-bit grayscale), rgb (24-bit RGB color, default), rgba (32-bit RGB color with alpha channel for transparency), 4-bit (4-bit indexed color, up to 16 colors, smaller size), or 8-bit (8-bit indexed color, up to 256 colors)."
           },
@@ -1017,7 +994,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -1053,17 +1030,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "04a06cd5-158d-4191-a45b-6f58249c599d",
-                      "inputIds": [
-                        "7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"
-                      ]
+                      "inputIds": ["7a9e4b12-f3c8-4d56-b7e1-8c2f9d0a3e6f"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -1122,6 +1102,11 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           }
         }
@@ -1147,9 +1132,7 @@
       "PDFResponse": {
         "type": "object",
         "description": "Response containing the task ID and input file IDs for a PDF processing task.",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -1179,9 +1162,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -1204,6 +1185,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

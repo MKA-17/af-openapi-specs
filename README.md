@@ -19,13 +19,13 @@ import {
   SPEC_SLUGS,
   SPEC_CATEGORIES,
   SPECS_BY_CATEGORY,
-} from '@apifreaks/openapi-specs';
+} from "@apifreaks/openapi-specs";
 
 // Get a single spec by slug
-const spec = getSpec('ip-locator');
+const spec = getSpec("ip-locator");
 
 // Get all slugs in a category
-const ipSlugs = getSpecsByCategory('ip-intelligence');
+const ipSlugs = getSpecsByCategory("ip-intelligence");
 
 // All available slugs
 console.log(SPEC_SLUGS); // ['ip-locator', 'dns-lookup', ...]
@@ -40,59 +40,59 @@ console.log(SPECS_BY_CATEGORY);
 ### Direct JSON import (tree-shakable)
 
 ```ts
-import ipLocator from '@apifreaks/openapi-specs/specs/ip-intelligence/ip-locator.json';
+import ipLocator from "@apifreaks/openapi-specs/specs/ip-intelligence/ip-locator.json";
 ```
 
 ### CommonJS
 
 ```js
-const { getSpec, SPEC_SLUGS } = require('@apifreaks/openapi-specs');
+const { getSpec, SPEC_SLUGS } = require("@apifreaks/openapi-specs");
 ```
 
 ## API
 
-| Export | Type | Description |
-|---|---|---|
-| `getSpec(slug)` | `(string) => OpenAPISpec \| undefined` | Returns the full spec object for a given slug |
-| `getSpecsByCategory(category)` | `(string) => string[]` | Returns all slugs in a category, or `[]` if unknown |
-| `SPEC_SLUGS` | `string[]` | All 102 spec slugs |
-| `SPEC_CATEGORIES` | `string[]` | All 21 category names |
-| `SPECS` | `Record<string, OpenAPISpec>` | Full spec objects keyed by slug |
-| `SPECS_BY_CATEGORY` | `Record<string, string[]>` | Slugs grouped by category |
+| Export                         | Type                                   | Description                                         |
+| ------------------------------ | -------------------------------------- | --------------------------------------------------- |
+| `getSpec(slug)`                | `(string) => OpenAPISpec \| undefined` | Returns the full spec object for a given slug       |
+| `getSpecsByCategory(category)` | `(string) => string[]`                 | Returns all slugs in a category, or `[]` if unknown |
+| `SPEC_SLUGS`                   | `string[]`                             | All 102 spec slugs                                  |
+| `SPEC_CATEGORIES`              | `string[]`                             | All 21 category names                               |
+| `SPECS`                        | `Record<string, OpenAPISpec>`          | Full spec objects keyed by slug                     |
+| `SPECS_BY_CATEGORY`            | `Record<string, string[]>`             | Slugs grouped by category                           |
 
 ### Types
 
 ```ts
-import type { OpenAPISpec } from '@apifreaks/openapi-specs';
+import type { OpenAPISpec } from "@apifreaks/openapi-specs";
 
 // OpenAPISpec has: openapi, info, servers?, paths?, components?, [key: string]
 ```
 
 ## Categories
 
-| Category | Count | Description |
-|---|---|---|
-| `commodity` | 5 | Commodity prices, symbols, time series |
-| `currency` | 10 | Exchange rates, conversion, historical data |
-| `dns` | 4 | DNS lookup, reverse DNS, history |
-| `domain` | 4 | Domain search, checker, subdomain lookup |
-| `email-validation` | 2 | Email verification and bulk validation |
-| `financial` | 8 | VAT rates, IBAN/SWIFT validation |
-| `general` | 1 | Usage and credits |
-| `geocoding` | 2 | Forward and reverse geocoding |
-| `geodb` | 10 | Countries, cities, regions, flags, administrative units |
-| `ip-intelligence` | 4 | IP geolocation, threat intelligence, bulk lookup |
-| `other` | 1 | Astronomy data |
-| `pdf` | 19 | PDF manipulation, conversion, encryption |
-| `phone-validation` | 2 | Phone number validation |
-| `scraper` | 1 | Web scraping |
-| `screenshot` | 2 | Website screenshots |
-| `ssl` | 2 | SSL certificate lookup |
-| `timezone` | 2 | Timezone lookup and conversion |
-| `user-agent` | 2 | User-agent parsing |
-| `weather` | 8 | Current, forecast, historical, marine weather |
-| `whois` | 6 | WHOIS lookup, ASN, reverse WHOIS |
-| `zip-code` | 7 | Zip code lookup, distance, radius search |
+| Category           | Count | Description                                             |
+| ------------------ | ----- | ------------------------------------------------------- |
+| `commodity`        | 5     | Commodity prices, symbols, time series                  |
+| `currency`         | 10    | Exchange rates, conversion, historical data             |
+| `dns`              | 4     | DNS lookup, reverse DNS, history                        |
+| `domain`           | 4     | Domain search, checker, subdomain lookup                |
+| `email-validation` | 2     | Email verification and bulk validation                  |
+| `financial`        | 8     | VAT rates, IBAN/SWIFT validation                        |
+| `general`          | 1     | Usage and credits                                       |
+| `geocoding`        | 2     | Forward and reverse geocoding                           |
+| `geodb`            | 10    | Countries, cities, regions, flags, administrative units |
+| `ip-intelligence`  | 4     | IP geolocation, threat intelligence, bulk lookup        |
+| `other`            | 1     | Astronomy data                                          |
+| `pdf`              | 19    | PDF manipulation, conversion, encryption                |
+| `phone-validation` | 2     | Phone number validation                                 |
+| `scraper`          | 1     | Web scraping                                            |
+| `screenshot`       | 2     | Website screenshots                                     |
+| `ssl`              | 2     | SSL certificate lookup                                  |
+| `timezone`         | 2     | Timezone lookup and conversion                          |
+| `user-agent`       | 2     | User-agent parsing                                      |
+| `weather`          | 8     | Current, forecast, historical, marine weather           |
+| `whois`            | 6     | WHOIS lookup, ASN, reverse WHOIS                        |
+| `zip-code`         | 7     | Zip code lookup, distance, radius search                |
 
 ## Development
 

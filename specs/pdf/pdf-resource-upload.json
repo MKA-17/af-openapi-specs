@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/resource/upload": {
       "post": {
-        "tags": [
-          "PDF Upload and Download APIs"
-        ],
+        "tags": ["PDF Upload and Download APIs"],
         "summary": "Upload multiple PDFs and get file IDs",
         "description": "This API uploads multiple PDF files to the API Freaks server and generates their unique file IDs.",
         "operationId": "uploadResource",
@@ -32,10 +30,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -97,10 +92,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing or invalid parameters",
+            "description": "Bad Request — Missing or invalid parameters",
             "content": {
               "application/json": {
                 "schema": {
@@ -119,10 +119,15 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "schema": {
@@ -140,6 +145,11 @@
                     }
                   }
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -165,18 +175,13 @@
     "schemas": {
       "ResourceUploadResponse": {
         "type": "object",
-        "required": [
-          "files"
-        ],
+        "required": ["files"],
         "properties": {
           "files": {
             "type": "array",
             "items": {
               "type": "object",
-              "required": [
-                "fileName",
-                "fileId"
-              ],
+              "required": ["fileName", "fileId"],
               "properties": {
                 "fileName": {
                   "type": "string",
@@ -208,9 +213,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -233,6 +236,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

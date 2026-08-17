@@ -741,6 +741,17 @@
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              },
+              "X-Concurrent-Threads": {
+                "$ref": "#/components/headers/X-Concurrent-Threads"
+              },
+              "X-Concurrent-Threads-Active": {
+                "$ref": "#/components/headers/X-Concurrent-Threads-Active"
+              }
             }
           },
           "400": {
@@ -773,6 +784,17 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              },
+              "X-Concurrent-Threads": {
+                "$ref": "#/components/headers/X-Concurrent-Threads"
+              },
+              "X-Concurrent-Threads-Active": {
+                "$ref": "#/components/headers/X-Concurrent-Threads-Active"
+              }
             }
           },
           "408": {
@@ -794,6 +816,17 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              },
+              "X-Concurrent-Threads": {
+                "$ref": "#/components/headers/X-Concurrent-Threads"
+              },
+              "X-Concurrent-Threads-Active": {
+                "$ref": "#/components/headers/X-Concurrent-Threads-Active"
               }
             }
           }
@@ -1132,6 +1165,26 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "X-Concurrent-Threads": {
+        "description": "Specifies the maximum number of concurrent requests allowed.",
+        "schema": {
+          "type": "integer"
+        }
+      },
+      "X-Concurrent-Threads-Active": {
+        "description": "Indicates the number of active concurrent requests being processed.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

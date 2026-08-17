@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/extract-pages": {
       "post": {
-        "tags": [
-          "PDF Operations APIs"
-        ],
+        "tags": ["PDF Operations APIs"],
         "summary": "Extract pages from a PDF",
         "description": "This API extracts specific pages or page ranges from a PDF file and returns them as a new PDF.",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -73,7 +68,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Specifies which pages to extract from the PDF. You can provide individual page numbers (e.g., '2') and/or page ranges in any order, including descending (e.g., '9-5', '16-last'). Use commas to separate entries and hyphens for ranges. You may alternatively pass only one of the special keywords: 'even' (extracts all even-numbered pages), 'odd' (extracts all odd-numbered pages), 'last' (extracts only the last page), or 'all' (extracts all pages into individual files). Examples: '2,6-3', 'even', 'all'. Mixing special keywords with specific pages/ranges is not allowed. Malformed values or page numbers exceeding the document's page count are not rejected on this call \u2014 the resulting task fails asynchronously (check task status)."
+            "description": "Specifies which pages to extract from the PDF. You can provide individual page numbers (e.g., '2') and/or page ranges in any order, including descending (e.g., '9-5', '16-last'). Use commas to separate entries and hyphens for ranges. You may alternatively pass only one of the special keywords: 'even' (extracts all even-numbered pages), 'odd' (extracts all odd-numbered pages), 'last' (extracts only the last page), or 'all' (extracts all pages into individual files). Examples: '2,6-3', 'even', 'all'. Mixing special keywords with specific pages/ranges is not allowed. Malformed values or page numbers exceeding the document's page count are not rejected on this call — the resulting task fails asynchronously (check task status)."
           },
           {
             "name": "separated",
@@ -100,7 +95,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -125,7 +120,7 @@
         },
         "responses": {
           "200": {
-            "description": "Extract task created successfully. Malformed or out-of-range page specifications are not rejected synchronously \u2014 the task is created, then fails asynchronously; poll the task status endpoint and check for status \"failed\" with an error/message pair.",
+            "description": "Extract task created successfully. Malformed or out-of-range page specifications are not rejected synchronously — the task is created, then fails asynchronously; poll the task status endpoint and check for status \"failed\" with an error/message pair.",
             "content": {
               "application/json": {
                 "schema": {
@@ -136,17 +131,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "dabcbcf5-d4ba-4143-bc34-3a8db6c8476e",
-                      "inputIds": [
-                        "01a77122-c457-475d-a6f2-f88cd4ad8924"
-                      ]
+                      "inputIds": ["01a77122-c457-475d-a6f2-f88cd4ad8924"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -175,10 +173,15 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "examples": {
@@ -196,6 +199,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -223,9 +231,7 @@
       "PDFResponse": {
         "type": "object",
         "description": "Response containing the task ID and input file IDs for a PDF processing task.",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -255,9 +261,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -280,6 +284,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }

@@ -19,9 +19,7 @@
   "paths": {
     "/pdf/compress": {
       "post": {
-        "tags": [
-          "PDF Operations APIs"
-        ],
+        "tags": ["PDF Operations APIs"],
         "summary": "Compress a PDF file",
         "description": "This API compresses a given PDF file to reduce its file serize.",
         "parameters": [
@@ -31,10 +29,7 @@
             "required": false,
             "schema": {
               "type": "string",
-              "enum": [
-                "json",
-                "xml"
-              ],
+              "enum": ["json", "xml"],
               "default": "json"
             },
             "description": "Specifies the desired format for the API response. Choose 'json' for a JSON object or 'xml' for an XML structure."
@@ -64,12 +59,7 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "low",
-                "balanced",
-                "high",
-                "extreme"
-              ],
+              "enum": ["low", "balanced", "high", "extreme"],
               "default": "balanced"
             },
             "description": "Controls how aggressively the PDF is compressed. Lower levels preserve more quality, while higher levels reduce file size more."
@@ -99,7 +89,7 @@
             "schema": {
               "type": "boolean"
             },
-            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization\u2019s admin if part of one."
+            "description": "If true, a notification will also be sent by email in case the webhook request fails all the retries.  The email notification will be sent to the requesting user or their organization’s admin if part of one."
           },
           {
             "name": "X-Webhook-Authorization",
@@ -135,17 +125,20 @@
                     "summary": "Task created",
                     "value": {
                       "taskId": "ce4b1a38-6cfc-4373-9bd7-ff186fbd8e7e",
-                      "inputIds": [
-                        "f2ba4b50-6f8a-43ae-b42d-96937f50cd89"
-                      ]
+                      "inputIds": ["f2ba4b50-6f8a-43ae-b42d-96937f50cd89"]
                     }
                   }
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "400": {
-            "description": "Bad Request \u2014 Missing/invalid parameters or file ID",
+            "description": "Bad Request — Missing/invalid parameters or file ID",
             "content": {
               "application/json": {
                 "examples": {
@@ -184,10 +177,15 @@
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              }
             }
           },
           "415": {
-            "description": "Unsupported Media Type \u2014 File type not supported",
+            "description": "Unsupported Media Type — File type not supported",
             "content": {
               "application/json": {
                 "examples": {
@@ -205,6 +203,11 @@
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
                 }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
               }
             }
           }
@@ -232,9 +235,7 @@
       "PdfTaskResponse": {
         "type": "object",
         "description": "Response containing the task ID and input file IDs for a PDF processing task.",
-        "required": [
-          "taskId"
-        ],
+        "required": ["taskId"],
         "properties": {
           "taskId": {
             "type": "string",
@@ -264,9 +265,7 @@
       "ErrorResponse": {
         "type": "object",
         "description": "Standard error envelope returned by the API on failed requests.",
-        "required": [
-          "message"
-        ],
+        "required": ["message"],
         "properties": {
           "error": {
             "type": "string",
@@ -289,6 +288,14 @@
             "format": "date-time",
             "description": "Timestamp when the error occurred (ISO 8601)."
           }
+        }
+      }
+    },
+    "headers": {
+      "X-AF-Credits-Cost": {
+        "description": "Specifies the number of credits consumed by the current request.",
+        "schema": {
+          "type": "integer"
         }
       }
     }
