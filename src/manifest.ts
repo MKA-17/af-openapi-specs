@@ -37,54 +37,54 @@ import _s32 from "../specs/financial/vat-rates-country.json" with { type: "json"
 import _s33 from "../specs/general/usage-credits.json" with { type: "json" };
 import _s34 from "../specs/geocoding/forward-geocoding.json" with { type: "json" };
 import _s35 from "../specs/geocoding/reverse-geocoding.json" with { type: "json" };
-import _s36 from "../specs/geodb/administrative-units-details.json" with { type: "json" };
-import _s37 from "../specs/geodb/administrative-units-levels.json" with { type: "json" };
-import _s38 from "../specs/geodb/administrative-units.json" with { type: "json" };
-import _s39 from "../specs/geodb/cities.json" with { type: "json" };
-import _s40 from "../specs/geodb/countries-details.json" with { type: "json" };
-import _s41 from "../specs/geodb/countries.json" with { type: "json" };
-import _s42 from "../specs/geodb/flags-supported.json" with { type: "json" };
-import _s43 from "../specs/geodb/flags.json" with { type: "json" };
-import _s44 from "../specs/geodb/regions.json" with { type: "json" };
-import _s45 from "../specs/geodb/subregions.json" with { type: "json" };
+import _s36 from "../specs/geography/administrative-units-details.json" with { type: "json" };
+import _s37 from "../specs/geography/administrative-units-levels.json" with { type: "json" };
+import _s38 from "../specs/geography/administrative-units.json" with { type: "json" };
+import _s39 from "../specs/geography/cities.json" with { type: "json" };
+import _s40 from "../specs/geography/countries-details.json" with { type: "json" };
+import _s41 from "../specs/geography/countries.json" with { type: "json" };
+import _s42 from "../specs/geography/flags-supported.json" with { type: "json" };
+import _s43 from "../specs/geography/flags.json" with { type: "json" };
+import _s44 from "../specs/geography/regions.json" with { type: "json" };
+import _s45 from "../specs/geography/subregions.json" with { type: "json" };
 import _s46 from "../specs/ip-intelligence/bulk-ip-lookup.json" with { type: "json" };
 import _s47 from "../specs/ip-intelligence/bulk-ip-threat-intelligence.json" with { type: "json" };
 import _s48 from "../specs/ip-intelligence/ip-locator.json" with { type: "json" };
 import _s49 from "../specs/ip-intelligence/ip-threat-intelligence.json" with { type: "json" };
-import _s50 from "../specs/other/astronomy-data.json" with { type: "json" };
-import _s51 from "../specs/pdf/bulk-pdf-generator.json" with { type: "json" };
-import _s52 from "../specs/pdf/delete-pdf-page.json" with { type: "json" };
-import _s53 from "../specs/pdf/linearize-pdf.json" with { type: "json" };
-import _s54 from "../specs/pdf/merge-pdf.json" with { type: "json" };
-import _s55 from "../specs/pdf/pdf-compress.json" with { type: "json" };
-import _s56 from "../specs/pdf/pdf-decrypt.json" with { type: "json" };
-import _s57 from "../specs/pdf/pdf-encrypt.json" with { type: "json" };
-import _s58 from "../specs/pdf/pdf-extract-pages.json" with { type: "json" };
-import _s59 from "../specs/pdf/pdf-file-status.json" with { type: "json" };
-import _s60 from "../specs/pdf/pdf-file.json" with { type: "json" };
-import _s61 from "../specs/pdf/pdf-files.json" with { type: "json" };
-import _s62 from "../specs/pdf/pdf-generator.json" with { type: "json" };
-import _s63 from "../specs/pdf/pdf-resource-download.json" with { type: "json" };
-import _s64 from "../specs/pdf/pdf-resource-upload-binary.json" with { type: "json" };
-import _s65 from "../specs/pdf/pdf-resource-upload.json" with { type: "json" };
-import _s66 from "../specs/pdf/pdf-restrict.json" with { type: "json" };
-import _s67 from "../specs/pdf/pdf-split-pages.json" with { type: "json" };
-import _s68 from "../specs/pdf/pdf-task-status.json" with { type: "json" };
-import _s69 from "../specs/pdf/pdf-to-image.json" with { type: "json" };
-import _s70 from "../specs/pdf/pdf-unrestrict.json" with { type: "json" };
-import _s71 from "../specs/pdf/rotate-pdf-pages.json" with { type: "json" };
-import _s72 from "../specs/phone-validation/bulk-phone-number-validation.json" with { type: "json" };
-import _s73 from "../specs/phone-validation/phone-number-validation.json" with { type: "json" };
-import _s74 from "../specs/scraper/web-scraper.json" with { type: "json" };
-import _s75 from "../specs/screenshot/bulk-screenshot.json" with { type: "json" };
-import _s76 from "../specs/screenshot/website-screenshot.json" with { type: "json" };
-import _s77 from "../specs/ssl/ssl-certificate-chain-lookup.json" with { type: "json" };
-import _s78 from "../specs/ssl/ssl-certificate-lookup.json" with { type: "json" };
-import _s79 from "../specs/timezone/timezone-converter.json" with { type: "json" };
-import _s80 from "../specs/timezone/timezone-lookup.json" with { type: "json" };
-import _s81 from "../specs/user-agent/bulk-user-agent-parser.json" with { type: "json" };
-import _s82 from "../specs/user-agent/user-agent-parser.json" with { type: "json" };
-import _s83 from "../specs/weather/air-quality.json" with { type: "json" };
+import _s50 from "../specs/pdf/bulk-pdf-generator.json" with { type: "json" };
+import _s51 from "../specs/pdf/delete-pdf-page.json" with { type: "json" };
+import _s52 from "../specs/pdf/linearize-pdf.json" with { type: "json" };
+import _s53 from "../specs/pdf/merge-pdf.json" with { type: "json" };
+import _s54 from "../specs/pdf/pdf-compress.json" with { type: "json" };
+import _s55 from "../specs/pdf/pdf-decrypt.json" with { type: "json" };
+import _s56 from "../specs/pdf/pdf-encrypt.json" with { type: "json" };
+import _s57 from "../specs/pdf/pdf-extract-pages.json" with { type: "json" };
+import _s58 from "../specs/pdf/pdf-file-status.json" with { type: "json" };
+import _s59 from "../specs/pdf/pdf-file.json" with { type: "json" };
+import _s60 from "../specs/pdf/pdf-files.json" with { type: "json" };
+import _s61 from "../specs/pdf/pdf-generator.json" with { type: "json" };
+import _s62 from "../specs/pdf/pdf-resource-download.json" with { type: "json" };
+import _s63 from "../specs/pdf/pdf-resource-upload-binary.json" with { type: "json" };
+import _s64 from "../specs/pdf/pdf-resource-upload.json" with { type: "json" };
+import _s65 from "../specs/pdf/pdf-restrict.json" with { type: "json" };
+import _s66 from "../specs/pdf/pdf-split-pages.json" with { type: "json" };
+import _s67 from "../specs/pdf/pdf-task-status.json" with { type: "json" };
+import _s68 from "../specs/pdf/pdf-to-image.json" with { type: "json" };
+import _s69 from "../specs/pdf/pdf-unrestrict.json" with { type: "json" };
+import _s70 from "../specs/pdf/rotate-pdf-pages.json" with { type: "json" };
+import _s71 from "../specs/phone-validation/bulk-phone-number-validation.json" with { type: "json" };
+import _s72 from "../specs/phone-validation/phone-number-validation.json" with { type: "json" };
+import _s73 from "../specs/scraper/web-scraper.json" with { type: "json" };
+import _s74 from "../specs/screenshot/bulk-screenshot.json" with { type: "json" };
+import _s75 from "../specs/screenshot/website-screenshot.json" with { type: "json" };
+import _s76 from "../specs/ssl/ssl-certificate-chain-lookup.json" with { type: "json" };
+import _s77 from "../specs/ssl/ssl-certificate-lookup.json" with { type: "json" };
+import _s78 from "../specs/timezone/timezone-converter.json" with { type: "json" };
+import _s79 from "../specs/timezone/timezone-lookup.json" with { type: "json" };
+import _s80 from "../specs/user-agent/bulk-user-agent-parser.json" with { type: "json" };
+import _s81 from "../specs/user-agent/user-agent-parser.json" with { type: "json" };
+import _s82 from "../specs/weather/air-quality.json" with { type: "json" };
+import _s83 from "../specs/weather/astronomy-data.json" with { type: "json" };
 import _s84 from "../specs/weather/bulk-live-weather.json" with { type: "json" };
 import _s85 from "../specs/weather/flood-forecast.json" with { type: "json" };
 import _s86 from "../specs/weather/historical-weather.json" with { type: "json" };
@@ -157,40 +157,40 @@ export const SPECS: Record<string, OpenAPISpec> = {
   "bulk-ip-threat-intelligence": _s47 as OpenAPISpec,
   "ip-locator": _s48 as OpenAPISpec,
   "ip-threat-intelligence": _s49 as OpenAPISpec,
-  "astronomy-data": _s50 as OpenAPISpec,
-  "bulk-pdf-generator": _s51 as OpenAPISpec,
-  "delete-pdf-page": _s52 as OpenAPISpec,
-  "linearize-pdf": _s53 as OpenAPISpec,
-  "merge-pdf": _s54 as OpenAPISpec,
-  "pdf-compress": _s55 as OpenAPISpec,
-  "pdf-decrypt": _s56 as OpenAPISpec,
-  "pdf-encrypt": _s57 as OpenAPISpec,
-  "pdf-extract-pages": _s58 as OpenAPISpec,
-  "pdf-file-status": _s59 as OpenAPISpec,
-  "pdf-file": _s60 as OpenAPISpec,
-  "pdf-files": _s61 as OpenAPISpec,
-  "pdf-generator": _s62 as OpenAPISpec,
-  "pdf-resource-download": _s63 as OpenAPISpec,
-  "pdf-resource-upload-binary": _s64 as OpenAPISpec,
-  "pdf-resource-upload": _s65 as OpenAPISpec,
-  "pdf-restrict": _s66 as OpenAPISpec,
-  "pdf-split-pages": _s67 as OpenAPISpec,
-  "pdf-task-status": _s68 as OpenAPISpec,
-  "pdf-to-image": _s69 as OpenAPISpec,
-  "pdf-unrestrict": _s70 as OpenAPISpec,
-  "rotate-pdf-pages": _s71 as OpenAPISpec,
-  "bulk-phone-number-validation": _s72 as OpenAPISpec,
-  "phone-number-validation": _s73 as OpenAPISpec,
-  "web-scraper": _s74 as OpenAPISpec,
-  "bulk-screenshot": _s75 as OpenAPISpec,
-  "website-screenshot": _s76 as OpenAPISpec,
-  "ssl-certificate-chain-lookup": _s77 as OpenAPISpec,
-  "ssl-certificate-lookup": _s78 as OpenAPISpec,
-  "timezone-converter": _s79 as OpenAPISpec,
-  "timezone-lookup": _s80 as OpenAPISpec,
-  "bulk-user-agent-parser": _s81 as OpenAPISpec,
-  "user-agent-parser": _s82 as OpenAPISpec,
-  "air-quality": _s83 as OpenAPISpec,
+  "bulk-pdf-generator": _s50 as OpenAPISpec,
+  "delete-pdf-page": _s51 as OpenAPISpec,
+  "linearize-pdf": _s52 as OpenAPISpec,
+  "merge-pdf": _s53 as OpenAPISpec,
+  "pdf-compress": _s54 as OpenAPISpec,
+  "pdf-decrypt": _s55 as OpenAPISpec,
+  "pdf-encrypt": _s56 as OpenAPISpec,
+  "pdf-extract-pages": _s57 as OpenAPISpec,
+  "pdf-file-status": _s58 as OpenAPISpec,
+  "pdf-file": _s59 as OpenAPISpec,
+  "pdf-files": _s60 as OpenAPISpec,
+  "pdf-generator": _s61 as OpenAPISpec,
+  "pdf-resource-download": _s62 as OpenAPISpec,
+  "pdf-resource-upload-binary": _s63 as OpenAPISpec,
+  "pdf-resource-upload": _s64 as OpenAPISpec,
+  "pdf-restrict": _s65 as OpenAPISpec,
+  "pdf-split-pages": _s66 as OpenAPISpec,
+  "pdf-task-status": _s67 as OpenAPISpec,
+  "pdf-to-image": _s68 as OpenAPISpec,
+  "pdf-unrestrict": _s69 as OpenAPISpec,
+  "rotate-pdf-pages": _s70 as OpenAPISpec,
+  "bulk-phone-number-validation": _s71 as OpenAPISpec,
+  "phone-number-validation": _s72 as OpenAPISpec,
+  "web-scraper": _s73 as OpenAPISpec,
+  "bulk-screenshot": _s74 as OpenAPISpec,
+  "website-screenshot": _s75 as OpenAPISpec,
+  "ssl-certificate-chain-lookup": _s76 as OpenAPISpec,
+  "ssl-certificate-lookup": _s77 as OpenAPISpec,
+  "timezone-converter": _s78 as OpenAPISpec,
+  "timezone-lookup": _s79 as OpenAPISpec,
+  "bulk-user-agent-parser": _s80 as OpenAPISpec,
+  "user-agent-parser": _s81 as OpenAPISpec,
+  "air-quality": _s82 as OpenAPISpec,
+  "astronomy-data": _s83 as OpenAPISpec,
   "bulk-live-weather": _s84 as OpenAPISpec,
   "flood-forecast": _s85 as OpenAPISpec,
   "historical-weather": _s86 as OpenAPISpec,
@@ -264,7 +264,6 @@ export const SPEC_SLUGS: string[] = [
   "bulk-ip-threat-intelligence",
   "ip-locator",
   "ip-threat-intelligence",
-  "astronomy-data",
   "bulk-pdf-generator",
   "delete-pdf-page",
   "linearize-pdf",
@@ -298,6 +297,7 @@ export const SPEC_SLUGS: string[] = [
   "bulk-user-agent-parser",
   "user-agent-parser",
   "air-quality",
+  "astronomy-data",
   "bulk-live-weather",
   "flood-forecast",
   "historical-weather",
@@ -329,9 +329,8 @@ export const SPEC_CATEGORIES: string[] = [
   "financial",
   "general",
   "geocoding",
-  "geodb",
+  "geography",
   "ip-intelligence",
-  "other",
   "pdf",
   "phone-validation",
   "scraper",
@@ -389,7 +388,7 @@ export const SPECS_BY_CATEGORY: Record<string, string[]> = {
   ],
   general: ["usage-credits"],
   geocoding: ["forward-geocoding", "reverse-geocoding"],
-  geodb: [
+  geography: [
     "administrative-units-details",
     "administrative-units-levels",
     "administrative-units",
@@ -407,7 +406,6 @@ export const SPECS_BY_CATEGORY: Record<string, string[]> = {
     "ip-locator",
     "ip-threat-intelligence",
   ],
-  other: ["astronomy-data"],
   pdf: [
     "bulk-pdf-generator",
     "delete-pdf-page",
@@ -442,6 +440,7 @@ export const SPECS_BY_CATEGORY: Record<string, string[]> = {
   "user-agent": ["bulk-user-agent-parser", "user-agent-parser"],
   weather: [
     "air-quality",
+    "astronomy-data",
     "bulk-live-weather",
     "flood-forecast",
     "historical-weather",
@@ -595,9 +594,8 @@ export const SpecCategory = {
   FINANCIAL: "financial",
   GENERAL: "general",
   GEOCODING: "geocoding",
-  GEODB: "geodb",
+  GEOGRAPHY: "geography",
   IP_INTELLIGENCE: "ip-intelligence",
-  OTHER: "other",
   PDF: "pdf",
   PHONE_VALIDATION: "phone-validation",
   SCRAPER: "scraper",
