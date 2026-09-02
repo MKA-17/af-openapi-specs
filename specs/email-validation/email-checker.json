@@ -73,7 +73,7 @@
                         "fullMailBox": false
                       },
                       "dns": {
-                        "mxRecords": [
+                        "mxRecord": [
                           "gmail-smtp-in.l.google.com.",
                           "alt1.gmail-smtp-in.l.google.com.",
                           "alt2.gmail-smtp-in.l.google.com.",
@@ -137,7 +137,7 @@
                         "fullMailBox": false
                       },
                       "dns": {
-                        "mxRecords": [
+                        "mxRecord": [
                           "gmail-smtp-in.l.google.com.",
                           "alt1.gmail-smtp-in.l.google.com.",
                           "alt2.gmail-smtp-in.l.google.com.",
@@ -178,6 +178,30 @@
                         }
                       }
                     }
+                  },
+                  "appServerBlocked": {
+                    "summary": "Valid syntax, but the recipient mail server blocked the verification attempt",
+                    "value": {
+                      "success": true,
+                      "email": "randomuser98765zzz@gmx.com",
+                      "validEmail": "app_server_blocked",
+                      "validSyntax": true,
+                      "reason": "We are unable to determine the validity of email at the moment. Please try later.",
+                      "domain": {
+                        "name": "gmx.com",
+                        "disposable": false,
+                        "spam": false,
+                        "free": true,
+                        "validDomain": true,
+                        "catchAll": false
+                      },
+                      "account": {
+                        "role": false
+                      },
+                      "dns": {
+                        "mxRecord": ["mx00.gmx.net."]
+                      }
+                    }
                   }
                 }
               }
@@ -205,10 +229,10 @@
                   "missingEmail": {
                     "summary": "email field missing from request body",
                     "value": {
-                      "timestamp": "2026-07-27T12:51:23.593986185Z",
-                      "path": "/v2.0/email-validation/single",
+                      "timestamp": "2026-09-02T11:56:23.462Z",
+                      "path": "/v2/email-validation/single",
                       "status": 400,
-                      "error": "External API Error",
+                      "error": "Missing or Invalid Parameters",
                       "message": "Please pass valid value for 'email' in body."
                     }
                   }
@@ -242,6 +266,38 @@
                       "status": 408,
                       "error": "Request Timeout",
                       "message": "Timed out while connecting to the remote URL."
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-AF-Credits-Cost": {
+                "$ref": "#/components/headers/X-AF-Credits-Cost"
+              },
+              "X-Concurrent-Threads": {
+                "$ref": "#/components/headers/X-Concurrent-Threads"
+              },
+              "X-Concurrent-Threads-Active": {
+                "$ref": "#/components/headers/X-Concurrent-Threads-Active"
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found – The requested resource could not be found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                },
+                "examples": {
+                  "Resource Not Found": {
+                    "value": {
+                      "timestamp": "2026-09-02T11:56:23.937Z",
+                      "path": "/v1.0/email-validation/singlex",
+                      "status": 404,
+                      "error": "Resource Not Found",
+                      "message": "The requested resource could not be found. Please verify the URL and try again."
                     }
                   }
                 }
@@ -335,8 +391,8 @@
           },
           "validEmail": {
             "type": "string",
-            "enum": ["valid", "invalid", "INVALID_EMAIL", "unknown", "risky"],
-            "description": "Comprehensive deliverability assessment. Casing is inconsistent in the live API: syntactically invalid addresses return INVALID_EMAIL, while semantically invalid (undeliverable) addresses return lowercase invalid. unknown/risky are documented possibilities not observed during testing."
+            "enum": ["valid", "invalid", "INVALID_EMAIL", "unknown", "risky", "app_server_blocked"],
+            "description": "Comprehensive deliverability assessment. Casing is inconsistent in the live API: syntactically invalid addresses return INVALID_EMAIL, while semantically invalid (undeliverable) addresses return lowercase invalid. risky is a documented possibility not observed during testing. app_server_blocked is returned when the recipient mail server blocked the live verification attempt (reason explains that retrying later may succeed)."
           },
           "validSyntax": {
             "type": "boolean",
@@ -410,16 +466,16 @@
       },
       "DnsObject": {
         "type": "object",
-        "required": ["mxRecords"],
+        "required": ["mxRecord"],
         "properties": {
-          "mxRecords": {
+          "mxRecord": {
             "type": "array",
             "items": {
               "type": "string"
             },
             "description": "Collection of MX (Mail Exchange) hostname records from DNS queries."
           },
-          "aRecords": {
+          "aRecord": {
             "type": "array",
             "items": {
               "type": "string"
