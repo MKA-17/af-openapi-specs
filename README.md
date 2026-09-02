@@ -72,13 +72,13 @@ import type { OpenAPISpec } from "@apifreaks/openapi-specs";
 
 | Category           | Count | Description                                             |
 | ------------------ | ----- | ------------------------------------------------------- |
+| `billing`          | 1     | Usage and credits                                       |
 | `commodity`        | 5     | Commodity prices, symbols, time series                  |
 | `currency`         | 10    | Exchange rates, conversion, historical data             |
 | `dns`              | 4     | DNS lookup, reverse DNS, history                        |
 | `domain`           | 4     | Domain search, checker, subdomain lookup                |
 | `email-validation` | 2     | Email verification and bulk validation                  |
 | `financial`        | 8     | VAT rates, IBAN/SWIFT validation                        |
-| `general`          | 1     | Usage and credits                                       |
 | `geocoding`        | 2     | Forward and reverse geocoding                           |
 | `geography`        | 10    | Countries, cities, regions, flags, administrative units |
 | `ip-intelligence`  | 4     | IP geolocation, threat intelligence, bulk lookup        |
